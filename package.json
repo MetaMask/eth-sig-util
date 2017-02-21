@@ -1,0 +1,26 @@
+{
+  "name": "eth-sig-util",
+  "version": "1.0.0",
+  "description": "A few useful functions for signing ethereum data",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/flyswatter/eth-sig-util.git"
+  },
+  "keywords": [
+    "ethereum",
+    "signature"
+  ],
+  "author": "Dan Finlay",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/flyswatter/eth-sig-util/issues"
+  },
+  "homepage": "https://github.com/flyswatter/eth-sig-util#readme",
+  "dependencies": {
+    "ethereumjs-util": "^5.1.1"
+  }
+}
