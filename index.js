@@ -17,6 +17,26 @@ module.exports = {
     return ethUtil.addHexPrefix(address.toLowerCase())
   },
 
+  personalSign: function (privateKey, msgParams) {
+    var message = ethUtil.toBuffer(msgParams.data)
+    var msgHash = ethUtil.hashPersonalMessage(message)
+    var sig = ethUtil.ecsign(msgHash, privateKey)
+    var serialized = ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
+    return serialized
+  },
+
+  recoverPersonalSignature: function (msgParams) {
+    let senderHex
+    const message = ethUtil.toBuffer(msgParams.data)
+    const msgHash = ethUtil.hashPersonalMessage(message)
+    const signature = ethUtil.toBuffer(msgParams.sig)
+    const sigParams = ethUtil.fromRpcSig(signature)
+    const publicKey = ethUtil.ecrecover(msgHash, sigParams.v, sigParams.r, sigParams.s)
+    const sender = ethUtil.publicToAddress(publicKey)
+    senderHex = ethUtil.bufferToHex(sender)
+    return senderHex
+  },
+
 }
 
 function padWithZeroes (number, length) {
