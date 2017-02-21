@@ -1,4 +1,4 @@
-# Eth-Sig-Util
+# Eth-Sig-Util [![CircleCI](https://circleci.com/gh/flyswatter/eth-sig-util.svg?style=svg)](https://circleci.com/gh/flyswatter/eth-sig-util)
 
 A small collection of ethereum signing functions.
 
