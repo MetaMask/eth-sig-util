@@ -19,6 +19,7 @@ test('normalize address adds hex prefix', function (t) {
 test('personalSign and recover', function (t) {
   t.plan(1)
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
+  console.log('for address ' + address)
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
   const privKey = new Buffer(privKeyHex, 'hex')
   const message = 'Hello, world!'
@@ -30,6 +31,26 @@ test('personalSign and recover', function (t) {
 
   t.equal(recovered, address)
 })
+
+
+
+test('personalSign and extractPublicKey', function (t) {
+  t.plan(1)
+  const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
+  const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
+  const pubKeyHex = '0x9e9e45b2ec5f070b4e26f57c7fedf647afa7a03e894789816fbd12fedc5acd79d0dfeea925688e177caccb8f5e09f0c289bbcfc7adb98d76f5f8c5259478903a'
+
+  const privKey = new Buffer(privKeyHex, 'hex')
+  const message = 'Hello, world!'
+  const msgParams = { data: message }
+
+  const signed = sigUtil.personalSign(privKey, msgParams)
+  msgParams.sig = signed
+  const publicKey = sigUtil.extractPublicKey(msgParams)
+
+  t.equal(publicKey, pubKeyHex)
+})
+
 
 signatureTest({
   testLabel: 'geth kumavis manual I',

@@ -26,18 +26,29 @@ module.exports = {
   },
 
   recoverPersonalSignature: function (msgParams) {
-    let senderHex
-    const message = ethUtil.toBuffer(msgParams.data)
-    const msgHash = ethUtil.hashPersonalMessage(message)
-    const signature = ethUtil.toBuffer(msgParams.sig)
-    const sigParams = ethUtil.fromRpcSig(signature)
-    const publicKey = ethUtil.ecrecover(msgHash, sigParams.v, sigParams.r, sigParams.s)
+    const publicKey = getPublicKeyFor(msgParams)
     const sender = ethUtil.publicToAddress(publicKey)
     senderHex = ethUtil.bufferToHex(sender)
     return senderHex
   },
 
+  extractPublicKey: function (msgParams) {
+    const publicKey = getPublicKeyFor(msgParams)
+    return '0x' + publicKey.toString('hex')
+  },
+
 }
+
+function getPublicKeyFor (msgParams) {
+  let senderHex
+  const message = ethUtil.toBuffer(msgParams.data)
+  const msgHash = ethUtil.hashPersonalMessage(message)
+  const signature = ethUtil.toBuffer(msgParams.sig)
+  const sigParams = ethUtil.fromRpcSig(signature)
+  const publicKey = ethUtil.ecrecover(msgHash, sigParams.v, sigParams.r, sigParams.s)
+  return publicKey
+}
+
 
 function padWithZeroes (number, length) {
   var myString = '' + number

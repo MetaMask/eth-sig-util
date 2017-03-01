@@ -26,3 +26,9 @@ msgParams should have a `data` key that is hex-encoded data unsigned, and a `sig
 
 Returns a hex-encoded sender address.
 
+### extractPublicKey (msgParams)
+
+msgParams should have a `data` key that is hex-encoded data unsigned, and a `sig` key that is hex-encoded and already signed.
+
+Returns a hex-encoded public key.
+
