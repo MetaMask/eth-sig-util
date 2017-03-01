@@ -2,6 +2,14 @@
 
 A small collection of ethereum signing functions.
 
+[Available on NPM](https://www.npmjs.com/package/eth-sig-util)
+
+## Installation
+
+```
+npm install eth-sig-util --save
+```
+
 ## Methods
 
 ### concatSig(v, r, s)
