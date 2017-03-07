@@ -32,8 +32,6 @@ test('personalSign and recover', function (t) {
   t.equal(recovered, address)
 })
 
-
-
 test('personalSign and extractPublicKey', function (t) {
   t.plan(1)
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
@@ -51,10 +49,12 @@ test('personalSign and extractPublicKey', function (t) {
   t.equal(publicKey, pubKeyHex)
 })
 
+// personal_sign was declared without an explicit set of test data
+// so I made a script out of geth's internals to create this test data
+// https://gist.github.com/kumavis/461d2c0e9a04ea0818e423bb77e3d260
 
 signatureTest({
-  testLabel: 'geth kumavis manual I',
-  method: 'personal_sign',
+  testLabel: 'personalSign - kumavis fml manual test I',
   // "hello world"
   message: '0x68656c6c6f20776f726c64',
   signature: '0xce909e8ea6851bc36c007a0072d0524b07a3ff8d4e623aca4c71ca8e57250c4d0a3fc38fa8fbaaa81ead4b9f6bd03356b6f8bf18bccad167d78891636e1d69561b',
@@ -63,14 +63,23 @@ signatureTest({
 })
 
 signatureTest({
-  testLabel: 'geth kumavis manual II',
-  method: 'personal_sign',
-  // message from parity's test - note result is different than what they are testing against
-  // https://github.com/ethcore/parity/blob/5369a129ae276d38f3490abb18c5093b338246e0/rpc/src/v1/tests/mocked/eth.rs#L301-L317
+  testLabel: 'personalSign - kumavis fml manual test II',
+  // some random binary message from parity's test
   message: '0x0cc175b9c0f1b6a831c399e26977266192eb5ffee6ae2fec3ad71c777531578f',
   signature: '0x9ff8350cc7354b80740a3580d0e0fd4f1f02062040bc06b893d70906f8728bb5163837fd376bf77ce03b55e9bd092b32af60e86abce48f7b8d3539988ee5a9be1c',
   addressHex: '0xbe93f9bacbcffc8ee6663f2647917ed7a20a57bb',
   privateKey: new Buffer('6969696969696969696969696969696969696969696969696969696969696969', 'hex'),
+})
+
+signatureTest({
+  testLabel: 'personalSign - kumavis fml manual test III',
+  // random binary message data and pk from parity's test
+  // https://github.com/ethcore/parity/blob/5369a129ae276d38f3490abb18c5093b338246e0/rpc/src/v1/tests/mocked/eth.rs#L301-L317
+  // note: their signature result is incorrect (last byte moved to front) due to a parity bug
+  message: '0x0cc175b9c0f1b6a831c399e26977266192eb5ffee6ae2fec3ad71c777531578f',
+  signature: '0xa2870db1d0c26ef93c7b72d2a0830fa6b841e0593f7186bc6c7cc317af8cf3a42fda03bd589a49949aa05db83300cdb553116274518dbe9d90c65d0213f4af491b',
+  addressHex: '0xe0da1edcea030875cd0f199d96eb70f6ab78faf2',
+  privateKey: new Buffer('4545454545454545454545454545454545454545454545454545454545454545', 'hex'),
 })
 
 function signatureTest(opts) {
