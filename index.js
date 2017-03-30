@@ -40,7 +40,6 @@ module.exports = {
 }
 
 function getPublicKeyFor (msgParams) {
-  let senderHex
   const message = ethUtil.toBuffer(msgParams.data)
   const msgHash = ethUtil.hashPersonalMessage(message)
   const signature = ethUtil.toBuffer(msgParams.sig)
