@@ -16,6 +16,24 @@ test('normalize address adds hex prefix', function (t) {
   t.equal(result, '0x' + initial.toLowerCase())
 })
 
+test('normalize an integer converts to byte-pair hex', function (t) {
+  t.plan(1)
+  const initial = 1
+  const result = sigUtil.normalize(initial)
+  t.equal(result, '0x01')
+})
+
+test('normalize an unsupported type throws', function (t) {
+  t.plan(1)
+  const initial = {}
+  try {
+    const result = sigUtil.normalize(initial)
+    t.ok(false, 'did not throw')
+  } catch (e) {
+    t.ok(e, 'should throw')
+  }
+})
+
 test('personalSign and recover', function (t) {
   t.plan(1)
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
