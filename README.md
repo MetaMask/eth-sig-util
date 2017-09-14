@@ -2,7 +2,16 @@
 
 A small collection of ethereum signing functions.
 
+You can find usage examples [here](https://github.com/flyswatter/js-eth-personal-sign-examples) 
+
 [Available on NPM](https://www.npmjs.com/package/eth-sig-util)
+
+## Supported Signing Methods
+
+Currently there is only one supported signing protocol. More will be added as standardized. 
+
+- Personal Sign (`personal_sign`) [geth thread](https://github.com/ethereum/go-ethereum/pull/2940)
+
 
 ## Installation
 
