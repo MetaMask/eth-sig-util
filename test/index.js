@@ -67,6 +67,57 @@ test('personalSign and extractPublicKey', function (t) {
   t.equal(publicKey, pubKeyHex)
 })
 
+test('signTypedData and ecrecoverTypedData - single message', function (t) {
+  t.plan(1)
+  const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
+  const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
+
+  const privKey = Buffer.from(privKeyHex, 'hex')
+
+  const typedData = [
+    {
+      type: 'string',
+      name: 'message',
+      value: 'Hi, Alice!'
+    }
+  ]
+
+  const msgParams = { data: typedData }
+
+  const signature = sigUtil.signTypedData(privKey, msgParams)
+  const recovered = sigUtil.ecrecoverTypedData({ data: msgParams.data, sig: signature })
+
+  t.equal(address, recovered)
+})
+
+test('signTypedData and ecrecoverTypedData - multiple messages', function (t) {
+  t.plan(1)
+  const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
+  const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
+
+  const privKey = Buffer.from(privKeyHex, 'hex')
+
+  const typedData = [
+    {
+      type: 'string',
+      name: 'message',
+      value: 'Hi, Alice!'
+    },
+    {
+      type: 'uint8',
+      name: 'value',
+      value: 10
+    },
+  ]
+
+  const msgParams = { data: typedData }
+
+  const signature = sigUtil.signTypedData(privKey, msgParams)
+  const recovered = sigUtil.ecrecoverTypedData({ data: msgParams.data, sig: signature })
+
+  t.equal(address, recovered)
+})
+
 // personal_sign was declared without an explicit set of test data
 // so I made a script out of geth's internals to create this test data
 // https://gist.github.com/kumavis/461d2c0e9a04ea0818e423bb77e3d260
