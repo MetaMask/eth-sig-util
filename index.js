@@ -56,7 +56,7 @@ module.exports = {
     return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
   },
 
-  ecrecoverTypedData: function (msgParams) {
+  recoverTypedSignature: function (msgParams) {
     const msgHash = typedSignatureHash(msgParams.data)
     const publicKey = recoverPublicKey(msgHash, msgParams.sig)
     const sender = ethUtil.publicToAddress(publicKey)
@@ -74,8 +74,8 @@ function typedSignatureHash(typedData) {
     ['bytes32', 'bytes32'],
     [
       ethAbi.soliditySHA3(new Array(typedData.length).fill('string'), schema),
-      ethAbi.soliditySHA3(types, data),
-    ],
+      ethAbi.soliditySHA3(types, data)
+    ]
   )
 }
 
