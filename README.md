@@ -43,6 +43,18 @@ msgParams should have a `data` key that is hex-encoded data unsigned, and a `sig
 
 Returns a hex-encoded sender address.
 
+### signTypedData (privateKeyBuffer, msgParams)
+
+Signs typed data as per [EIP712](https://github.com/ethereum/EIPs/pull/712).
+
+Data should be under `data` key of `msgParams`. The method returns prefixed signature.
+
+### recoverTypedSignature ({data, sig})
+
+Return address of a signer that did `signTypedData`.
+
+Expects the same data that were used for signing. `sig` is a prefixed signature.
+
 ### extractPublicKey (msgParams)
 
 msgParams should have a `data` key that is hex-encoded data unsigned, and a `sig` key that is hex-encoded and already signed.
