@@ -1,6 +1,5 @@
 const test = require('tape')
 const sigUtil = require('../')
-const ethUtil = require('ethereumjs-util')
 
 test('normalize address lower cases', function (t) {
   t.plan(1)
@@ -52,7 +51,6 @@ test('personalSign and recover', function (t) {
 
 test('personalSign and extractPublicKey', function (t) {
   t.plan(1)
-  const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
   const pubKeyHex = '0x9e9e45b2ec5f070b4e26f57c7fedf647afa7a03e894789816fbd12fedc5acd79d0dfeea925688e177caccb8f5e09f0c289bbcfc7adb98d76f5f8c5259478903a'
 
@@ -65,6 +63,57 @@ test('personalSign and extractPublicKey', function (t) {
   const publicKey = sigUtil.extractPublicKey(msgParams)
 
   t.equal(publicKey, pubKeyHex)
+})
+
+test('signTypedData and recoverTypedSignature - single message', function (t) {
+  t.plan(1)
+  const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
+  const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
+
+  const privKey = Buffer.from(privKeyHex, 'hex')
+
+  const typedData = [
+    {
+      type: 'string',
+      name: 'message',
+      value: 'Hi, Alice!'
+    }
+  ]
+
+  const msgParams = { data: typedData }
+
+  const signature = sigUtil.signTypedData(privKey, msgParams)
+  const recovered = sigUtil.recoverTypedSignature({ data: msgParams.data, sig: signature })
+
+  t.equal(address, recovered)
+})
+
+test('signTypedData and recoverTypedSignature - multiple messages', function (t) {
+  t.plan(1)
+  const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
+  const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
+
+  const privKey = Buffer.from(privKeyHex, 'hex')
+
+  const typedData = [
+    {
+      type: 'string',
+      name: 'message',
+      value: 'Hi, Alice!'
+    },
+    {
+      type: 'uint8',
+      name: 'value',
+      value: 10
+    },
+  ]
+
+  const msgParams = { data: typedData }
+
+  const signature = sigUtil.signTypedData(privKey, msgParams)
+  const recovered = sigUtil.recoverTypedSignature({ data: msgParams.data, sig: signature })
+
+  t.equal(address, recovered)
 })
 
 // personal_sign was declared without an explicit set of test data

@@ -1,4 +1,5 @@
 const ethUtil = require('ethereumjs-util')
+const ethAbi = require('ethereumjs-abi')
 
 module.exports = {
 
@@ -49,15 +50,45 @@ module.exports = {
     return '0x' + publicKey.toString('hex')
   },
 
+  signTypedData: function (privateKey, msgParams) {
+    const msgHash = typedSignatureHash(msgParams.data)
+    const sig = ethUtil.ecsign(msgHash, privateKey)
+    return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
+  },
+
+  recoverTypedSignature: function (msgParams) {
+    const msgHash = typedSignatureHash(msgParams.data)
+    const publicKey = recoverPublicKey(msgHash, msgParams.sig)
+    const sender = ethUtil.publicToAddress(publicKey)
+    return ethUtil.bufferToHex(sender)
+  }
+
+}
+
+function typedSignatureHash(typedData) {
+  const data = typedData.map(function (e) { return e.value })
+  const types = typedData.map(function (e) { return e.type })
+  const schema = typedData.map(function (e) { return `${e.type} ${e.name}` })
+
+  return ethAbi.soliditySHA3(
+    ['bytes32', 'bytes32'],
+    [
+      ethAbi.soliditySHA3(new Array(typedData.length).fill('string'), schema),
+      ethAbi.soliditySHA3(types, data)
+    ]
+  )
+}
+
+function recoverPublicKey(hash, sig) {
+  const signature = ethUtil.toBuffer(sig)
+  const sigParams = ethUtil.fromRpcSig(signature)
+  return ethUtil.ecrecover(hash, sigParams.v, sigParams.r, sigParams.s)
 }
 
 function getPublicKeyFor (msgParams) {
   const message = ethUtil.toBuffer(msgParams.data)
   const msgHash = ethUtil.hashPersonalMessage(message)
-  const signature = ethUtil.toBuffer(msgParams.sig)
-  const sigParams = ethUtil.fromRpcSig(signature)
-  const publicKey = ethUtil.ecrecover(msgHash, sigParams.v, sigParams.r, sigParams.s)
-  return publicKey
+  return recoverPublicKey(msgHash, msgParams.sig)
 }
 
 
