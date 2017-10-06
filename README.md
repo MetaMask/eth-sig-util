@@ -57,6 +57,10 @@ Return address of a signer that did `signTypedData`.
 
 Expects the same data that were used for signing. `sig` is a prefixed signature.
 
+### typedSignatureHash (typedData)
+
+Return hex-encoded hash of typed data params according to [EIP712](https://github.com/ethereum/EIPs/pull/712) schema.
+
 ### extractPublicKey (msgParams)
 
 msgParams should have a `data` key that is hex-encoded data unsigned, and a `sig` key that is hex-encoded and already signed.

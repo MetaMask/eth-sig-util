@@ -116,6 +116,83 @@ test('signTypedData and recoverTypedSignature - multiple messages', function (t)
   t.equal(address, recovered)
 })
 
+test('typedSignatureHash - single value', function (t) {
+  t.plan(1)
+  const typedData = [
+    {
+      type: 'string',
+      name: 'message',
+      value: 'Hi, Alice!'
+    }
+  ]
+  const hash = sigUtil.typedSignatureHash(typedData)
+  t.equal(hash, '0x14b9f24872e28cc49e72dc104d7380d8e0ba84a3fe2e712704bcac66a5702bd5')
+})
+
+test('typedSignatureHash - multiple values', function (t) {
+  t.plan(1)
+  const typedData = [
+    {
+      type: 'string',
+      name: 'message',
+      value: 'Hi, Alice!'
+    },
+    {
+      type: 'uint8',
+      name: 'value',
+      value: 10
+    },
+  ]
+  const hash = sigUtil.typedSignatureHash(typedData)
+  t.equal(hash, '0xf7ad23226db5c1c00ca0ca1468fd49c8f8bbc1489bc1c382de5adc557a69c229')
+})
+
+typedSignatureHashThrowsTest({
+    testLabel: 'empty array',
+    argument: []
+})
+
+typedSignatureHashThrowsTest({
+    testLabel: 'not array',
+    argument: 42
+})
+
+typedSignatureHashThrowsTest({
+    testLabel: 'null',
+    argument: null
+})
+
+typedSignatureHashThrowsTest({
+  testLabel: 'wrong type',
+  argument: [
+    {
+      type: 'jocker',
+      name: 'message',
+      value: 'Hi, Alice!'
+    }
+  ]
+})
+
+typedSignatureHashThrowsTest({
+  testLabel: 'no type',
+  argument: [
+    {
+      name: 'message',
+      value: 'Hi, Alice!'
+    }
+  ]
+})
+
+typedSignatureHashThrowsTest({
+  testLabel: 'no name',
+  argument: [
+    {
+      type: 'string',
+      value: 'Hi, Alice!'
+    }
+  ]
+})
+
 // personal_sign was declared without an explicit set of test data
 // so I made a script out of geth's internals to create this test data
 // https://gist.github.com/kumavis/461d2c0e9a04ea0818e423bb77e3d260
@@ -165,5 +242,18 @@ function signatureTest(opts) {
     const recovered = sigUtil.recoverPersonalSignature(msgParams)
 
     t.equal(recovered, address)
+  })
+}
+
+function typedSignatureHashThrowsTest(opts) {
+  const label = `typedSignatureHash - malformed arguments - ${opts.testLabel}`
+  test(label, function (t) {
+    t.plan(1)
+
+    const argument = opts.argument
+
+    t.throws(() => {
+      sigUtil.typedSignatureHash(argument)
+    })
   })
 }
