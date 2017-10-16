@@ -67,8 +67,8 @@ test('personalSign and extractPublicKey', function (t) {
 
 test('signTypedData and recoverTypedSignature - single message', function (t) {
   t.plan(1)
-  const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
-  const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
+  const address = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
+  const privKeyHex = 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d'
 
   const privKey = Buffer.from(privKeyHex, 'hex')
 
@@ -126,25 +126,30 @@ test('typedSignatureHash - single value', function (t) {
     }
   ]
   const hash = sigUtil.typedSignatureHash(typedData)
-  t.equal(hash, '0x14b9f24872e28cc49e72dc104d7380d8e0ba84a3fe2e712704bcac66a5702bd5')
+  t.equal(hash, '0xe18794748cc6d73634d578f6a83f752bee11a0c9853d76bd0111d67a9b555a2c')
 })
 
 test('typedSignatureHash - multiple values', function (t) {
   t.plan(1)
   const typedData = [
     {
-      type: 'string',
-      name: 'message',
-      value: 'Hi, Alice!'
+      value: 42,
+      type: 'uint',
+      name: 'value',
     },
     {
-      type: 'uint8',
-      name: 'value',
-      value: 10
+      value: 'Hi, Alice!',
+      type: 'string',
+      name: 'message',
+    },
+    {
+      value: false,
+      type: 'bool',
+      name: 'removed',
     },
   ]
   const hash = sigUtil.typedSignatureHash(typedData)
-  t.equal(hash, '0xf7ad23226db5c1c00ca0ca1468fd49c8f8bbc1489bc1c382de5adc557a69c229')
+  t.equal(hash, '0xdb7ef11800c80fd69e0d1ddeb08309aecc0deefc5db8e2bafe84655f5266f0eb')
 })
 
 typedSignatureHashThrowsTest({

@@ -83,15 +83,10 @@ function typedSignatureHash(typedData) {
   const schema = typedData.map(function (e) {
     if (!e.name) throw error
     return `${e.type} ${e.name}`
-  })
+  }).join(',')
+  const schemaHash = ethAbi.soliditySHA3(['string'], [schema])
 
-  return ethAbi.soliditySHA3(
-    ['bytes32', 'bytes32'],
-    [
-      ethAbi.soliditySHA3(new Array(typedData.length).fill('string'), schema),
-      ethAbi.soliditySHA3(types, data)
-    ]
-  )
+  return ethAbi.soliditySHA3(['bytes32'].concat(types), [schemaHash].concat(data))
 }
 
 function recoverPublicKey(hash, sig) {
