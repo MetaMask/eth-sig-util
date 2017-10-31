@@ -22,8 +22,8 @@ module.exports = {
     }
 
     if (typeof input !== 'string') {
-      let msg = 'eth-sig-util.normalize() requires hex string or integer input.'
-      msg += ` received ${typeof input}: ${input}`
+      var msg = 'eth-sig-util.normalize() requires hex string or integer input.'
+      msg += ' received ' + (typeof input) + ': ' + input
       throw new Error(msg)
     }
 
@@ -82,7 +82,7 @@ function typedSignatureHash(typedData) {
   const types = typedData.map(function (e) { return e.type })
   const schema = typedData.map(function (e) {
     if (!e.name) throw error
-    return `${e.type} ${e.name}`
+    return e.type + ' ' + e.name
   })
 
   return ethAbi.soliditySHA3(
