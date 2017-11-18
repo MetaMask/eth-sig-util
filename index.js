@@ -1,5 +1,7 @@
 const ethUtil = require('ethereumjs-util')
 const ethAbi = require('ethereumjs-abi')
+const nacl = require('tweetnacl')
+nacl.util = require('tweetnacl-util')
 
 module.exports = {
 
@@ -30,25 +32,38 @@ module.exports = {
     return ethUtil.addHexPrefix(input.toLowerCase())
   },
 
-  encrypt: function (msgParams) {
-    // once incoming msg is signed by test driver...
-    //const publicKey = getPublicKeyFor(msgParams)
+  encrypt: function (privateKey, msgParams) {
+    const theirPubKey = getPublicKeyFor(msgParams);
 
-    // encrypt with public key
+    // encrypt with recipient's public key and encryptor's private key
+    var privKeyUInt8Array = nacl_decodeHex(privateKey);
+    var pubKeyUInt8Array = nacl_decodeHex(theirPubKey);
+    var nonce = nacl.randomBytes(nacl.box.nonceLength);
+    var encryptedMessage = nacl.box(msgParams.data, nonce, pubKeyUInt8Array, privKeyUInt8Array);
+
+    var output = {
+      alg: 'curve25519-xsalsa20-poly1305',
+      nonce: nacl.util.encodeBase64(nonce),
+      ciphertext: nacl.util.encodeBase64(encryptedMessage)
+    };
 
     // return encrypted msg data
-
-    // return data in clear during intermediate phase of test-driven development
-    return msgParams.data
+    return output;
   },
 
   personalDecrypt: function (privateKey, msgParams) {
-    // decrypt with private key
+    const theirPubKey = getPublicKeyFor(msgParams);
+
+    // decrypt using recipient's public key and encryptor's private key
+    var privKeyUInt8Array = nacl_decodeHex(privateKey);
+    var pubKeyUInt8Array = nacl_decodeHex(theirPubKey);
+
+    var nonce = nacl.util.decodeBase64(msgParams.data.nonce);
+    var ciphertext = nacl.util.decodeBase64(msgParams.data.ciphertext);
+    var cleartext = nacl.box.open(ciphertext, nonce, pubKeyUInt8Array, privKeyUInt8Array);
 
     // return decrypted msg data
-
-    // return original clear data during intermediate phase of test-driven development
-    return msgParams.data
+    return cleartext;
   },
 
   personalSign: function (privateKey, msgParams) {
@@ -127,11 +142,20 @@ function getPublicKeyFor (msgParams) {
   return recoverPublicKey(msgHash, msgParams.sig)
 }
 
-
 function padWithZeroes (number, length) {
   var myString = '' + number
   while (myString.length < length) {
     myString = '0' + myString
   }
   return myString
+}
+
+function nacl_encodeHex(msgUInt8Arr) {
+  var msgBase64 = nacl.util.encodeBase64(msgUInt8Arr);
+  return (new Buffer(msgBase64, 'base64')).toString('hex');
+}
+
+function nacl_decodeHex(msgHex) {
+  var msgBase64 = (new Buffer(msgHex, 'hex')).toString('base64');
+  return nacl.util.decodeBase64(msgBase64);
 }
