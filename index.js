@@ -30,6 +30,27 @@ module.exports = {
     return ethUtil.addHexPrefix(input.toLowerCase())
   },
 
+  encrypt: function (msgParams) {
+    // once incoming msg is signed by test driver...
+    //const publicKey = getPublicKeyFor(msgParams)
+
+    // encrypt with public key
+
+    // return encrypted msg data
+
+    // return data in clear during intermediate phase of test-driven development
+    return msgParams.data
+  },
+
+  personalDecrypt: function (privateKey, msgParams) {
+    // decrypt with private key
+
+    // return decrypted msg data
+
+    // return original clear data during intermediate phase of test-driven development
+    return msgParams.data
+  },
+
   personalSign: function (privateKey, msgParams) {
     var message = ethUtil.toBuffer(msgParams.data)
     var msgHash = ethUtil.hashPersonalMessage(message)
