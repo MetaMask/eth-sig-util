@@ -33,6 +33,18 @@ Returns a continuous, hex-prefixed hex value for the signature, suitable for inc
 
 Takes an address of either upper or lower case, with or without a hex prefix, and returns an all-lowercase, hex-prefixed address, suitable for submitting to an ethereum provider.
 
+### encrypt(msgParams)
+
+msgParams should have a `data` key that is hex-encoded data unencrypted, and a `sig` key that is hex-encoded and signed.
+
+Returns value of `data` encrypted with public key used to sign `sig`
+
+### decrypt (privateKeyBuffer, msgParams)
+
+msgParams should have a `data` key that is hex-encoded data to decrypt.
+
+Returns value of `data` decrypted with the provided private key material.
+
 ### personalSign (privateKeyBuffer, msgParams)
 
 msgParams should have a `data` key that is hex-encoded data to sign.
