@@ -38,8 +38,11 @@ module.exports = {
     // encrypt with recipient's public key and encryptor's private key
     var privKeyUInt8Array = nacl_decodeHex(privateKey);
     var pubKeyUInt8Array = nacl_decodeHex(theirPubKey);
+
+    var trimmedPubKeyUInt8Array = new Uint8Array(pubKeyUInt8Array.slice(0,32));
     var nonce = nacl.randomBytes(nacl.box.nonceLength);
-    var encryptedMessage = nacl.box(msgParams.data, nonce, pubKeyUInt8Array, privKeyUInt8Array);
+    var msgParamsUInt8Array = new Uint8Array(msgParams.data);
+    var encryptedMessage = nacl.box(msgParamsUInt8Array, nonce, trimmedPubKeyUInt8Array, privKeyUInt8Array);
 
     var output = {
       alg: 'curve25519-xsalsa20-poly1305',
@@ -51,16 +54,17 @@ module.exports = {
     return output;
   },
 
-  personalDecrypt: function (privateKey, msgParams) {
-    const theirPubKey = getPublicKeyFor(msgParams);
+  decrypt: function (privateKey, msgParams) {
+    const theirPubKey = getPublicKeyForCiphertext(msgParams);
 
     // decrypt using recipient's public key and encryptor's private key
     var privKeyUInt8Array = nacl_decodeHex(privateKey);
     var pubKeyUInt8Array = nacl_decodeHex(theirPubKey);
 
+    var trimmedPubKeyUInt8Array = new Uint8Array(pubKeyUInt8Array.slice(0,32));
     var nonce = nacl.util.decodeBase64(msgParams.data.nonce);
     var ciphertext = nacl.util.decodeBase64(msgParams.data.ciphertext);
-    var cleartext = nacl.box.open(ciphertext, nonce, pubKeyUInt8Array, privKeyUInt8Array);
+    var cleartext = nacl.box.open(ciphertext, nonce, trimmedPubKeyUInt8Array, privKeyUInt8Array);
 
     // return decrypted msg data
     return cleartext;
@@ -68,6 +72,14 @@ module.exports = {
 
   personalSign: function (privateKey, msgParams) {
     var message = ethUtil.toBuffer(msgParams.data)
+    var msgHash = ethUtil.hashPersonalMessage(message)
+    var sig = ethUtil.ecsign(msgHash, privateKey)
+    var serialized = ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
+    return serialized
+  },
+
+  personalSignCiphertext: function (privateKey, msgParams) {
+    var message = ethUtil.toBuffer(msgParams.data.ciphertext)
     var msgHash = ethUtil.hashPersonalMessage(message)
     var sig = ethUtil.ecsign(msgHash, privateKey)
     var serialized = ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
@@ -138,6 +150,12 @@ function recoverPublicKey(hash, sig) {
 
 function getPublicKeyFor (msgParams) {
   const message = ethUtil.toBuffer(msgParams.data)
+  const msgHash = ethUtil.hashPersonalMessage(message)
+  return recoverPublicKey(msgHash, msgParams.sig)
+}
+
+function getPublicKeyForCiphertext (msgParams) {
+  const message = ethUtil.toBuffer(msgParams.data.ciphertext)
   const msgHash = ethUtil.hashPersonalMessage(message)
   return recoverPublicKey(msgHash, msgParams.sig)
 }

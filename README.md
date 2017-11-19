@@ -39,7 +39,7 @@ msgParams should have a `data` key that is hex-encoded data unencrypted, and a `
 
 Returns value of `data` encrypted with public key used to sign `sig`
 
-### personalDecrypt (privateKeyBuffer, msgParams)
+### decrypt (privateKeyBuffer, msgParams)
 
 msgParams should have a `data` key that is hex-encoded data to decrypt.
 

@@ -34,10 +34,9 @@ test('normalize an unsupported type throws', function (t) {
   }
 })
 
-test('encrypt and personalDecrypt', function (t) {
+test('encrypt and decrypt', function (t) {
   t.plan(1)
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
-  console.log('for address ' + address)
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
 
   const privKey = new Buffer(privKeyHex, 'hex')
@@ -51,14 +50,14 @@ test('encrypt and personalDecrypt', function (t) {
   // encrypt signed clear data
   const encrypted = encUtil.encrypt(privKey, msgParams)
 
-  msgParams = { data: encrypted }
+  msgParams.data = encrypted
 
   // sign encrypted data
-  const signedEnc = sigUtil.personalSign(privKey, msgParams)
+  const signedEnc = sigUtil.personalSignCiphertext(privKey, msgParams)
   msgParams.sig = signedEnc
 
   // decrypt signed encrypted data
-  const decrypted = encUtil.personalDecrypt(privKey, msgParams)
+  const decrypted = encUtil.decrypt(privKey, msgParams)
 
   t.equal(decrypted, message)
 })
@@ -66,7 +65,6 @@ test('encrypt and personalDecrypt', function (t) {
 test('personalSign and recover', function (t) {
   t.plan(1)
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
-  console.log('for address ' + address)
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
   const privKey = new Buffer(privKeyHex, 'hex')
   const message = 'Hello, world!'
@@ -74,6 +72,7 @@ test('personalSign and recover', function (t) {
 
   const signed = sigUtil.personalSign(privKey, msgParams)
   msgParams.sig = signed
+
   const recovered = sigUtil.recoverPersonalSignature(msgParams)
 
   t.equal(recovered, address)
