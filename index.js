@@ -1,5 +1,6 @@
 const ethUtil = require('ethereumjs-util')
 const ethAbi = require('ethereumjs-abi')
+const btoa = require('btoa')
 const nacl = require('tweetnacl')
 nacl.util = require('tweetnacl-util')
 
@@ -39,11 +40,15 @@ module.exports = {
     var privKeyUInt8Array = nacl_decodeHex(privateKey);
     var pubKeyUInt8Array = nacl_decodeHex(theirPubKey);
 
+    // assemble encryption parameters
     var trimmedPubKeyUInt8Array = new Uint8Array(pubKeyUInt8Array.slice(0,32));
     var nonce = nacl.randomBytes(nacl.box.nonceLength);
-    var msgParamsUInt8Array = new Uint8Array(msgParams.data);
+    var msgParamsUInt8Array = stringToUint(msgParams.data);
+
+    // encrypt
     var encryptedMessage = nacl.box(msgParamsUInt8Array, nonce, trimmedPubKeyUInt8Array, privKeyUInt8Array);
 
+    // handle encrypted data
     var output = {
       alg: 'curve25519-xsalsa20-poly1305',
       nonce: nacl.util.encodeBase64(nonce),
@@ -61,10 +66,18 @@ module.exports = {
     var privKeyUInt8Array = nacl_decodeHex(privateKey);
     var pubKeyUInt8Array = nacl_decodeHex(theirPubKey);
 
+    // assemble decryption parameters
     var trimmedPubKeyUInt8Array = new Uint8Array(pubKeyUInt8Array.slice(0,32));
     var nonce = nacl.util.decodeBase64(msgParams.data.nonce);
     var ciphertext = nacl.util.decodeBase64(msgParams.data.ciphertext);
-    var cleartext = nacl.box.open(ciphertext, nonce, trimmedPubKeyUInt8Array, privKeyUInt8Array);
+
+    // decrypt
+    var decryptionMaterial = nacl.box.open(ciphertext, nonce, trimmedPubKeyUInt8Array, privKeyUInt8Array);
+
+    // handle decrypted data
+    var encodedCleartext = uintToString(decryptionMaterial);
+    var decodedCleartext = nacl.util.decodeBase64(encodedCleartext);
+    var cleartext = uintToString(decodedCleartext);
 
     // return decrypted msg data
     return cleartext;
@@ -176,4 +189,20 @@ function nacl_encodeHex(msgUInt8Arr) {
 function nacl_decodeHex(msgHex) {
   var msgBase64 = (new Buffer(msgHex, 'hex')).toString('base64');
   return nacl.util.decodeBase64(msgBase64);
+}
+
+function stringToUint(string) {
+    var string = btoa(unescape(encodeURIComponent(string))),
+        charList = string.split(''),
+        uintArray = [];
+    for (var i = 0; i < charList.length; i++) {
+        uintArray.push(charList[i].charCodeAt(0));
+    }
+    return new Uint8Array(uintArray);
+}
+
+function uintToString(uintArray) {
+    var encodedString = String.fromCharCode.apply(null, uintArray),
+        decodedString = decodeURIComponent(escape(encodedString));
+    return decodedString;
 }
