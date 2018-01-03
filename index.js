@@ -41,7 +41,7 @@ module.exports = {
   recoverPersonalSignature: function (msgParams) {
     const publicKey = getPublicKeyFor(msgParams)
     const sender = ethUtil.publicToAddress(publicKey)
-    senderHex = ethUtil.bufferToHex(sender)
+    const senderHex = ethUtil.bufferToHex(sender)
     return senderHex
   },
 
