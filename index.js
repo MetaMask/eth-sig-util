@@ -78,7 +78,9 @@ function typedSignatureHash(typedData) {
   const error = new Error('Expect argument to be non-empty array')
   if (typeof typedData !== 'object' || !typedData.length) throw error
 
-  const data = typedData.map(function (e) { return e.value })
+  const data = typedData.map(function (e) {
+    return e.type === 'bytes' ? ethUtil.toBuffer(e.value) : e.value
+  })
   const types = typedData.map(function (e) { return e.type })
   const schema = typedData.map(function (e) {
     if (!e.name) throw error

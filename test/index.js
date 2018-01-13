@@ -147,6 +147,19 @@ test('typedSignatureHash - multiple values', function (t) {
   t.equal(hash, '0xf7ad23226db5c1c00ca0ca1468fd49c8f8bbc1489bc1c382de5adc557a69c229')
 })
 
+test('typedSignatureHash - bytes', function (t) {
+    t.plan(1)
+    const typedData = [
+        {
+            type: 'bytes',
+            name: 'message',
+            value: '0xdeadbeaf'
+        }
+    ]
+    const hash = sigUtil.typedSignatureHash(typedData)
+    t.equal(hash, '0x6c69d03412450b174def7d1e48b3bcbbbd8f51df2e76e2c5b3a5d951125be3a9')
+})
+
 typedSignatureHashThrowsTest({
     testLabel: 'empty array',
     argument: []
