@@ -1,5 +1,6 @@
 const ethUtil = require('ethereumjs-util')
 const ethAbi = require('ethereumjs-abi')
+const eccrypto = require('./utils/eccrypto-lite')
 
 module.exports = {
 
@@ -66,6 +67,42 @@ module.exports = {
     const publicKey = recoverPublicKey(msgHash, msgParams.sig)
     const sender = ethUtil.publicToAddress(publicKey)
     return ethUtil.bufferToHex(sender)
+  },
+
+  encrypt: async function(senderprivateKey, receiverPublicKey, msgParams) {
+    //first sign message using personalSign functions
+    const signed = this.personalSign(ethUtil.toBuffer(senderprivateKey), msgParams);
+
+    // then create payload
+    const payload = {
+      message: msgParams.data,
+      signed
+    };
+
+    //then encrypt
+    const encrypted = await eccrypto.encryptWithPublicKey(
+      receiverPublicKey, // by encryping with bobs publicKey, only bob can decrypt the payload with his privateKey
+      JSON.stringify(payload) // we have to stringify the payload before we can encrypt it
+    );
+
+    return encrypted;
+  },
+
+  decrypt: async function(encryptedMsg, privateKey) {
+    const decrypted = await eccrypto.decryptWithPrivateKey(
+      privateKey,
+      encryptedMsg
+    );
+
+    const decryptedPayload = JSON.parse(decrypted);
+
+    //check signature
+    const senderAddress = this.recoverPersonalSignature({
+      data: decryptedPayload.message,
+      sig: decryptedPayload.signed
+    });
+
+    return { from: senderAddress, message: decryptedPayload.message };
   }
 
 }
