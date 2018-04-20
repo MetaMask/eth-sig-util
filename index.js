@@ -84,14 +84,14 @@ module.exports = {
       receiverPublicKey, // by encryping with bobs publicKey, only bob can decrypt the payload with his privateKey
       JSON.stringify(payload) // we have to stringify the payload before we can encrypt it
     );
-
+ 
     return encrypted;
   },
 
-  decrypt: async function(encryptedMsg, privateKey) {
+  decrypt: async function(encryptedData, privateKey) {
     const decrypted = await eccrypto.decryptWithPrivateKey(
       privateKey,
-      encryptedMsg
+      encryptedData
     );
 
     const decryptedPayload = JSON.parse(decrypted);

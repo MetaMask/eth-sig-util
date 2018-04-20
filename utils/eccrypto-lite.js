@@ -5,12 +5,12 @@ var secp256k1 = require("secp256k1");
 var ecdh = require("./ecdh");
 
 module.exports = {
-	decryptWithPrivateKey: function(pk, edata) {
-		const result = decryptWithPrivateKey(pk, edata);
+	decryptWithPrivateKey: function(privateKey, encryptedData) {
+		const result = decryptWithPrivateKey(privateKey, encryptedData);
 		return result;
 	},
-	encryptWithPublicKey: function(pk, payload) {
-		const result = encryptWithPublicKey(pk, payload);
+	encryptWithPublicKey: function(receiverPublicKey, payload) {
+		const result = encryptWithPublicKey(receiverPublicKey, payload);
 		return result;
 	}
 };
