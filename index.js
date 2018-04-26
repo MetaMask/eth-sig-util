@@ -1,6 +1,6 @@
-const ethUtil = require('ethereumjs-util')
-const ethAbi = require('ethereumjs-abi')
-const eccrypto = require('./utils/eccrypto-lite')
+const ethUtil = require('ethereumjs-util');
+const ethAbi = require('ethereumjs-abi');
+const eccrypto = require('./utils/eccrypto-lite');
 
 module.exports = {
 
@@ -72,7 +72,7 @@ module.exports = {
   encrypt: async function(senderprivateKey, receiverPublicKey, msgParams) {
     //first sign message using personalSign functions
     const signed = this.personalSign(ethUtil.toBuffer(senderprivateKey), msgParams);
-
+    
     // then create payload
     const payload = {
       message: msgParams.data,
