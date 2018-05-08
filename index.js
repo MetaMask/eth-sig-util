@@ -1,6 +1,7 @@
 const ethUtil = require('ethereumjs-util');
 const ethAbi = require('ethereumjs-abi');
-const eccrypto = require('./utils/eccrypto-lite');
+const nacl = require('tweetnacl');
+nacl.util = require('tweetnacl-util');
 
 module.exports = {
 
@@ -69,40 +70,42 @@ module.exports = {
     return ethUtil.bufferToHex(sender)
   },
 
-  encrypt: async function(senderprivateKey, receiverPublicKey, msgParams) {
-    //first sign message using personalSign functions
-    const signed = this.personalSign(ethUtil.toBuffer(senderprivateKey), msgParams);
-    
-    // then create payload
-    const payload = {
-      message: msgParams.data,
-      signed
+  encrypt: function(senderprivateKey, receiverPublicKey, msgParams) {
+    // assemble encryption parameters - from string to UInt8
+    var privKeyUInt8Array = nacl.util.decodeBase64(senderprivateKey);
+    var pubKeyUInt8Array = nacl.util.decodeBase64(receiverPublicKey);
+    var msgParamsUInt8Array = nacl.util.decodeUTF8(msgParams.data);
+
+    var nonce = nacl.randomBytes(nacl.box.nonceLength);
+
+    // encrypt
+    var encryptedMessage = nacl.box(msgParamsUInt8Array, nonce, pubKeyUInt8Array, privKeyUInt8Array);
+
+    // handle encrypted data 
+    var output = {
+      version: '0x04',
+      nonce: nacl.util.encodeBase64(nonce),
+      ciphertext: nacl.util.encodeBase64(encryptedMessage)
     };
 
-    //then encrypt
-    const encrypted = await eccrypto.encryptWithPublicKey(
-      receiverPublicKey, // by encryping with bobs publicKey, only bob can decrypt the payload with his privateKey
-      JSON.stringify(payload) // we have to stringify the payload before we can encrypt it
-    );
- 
-    return encrypted;
+    // return encrypted msg data
+    return output;
   },
 
-  decrypt: async function(encryptedData, privateKey) {
-    const decrypted = await eccrypto.decryptWithPrivateKey(
-      privateKey,
-      encryptedData
-    );
+  decrypt: async function(encryptedData, receiverPrivateKey, senderPublicKey) {
+    //string to buffer to UInt8Array
+    var privKeyUInt8Array = nacl.util.decodeBase64(receiverPrivateKey);
+    var pubKeyUInt8Array = nacl.util.decodeBase64(senderPublicKey);
 
-    const decryptedPayload = JSON.parse(decrypted);
+    // assemble decryption parameters
+    var nonce = nacl.util.decodeBase64(encryptedData.nonce);
+    var ciphertext = nacl.util.decodeBase64(encryptedData.ciphertext);
 
-    //check signature
-    const senderAddress = this.recoverPersonalSignature({
-      data: decryptedPayload.message,
-      sig: decryptedPayload.signed
-    });
+    // decrypt
+    var decryptedMessage = nacl.box.open(ciphertext, nonce, pubKeyUInt8Array, privKeyUInt8Array);
 
-    return { from: senderAddress, message: decryptedPayload.message };
+    // return decrypted msg data
+    return nacl.util.encodeUTF8(decryptedMessage);
   }
 
 }

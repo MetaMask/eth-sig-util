@@ -271,45 +271,43 @@ function typedSignatureHashThrowsTest(opts) {
   })
 }
 
-//encryption test
-test("encrypt text with ECDH", async t => {
-  t.plan(4);
+// these keys were generated using nacl.box.keyPair()
+// To-do: Convert ethereum keys into nacl compatible versions
+const alice = { privateKey: 'B+TAO3bSusggdubN+IVZ29dvPGySf8V+1aBptUYJKJU=',
+  publicKey: 'eMiE7HauRAGMBEnmLUnT+mk78RWJ2I2AZhOoksfl/gg=' }
 
-  const senderPrivateKey =
-    "0x7f2e0a903b5e5fdee8458987386ca23c3f2db7d07eae02d3c2e6e5c6f17599a0";
-  const receiverPublicKey =
-    "44be5ff4da3cc349f101b0cb189887a55b05efc2ed97ab3054d2a16c19ca488685c70fa48556ef3d6d5342cd996ba4b41df4214947ca5ecf6324b9bc39fa5246";
-  const msgParams = { data: "My name is Satoshi Buterin" };
+const bob = { privateKey: '/oaOMvAzhHzVWqIlKqum1Pyg2/Xc2Wa+1DIr4PhAO1M=',
+  publicKey: 'TKF5xmj85gVm5WjWScJVfXLXWRLFmoxuXL6S1wCxmkI=' }
+
+const secretMessage = {data:'My name is Satoshi Buterin'};
+
+//encryption test
+test("encrypt text with nacl", async t => {
+  t.plan(3);
 
   const result = await sigUtil.encrypt(
-    senderPrivateKey,
-    receiverPublicKey,
-    msgParams
+    alice.privateKey,
+    bob.publicKey,
+    secretMessage
   );
 
-  t.ok(result.iv);
-  t.ok(result.ephemPublicKey);
+  console.log("RESULT", result)
+
+  t.ok(result.version);
+  t.ok(result.nonce);
   t.ok(result.ciphertext);
-  t.ok(result.mac);
+
 });
 
 //decryption test
-test("decrypt ECDh encrypted text", async t => {
+test("decrypt text with nacl", async t => {
   t.plan(1);
-  const originalText = "My name is Satoshi Buterin";
-  //encrypted data
-  const encryptedData = {
-    iv: "c70881072e88ccbf084d9c172ba96f52",
-    ephemPublicKey:
-      "0451e0077b7d1f87720d5e6cd19c6379998ac918569847c3b87b4ea19cfcd89b65c986ac6a1cc782bc61d85d0b9628176cf077fc384a7e30a051586015d94cdb37",
-    ciphertext:
-      "add5994482aacd0ad2f148fdb91820e89d4ee9b3b165bff04791b6489a8a8f5364de15b34f7173f6e41f2283e9a3be7506ec98a6176b91c473394b6a97e1cc3a71552467ab6e378c3cfa0dace7321f24c7306f7fba7f7e9fc7b6c52fb4c136d9f67d3c16144417f1b18bfb59475425bac63ddcdba295eac7d9688b2e0f319caac59ed723d7ceb1b475766a34f164dc16502e61541d3fab5fbad4b1bd1c82454ca1614f75cd23dec1593c50a11f4c3c9ab0503ba3aa4031452701ab137f3dedfc",
-    mac: "9f8ef19e474afa745187e59b73bbacbeabfc55e150a271497bc68bf8e40e2967"
-  };
 
-  //private key
-  const privateKey =
-    "0x7e5374ec2ef0d91761a6e72fdf8f6ac665519bfdf6da0a2329cf0d804514b816";
-  const result = await sigUtil.decrypt(encryptedData, privateKey);
-  t.equal(result.message, originalText);
+  //encrypted data
+  const encryptedData = { version: '0x04',
+  nonce: 'SrmrV3Ob3UzuzXYN6sdj8jQwAC5WUIsY',
+  ciphertext: 'FXpiOUOSZIYG2Iviv0LQvSCE8d3NqUbCKZ7x3WWBAl1DJ/brlU/jzhq4' };
+
+  const result = await sigUtil.decrypt(encryptedData, bob.privateKey, alice.publicKey);
+  t.equal(result, secretMessage.data);
 });
