@@ -304,7 +304,7 @@ test("decrypt text with nacl", async t => {
   t.plan(1);
 
   //encrypted data
-  const encryptedData = { version: '0x04',
+  const encryptedData = { version: 'x25519-xsalsa20-poly1305',
   nonce: 'SrmrV3Ob3UzuzXYN6sdj8jQwAC5WUIsY',
   ciphertext: 'FXpiOUOSZIYG2Iviv0LQvSCE8d3NqUbCKZ7x3WWBAl1DJ/brlU/jzhq4' };
 

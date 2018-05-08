@@ -70,7 +70,7 @@ module.exports = {
     return ethUtil.bufferToHex(sender)
   },
 
-  encrypt: function(senderprivateKey, receiverPublicKey, msgParams) {
+  encrypt: function(senderprivateKey, receiverPublicKey, msgParams, version) {
     // assemble encryption parameters - from string to UInt8
     var privKeyUInt8Array = nacl.util.decodeBase64(senderprivateKey);
     var pubKeyUInt8Array = nacl.util.decodeBase64(receiverPublicKey);
@@ -83,7 +83,7 @@ module.exports = {
 
     // handle encrypted data 
     var output = {
-      version: '0x04',
+      version: 'x25519-xsalsa20-poly1305',
       nonce: nacl.util.encodeBase64(nonce),
       ciphertext: nacl.util.encodeBase64(encryptedMessage)
     };
@@ -92,7 +92,7 @@ module.exports = {
     return output;
   },
 
-  decrypt: async function(encryptedData, receiverPrivateKey, senderPublicKey) {
+  decrypt: async function(encryptedData, receiverPrivateKey, senderPublicKey, version) {
     //string to buffer to UInt8Array
     var privKeyUInt8Array = nacl.util.decodeBase64(receiverPrivateKey);
     var pubKeyUInt8Array = nacl.util.decodeBase64(senderPublicKey);
