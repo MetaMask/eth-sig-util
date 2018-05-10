@@ -271,43 +271,50 @@ function typedSignatureHashThrowsTest(opts) {
   })
 }
 
-// these keys were generated using nacl.box.keyPair()
-// To-do: Convert ethereum keys into nacl compatible versions
-const alice = { privateKey: 'B+TAO3bSusggdubN+IVZ29dvPGySf8V+1aBptUYJKJU=',
-  publicKey: 'eMiE7HauRAGMBEnmLUnT+mk78RWJ2I2AZhOoksfl/gg=' }
-
-const bob = { privateKey: '/oaOMvAzhHzVWqIlKqum1Pyg2/Xc2Wa+1DIr4PhAO1M=',
-  publicKey: 'TKF5xmj85gVm5WjWScJVfXLXWRLFmoxuXL6S1wCxmkI=' }
+const bob = { 
+  ethereumPrivateKey: '7e5374ec2ef0d91761a6e72fdf8f6ac665519bfdf6da0a2329cf0d804514b816',
+  encryptionPrivateKey: 'flN07C7w2Rdhpucv349qxmVRm/322gojKc8NgEUUuBY=',
+  encryptionPublicKey: 'C5YMNdqE4kLgxQhJO1MfuQcHP5hjVSXzamzd/TxlR0U=' }
 
 const secretMessage = {data:'My name is Satoshi Buterin'};
 
+test("Getting bob's encryptionPublicKey", async t => {
+  t.plan(1);
+
+  const result = await sigUtil.getEncryptionPublicKey(bob.ethereumPrivateKey)
+  t.equal(result, bob.encryptionPublicKey);
+});
+
 //encryption test
-test("encrypt text with nacl", async t => {
-  t.plan(3);
+test("Alice encrypts message with bob's encryptionPublicKey", async t => {
+  
+
+  t.plan(4);
 
   const result = await sigUtil.encrypt(
-    alice.privateKey,
-    bob.publicKey,
-    secretMessage
+    bob.encryptionPublicKey,
+    secretMessage,
   );
 
   console.log("RESULT", result)
 
   t.ok(result.version);
   t.ok(result.nonce);
+  t.ok(result.ephemPublicKey);
   t.ok(result.ciphertext);
 
 });
 
-//decryption test
-test("decrypt text with nacl", async t => {
+// decryption test
+test("Bob decrypts message that Alice sent to him", async t => {
   t.plan(1);
 
   //encrypted data
   const encryptedData = { version: 'x25519-xsalsa20-poly1305',
-  nonce: 'SrmrV3Ob3UzuzXYN6sdj8jQwAC5WUIsY',
-  ciphertext: 'FXpiOUOSZIYG2Iviv0LQvSCE8d3NqUbCKZ7x3WWBAl1DJ/brlU/jzhq4' };
+  nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
+  ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+  ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
 
-  const result = await sigUtil.decrypt(encryptedData, bob.privateKey, alice.publicKey);
+  const result = await sigUtil.decrypt(encryptedData, bob.ethereumPrivateKey);
   t.equal(result, secretMessage.data);
 });

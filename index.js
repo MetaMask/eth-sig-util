@@ -70,42 +70,66 @@ module.exports = {
     return ethUtil.bufferToHex(sender)
   },
 
-  encrypt: function(senderprivateKey, receiverPublicKey, msgParams, version) {
-    // assemble encryption parameters - from string to UInt8
-    var privKeyUInt8Array = nacl.util.decodeBase64(senderprivateKey);
-    var pubKeyUInt8Array = nacl.util.decodeBase64(receiverPublicKey);
-    var msgParamsUInt8Array = nacl.util.decodeUTF8(msgParams.data);
+  encrypt: function(receiverPublicKey, msgParams, version) {
 
-    var nonce = nacl.randomBytes(nacl.box.nonceLength);
+    switch(version) {
+      case 'some-version':
+        //code block
+        break;
+      default:
+        //generate ephemeral keypair
+        var ephemeralKeyPair = nacl.box.keyPair()
 
-    // encrypt
-    var encryptedMessage = nacl.box(msgParamsUInt8Array, nonce, pubKeyUInt8Array, privKeyUInt8Array);
+        // assemble encryption parameters - from string to UInt8
+        var pubKeyUInt8Array = nacl.util.decodeBase64(receiverPublicKey);
+        var msgParamsUInt8Array = nacl.util.decodeUTF8(msgParams.data);
+        var nonce = nacl.randomBytes(nacl.box.nonceLength);
 
-    // handle encrypted data 
-    var output = {
-      version: 'x25519-xsalsa20-poly1305',
-      nonce: nacl.util.encodeBase64(nonce),
-      ciphertext: nacl.util.encodeBase64(encryptedMessage)
-    };
+        // encrypt
+        var encryptedMessage = nacl.box(msgParamsUInt8Array, nonce, pubKeyUInt8Array, ephemeralKeyPair.secretKey);
 
-    // return encrypted msg data
-    return output;
+        // handle encrypted data 
+        var output = {
+          version: 'x25519-xsalsa20-poly1305',
+          nonce: nacl.util.encodeBase64(nonce),
+          ephemPublicKey: nacl.util.encodeBase64(ephemeralKeyPair.publicKey),
+          ciphertext: nacl.util.encodeBase64(encryptedMessage)
+        };
+
+        // return encrypted msg data
+        return output;
+    }
   },
 
-  decrypt: async function(encryptedData, receiverPrivateKey, senderPublicKey, version) {
-    //string to buffer to UInt8Array
-    var privKeyUInt8Array = nacl.util.decodeBase64(receiverPrivateKey);
-    var pubKeyUInt8Array = nacl.util.decodeBase64(senderPublicKey);
+  decrypt: async function(encryptedData, receiverPrivateKey, version) {
 
-    // assemble decryption parameters
-    var nonce = nacl.util.decodeBase64(encryptedData.nonce);
-    var ciphertext = nacl.util.decodeBase64(encryptedData.ciphertext);
+    switch(version) {
+      case 'some-version':
+        //code block
+        break;
+      default:
+        //string to buffer to UInt8Array
+        var recieverPrivateKeyUint8Array = nacl_decodeHex(receiverPrivateKey)
+        var recieverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(recieverPrivateKeyUint8Array).secretKey
 
-    // decrypt
-    var decryptedMessage = nacl.box.open(ciphertext, nonce, pubKeyUInt8Array, privKeyUInt8Array);
+        // assemble decryption parameters
+        var nonce = nacl.util.decodeBase64(encryptedData.nonce);
+        var ciphertext = nacl.util.decodeBase64(encryptedData.ciphertext);
+        var ephemPublicKey = nacl.util.decodeBase64(encryptedData.ephemPublicKey);
 
-    // return decrypted msg data
-    return nacl.util.encodeUTF8(decryptedMessage);
+        // decrypt
+        var decryptedMessage = nacl.box.open(ciphertext, nonce, ephemPublicKey, recieverEncryptionPrivateKey);
+
+        // return decrypted msg data
+        return nacl.util.encodeUTF8(decryptedMessage);
+    }
+    
+  },
+
+  getEncryptionPublicKey: function(privateKey){
+    var privateKeyUint8Array = nacl_decodeHex(privateKey)
+    var encryptionPublicKey = nacl.box.keyPair.fromSecretKey(privateKeyUint8Array).publicKey
+    return nacl.util.encodeBase64(encryptionPublicKey)
   }
 
 }
@@ -156,3 +180,12 @@ function padWithZeroes (number, length) {
   }
   return myString
 }
+
+//converts hex strings to the Uint8Array format used by nacl
+function nacl_decodeHex(msgHex) {
+  var msgBase64 = (new Buffer(msgHex, 'hex')).toString('base64');
+  return nacl.util.decodeBase64(msgBase64);
+}
+
+
+
