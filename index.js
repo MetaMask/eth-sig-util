@@ -73,15 +73,21 @@ module.exports = {
   encrypt: function(receiverPublicKey, msgParams, version) {
 
     switch(version) {
-      case 'some-version':
-        //code block
-        break;
-      default:
+      case 'x25519-xsalsa20-poly1305':
+        console.log(typeof msgParams.data )
+        if( typeof msgParams.data == 'undefined'){
+          throw new Error('Cannot detect secret message, message params should be of the form {data: "secret message"} ')
+        }
         //generate ephemeral keypair
         var ephemeralKeyPair = nacl.box.keyPair()
 
         // assemble encryption parameters - from string to UInt8
-        var pubKeyUInt8Array = nacl.util.decodeBase64(receiverPublicKey);
+        try {
+          var pubKeyUInt8Array = nacl.util.decodeBase64(receiverPublicKey);
+        } catch (err){
+          throw new Error('Bad public key')
+        }
+        
         var msgParamsUInt8Array = nacl.util.decodeUTF8(msgParams.data);
         var nonce = nacl.randomBytes(nacl.box.nonceLength);
 
@@ -95,19 +101,19 @@ module.exports = {
           ephemPublicKey: nacl.util.encodeBase64(ephemeralKeyPair.publicKey),
           ciphertext: nacl.util.encodeBase64(encryptedMessage)
         };
-
         // return encrypted msg data
         return output;
+
+      default:
+        throw new Error('Encryption type/version not supported')
+      
     }
   },
 
-  decrypt: async function(encryptedData, receiverPrivateKey, version) {
+  decrypt: async function(encryptedData, receiverPrivateKey) {
 
-    switch(version) {
-      case 'some-version':
-        //code block
-        break;
-      default:
+    switch(encryptedData.version) {
+      case 'x25519-xsalsa20-poly1305':
         //string to buffer to UInt8Array
         var recieverPrivateKeyUint8Array = nacl_decodeHex(receiverPrivateKey)
         var recieverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(recieverPrivateKeyUint8Array).secretKey
@@ -121,7 +127,18 @@ module.exports = {
         var decryptedMessage = nacl.box.open(ciphertext, nonce, ephemPublicKey, recieverEncryptionPrivateKey);
 
         // return decrypted msg data
-        return nacl.util.encodeUTF8(decryptedMessage);
+        var output = nacl.util.encodeUTF8(decryptedMessage);
+
+        if (output){
+          return output;
+        }else{
+          const error = new Error('Decrypt authentication failed. ')
+          throw error
+        }
+        
+  
+      default:
+        throw new Error('Encryption type/version not supported')
     }
     
   },

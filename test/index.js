@@ -294,6 +294,7 @@ test("Alice encrypts message with bob's encryptionPublicKey", async t => {
   const result = await sigUtil.encrypt(
     bob.encryptionPublicKey,
     secretMessage,
+    'x25519-xsalsa20-poly1305'
   );
 
   console.log("RESULT", result)
