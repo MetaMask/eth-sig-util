@@ -110,7 +110,7 @@ module.exports = {
     }
   },
 
-  decrypt: async function(encryptedData, receiverPrivateKey) {
+  decrypt: function(encryptedData, receiverPrivateKey) {
 
     switch(encryptedData.version) {
       case 'x25519-xsalsa20-poly1305':
@@ -127,18 +127,21 @@ module.exports = {
         var decryptedMessage = nacl.box.open(ciphertext, nonce, ephemPublicKey, recieverEncryptionPrivateKey);
 
         // return decrypted msg data
-        var output = nacl.util.encodeUTF8(decryptedMessage);
+        try {
+          var output = nacl.util.encodeUTF8(decryptedMessage);
+        }catch(err) {
+          throw new Error('Decryption failed.')
+        }
 
         if (output){
           return output;
         }else{
-          const error = new Error('Decrypt authentication failed. ')
-          throw error
+          throw new Error('Decryption failed.')
         }
         
   
       default:
-        throw new Error('Encryption type/version not supported')
+        throw new Error('Encryption type/version not supported.')
     }
     
   },
