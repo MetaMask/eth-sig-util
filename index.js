@@ -1,7 +1,164 @@
 const ethUtil = require('ethereumjs-util')
 const ethAbi = require('ethereumjs-abi')
 
+const TYPED_MESSAGE_SCHEMA = {
+  type: 'object',
+  properties: {
+    types: {
+      type: 'object',
+      additionalProperties: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            name: {type: 'string'},
+            type: {type: 'string'},
+          },
+          required: ['name', 'type'],
+        },
+      },
+    },
+    primaryType: {type: 'string'},
+    domain: {type: 'object'},
+    message: {type: 'object'},
+  },
+  required: ['types', 'primaryType', 'domain', 'message'],
+}
+
+/**
+ * A collection of utility functions used for signing typed data
+ */
+const TypedDataUtils = {
+  /**
+   * Encodes an object by encoding and concatenating each of its members
+   *
+   * @param {string} primaryType - Root type
+   * @param {Object} data - Object to encode
+   * @param {Object} types - Type definitions
+   * @returns {string} - Encoded representation of an object
+   */
+  encodeData (primaryType, data, types) {
+    const encodedTypes = ['bytes32']
+    const encodedValues = [this.hashType(primaryType, types)]
+
+    for (const field of types[primaryType]) {
+      let value = data[field.name]
+      if (value !== undefined) {
+        if (field.type === 'string' || field.type === 'bytes') {
+          encodedTypes.push('bytes32')
+          value = ethUtil.sha3(value)
+          encodedValues.push(value)
+        } else if (types[field.type] !== undefined) {
+          encodedTypes.push('bytes32')
+          value = ethUtil.sha3(this.encodeData(field.type, value, types))
+          encodedValues.push(value)
+        } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
+          throw new Error('Arrays currently unimplemented in encodeData')
+        } else {
+          encodedTypes.push(field.type)
+          encodedValues.push(value)
+        }
+      }
+    }
+
+    return ethAbi.rawEncode(encodedTypes, encodedValues)
+  },
+
+  /**
+   * Encodes the type of an object by encoding a comma delimited list of its members
+   * 
+   * @param {string} primaryType - Root type to encode
+   * @param {Object} types - Type definitions
+   * @returns {string} - Encoded representation of the type of an object
+   */
+  encodeType (primaryType, types) {
+    let result = ''
+    let deps = this.findTypeDependencies(primaryType, types).filter(dep => dep !== primaryType)
+    deps = [primaryType].concat(deps.sort())
+    for (const type of deps) {
+      const children = types[type]
+      if (!children) {
+        throw new Error(`No type definition specified: ${type}`)
+      }
+      result += `${type}(${types[type].map(({ name, type }) => `${type} ${name}`).join(',')})`
+    }
+    return result
+  },
+
+  /**
+   * Finds all types within a type defintion object
+   *
+   * @param {string} primaryType - Root type
+   * @param {Object} types - Type definitions
+   * @param {Array} results - current set of accumulated types
+   * @returns {Array} - Set of all types found in the type definition
+   */
+  findTypeDependencies (primaryType, types, results = []) {
+    if (results.includes(primaryType) || types[primaryType] === undefined) { return results }
+    results.push(primaryType)
+    for (const field of types[primaryType]) {
+      for (const dep of this.findTypeDependencies(field.type, types, results)) {
+        !results.includes(dep) && results.push(dep)
+      }
+    }
+    return results
+  },
+
+  /**
+   * Hashes an object
+   *
+   * @param {string} primaryType - Root type
+   * @param {Object} data - Object to hash
+   * @param {Object} types - Type definitions
+   * @returns {string} - Hash of an object
+   */
+  hashStruct (primaryType, data, types) {
+    return ethUtil.sha3(this.encodeData(primaryType, data, types))
+  },
+
+  /**
+   * Hashes the type of an object
+   *
+   * @param {string} primaryType - Root type to hash
+   * @param {Object} types - Type definitions
+   * @returns {string} - Hash of an object
+   */
+  hashType (primaryType, types) {
+    return ethUtil.sha3(this.encodeType(primaryType, types))
+  },
+
+  /**
+   * Removes properties from a message object that are not defined per EIP-712
+   * 
+   * @param {Object} data - typed message object
+   * @returns {Object} - typed message object with only allowed fields
+   */
+  sanitizeData (data) {
+    const sanitizedData = {}
+    for (const key in TYPED_MESSAGE_SCHEMA.properties) {
+      data[key] && (sanitizedData[key] = data[key])
+    }
+    return sanitizedData
+  },
+
+  /**
+   * Signs a typed message as per EIP-712 and returns its sha3 hash
+   *
+   * @param {Object} typedData - Types message data to sign 
+   * @returns {string} - sha3 hash of the resulting signed message
+   */
+  sign (typedData) {
+    sanitizedData = this.sanitizeData(typedData)
+    const parts = [Buffer.from('1901', 'hex')]
+    parts.push(this.hashStruct('EIP712Domain', sanitizedData.domain, sanitizedData.types))
+    parts.push(this.hashStruct(sanitizedData.primaryType, sanitizedData.message, sanitizedData.types))
+    return ethUtil.sha3(Buffer.concat(parts))
+  },
+}
+
 module.exports = {
+  TYPED_MESSAGE_SCHEMA,
+  TypedDataUtils,
 
   concatSig: function (v, r, s) {
     const rSig = ethUtil.fromSigned(r)
@@ -55,7 +212,7 @@ module.exports = {
     return ethUtil.bufferToHex(hashBuffer)
   },
 
-  signTypedData: function (privateKey, msgParams) {
+  signTypedDataLegacy: function (privateKey, msgParams) {
     const msgHash = typedSignatureHash(msgParams.data)
     const sig = ethUtil.ecsign(msgHash, privateKey)
     return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
@@ -66,7 +223,13 @@ module.exports = {
     const publicKey = recoverPublicKey(msgHash, msgParams.sig)
     const sender = ethUtil.publicToAddress(publicKey)
     return ethUtil.bufferToHex(sender)
-  }
+  },
+
+  signTypedData: function (privateKey, msgParams) {
+    const message = TypedDataUtils.sign(msgParams.data)
+    const sig = ethUtil.ecsign(message, privateKey)
+    return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
+  },
 
 }
 
