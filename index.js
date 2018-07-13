@@ -1,7 +1,6 @@
 const ethUtil = require('ethereumjs-util')
 const ethAbi = require('ethereumjs-abi')
 
-// JSON schema as per EIP-712, see https://git.io/fNtcx
 const TYPED_MESSAGE_SCHEMA = {
   type: 'object',
   properties: {
@@ -23,10 +22,12 @@ const TYPED_MESSAGE_SCHEMA = {
     domain: {type: 'object'},
     message: {type: 'object'},
   },
-  // TODO: Should these actually be required in the EIP?
   required: ['types', 'primaryType', 'domain', 'message'],
 }
 
+/**
+ * A collection of utility functions used for signing typed data
+ */
 const TypedDataUtils = {
   /**
    * Encodes an object by encoding and concatenating each of its members
@@ -157,6 +158,7 @@ const TypedDataUtils = {
 
 module.exports = {
   TYPED_MESSAGE_SCHEMA,
+  TypedDataUtils,
 
   concatSig: function (v, r, s) {
     const rSig = ethUtil.fromSigned(r)
@@ -225,8 +227,7 @@ module.exports = {
 
   signTypedData: function (privateKey, msgParams) {
     const message = TypedDataUtils.sign(msgParams.data)
-    const messageHash = ethUtil.hashPersonalMessage(message)
-    const sig = ethUtil.ecsign(messageHash, privateKey)
+    const sig = ethUtil.ecsign(message, privateKey)
     return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
   },
 
