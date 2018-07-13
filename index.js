@@ -218,7 +218,7 @@ module.exports = {
     return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
   },
 
-  recoverTypedSignature: function (msgParams) {
+  recoverTypedSignatureLegacy: function (msgParams) {
     const msgHash = typedSignatureHash(msgParams.data)
     const publicKey = recoverPublicKey(msgHash, msgParams.sig)
     const sender = ethUtil.publicToAddress(publicKey)
@@ -229,6 +229,13 @@ module.exports = {
     const message = TypedDataUtils.sign(msgParams.data)
     const sig = ethUtil.ecsign(message, privateKey)
     return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
+  },
+
+  recoverTypedSignature: function (msgParams) {
+    const message = TypedDataUtils.sign(msgParams.data)
+    const publicKey = recoverPublicKey(message, msgParams.sig)
+    const sender = ethUtil.publicToAddress(publicKey)
+    return ethUtil.bufferToHex(sender)
   },
 
 }

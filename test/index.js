@@ -104,7 +104,7 @@ test('personalSign and extractPublicKey', function (t) {
   t.equal(publicKey, pubKeyHex)
 })
 
-test('signTypedDataLegacy and recoverTypedSignature - single message', function (t) {
+test('signTypedDataLegacy and recoverTypedSignatureLegacy - single message', function (t) {
   t.plan(1)
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
@@ -122,12 +122,12 @@ test('signTypedDataLegacy and recoverTypedSignature - single message', function 
   const msgParams = { data: typedData }
 
   const signature = sigUtil.signTypedDataLegacy(privKey, msgParams)
-  const recovered = sigUtil.recoverTypedSignature({ data: msgParams.data, sig: signature })
+  const recovered = sigUtil.recoverTypedSignatureLegacy({ data: msgParams.data, sig: signature })
 
   t.equal(address, recovered)
 })
 
-test('signTypedDataLegacy and recoverTypedSignature - multiple messages', function (t) {
+test('signTypedDataLegacy and recoverTypedSignatureLegacy - multiple messages', function (t) {
   t.plan(1)
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
@@ -150,7 +150,7 @@ test('signTypedDataLegacy and recoverTypedSignature - multiple messages', functi
   const msgParams = { data: typedData }
 
   const signature = sigUtil.signTypedDataLegacy(privKey, msgParams)
-  const recovered = sigUtil.recoverTypedSignature({ data: msgParams.data, sig: signature })
+  const recovered = sigUtil.recoverTypedSignatureLegacy({ data: msgParams.data, sig: signature })
 
   t.equal(address, recovered)
 })
