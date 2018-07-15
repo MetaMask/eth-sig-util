@@ -141,6 +141,9 @@ const TypedDataUtils = {
     for (const key in TYPED_MESSAGE_SCHEMA.properties) {
       data[key] && (sanitizedData[key] = data[key])
     }
+    if (sanitizedData.types) {
+      sanitizedData.types = Object.assign({ EIP712Domain: [] }, sanitizedData.types)
+    }
     return sanitizedData
   },
 
