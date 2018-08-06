@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/flyswatter/eth-sig-util.git"
+    "url": "git+ssh://git@github.com/MetaMask/eth-sig-util.git"
   },
   "keywords": [
     "ethereum",
@@ -17,15 +17,14 @@
   "author": "Dan Finlay",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/flyswatter/eth-sig-util/issues"
+    "url": "https://github.com/MetaMask/eth-sig-util/issues"
   },
-  "homepage": "https://github.com/flyswatter/eth-sig-util#readme",
+  "homepage": "https://github.com/MetaMask/eth-sig-util#readme",
   "dependencies": {
-    "ethereumjs-abi": "git+https://github.com/ethereumjs/ethereumjs-abi.git",
+    "ethereumjs-abi": "0.6.5",
     "ethereumjs-util": "^5.1.1"
   },
   "devDependencies": {
-    "mocha": "^4.0.0",
-    "tape": "^4.6.3"
+    "tape": "^4.9.1"
   }
 }
