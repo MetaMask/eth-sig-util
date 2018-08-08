@@ -53,7 +53,10 @@ const TypedDataUtils = {
           value = ethUtil.sha3(this.encodeData(field.type, value, types))
           encodedValues.push(value)
         } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
-          throw new Error('Arrays currently unimplemented in encodeData')
+          encodedTypes.push('bytes32')
+          const parsedType = field.type.slice(0, field.type.lastIndexOf('['))
+          value = ethUtil.sha3(value.map(item => this.encodeData(parsedType, item, types)).join(''))
+          encodedValues.push(value)
         } else {
           encodedTypes.push(field.type)
           encodedValues.push(value)
@@ -138,6 +141,9 @@ const TypedDataUtils = {
     for (const key in TYPED_MESSAGE_SCHEMA.properties) {
       data[key] && (sanitizedData[key] = data[key])
     }
+    if (sanitizedData.types) {
+      sanitizedData.types = Object.assign({ EIP712Domain: [] }, sanitizedData.types)
+    }
     return sanitizedData
   },
 
@@ -148,7 +154,7 @@ const TypedDataUtils = {
    * @returns {string} - sha3 hash of the resulting signed message
    */
   sign (typedData) {
-    sanitizedData = this.sanitizeData(typedData)
+    const sanitizedData = this.sanitizeData(typedData)
     const parts = [Buffer.from('1901', 'hex')]
     parts.push(this.hashStruct('EIP712Domain', sanitizedData.domain, sanitizedData.types))
     parts.push(this.hashStruct(sanitizedData.primaryType, sanitizedData.message, sanitizedData.types))
