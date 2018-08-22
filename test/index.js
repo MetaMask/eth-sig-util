@@ -40,6 +40,10 @@ const typedData = {
   },
 }
 
+const typedDataWithBytes = JSON.parse(JSON.stringify(typedData)); // Deep copy
+typedDataWithBytes.types.Mail.push({ name: 'payload', type: 'bytes' })
+typedDataWithBytes.message.payload = "0x25192142931f380985072cdd991e37f65cf8253ba7a0e675b54163a1d133b8ca"
+
 test('normalize address lower cases', function (t) {
   t.plan(1)
   const initial = '0xA06599BD35921CfB5B71B4BE3869740385b0B306'
@@ -331,4 +335,27 @@ test('signedTypeData', (t) => {
     '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2')
   t.equal(ethUtil.bufferToHex(address), '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826')
   t.equal(sig, '0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b915621c')
+})
+
+test('signedTypeData with bytes', (t) => {
+  t.plan(8)
+  const utils = sigUtil.TypedDataUtils
+  const privateKey = ethUtil.sha3('cow')
+  const address = ethUtil.privateToAddress(privateKey)
+  const sig = sigUtil.signTypedData(privateKey, { data: typedDataWithBytes })
+
+  t.equal(utils.encodeType('Mail', typedDataWithBytes.types),
+    'Mail(Person from,Person to,string contents,bytes payload)Person(string name,address wallet)')
+  t.equal(ethUtil.bufferToHex(utils.hashType('Mail', typedDataWithBytes.types)),
+    '0x43999c52db673245777eb64b0330105de064e52179581a340a9856c32372528e')
+  t.equal(ethUtil.bufferToHex(utils.encodeData(typedDataWithBytes.primaryType, typedDataWithBytes.message, typedDataWithBytes.types)),
+    '0x43999c52db673245777eb64b0330105de064e52179581a340a9856c32372528efc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8fac776d21ae071a32c362d4c20ba6586779708a56cad3a78d01b37ecb5744298')
+  t.equal(ethUtil.bufferToHex(utils.hashStruct(typedDataWithBytes.primaryType, typedDataWithBytes.message, typedDataWithBytes.types)),
+    '0xe004bdc1ca57ba9ad5ea8c81e54dcbdb3bfce2d1d5ad92113f0871fb2a6eb052')
+  t.equal(ethUtil.bufferToHex(utils.hashStruct('EIP712Domain', typedDataWithBytes.domain, typedDataWithBytes.types)),
+    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f')
+  t.equal(ethUtil.bufferToHex(utils.sign(typedDataWithBytes)),
+    '0xb4aaf457227fec401db772ec22d2095d1235ee5d0833f56f59108c9ffc90fb4b')
+  t.equal(ethUtil.bufferToHex(address), '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826')
+  t.equal(sig, '0xdd17ea877a7da411c85ff94bc54180631d0e86efdcd68876aeb2e051417b68e76be6858d67b20baf7be9c6402d49930bfea2535e9ae150e85838ee265094fd081b')
 })
