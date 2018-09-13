@@ -63,7 +63,7 @@ export const TYPED_MESSAGE_SCHEMA = {
           type: 'object',
           properties: {
             name: { type: 'string' },
-            type: { type: 'string' },
+            type: { type: 'string', enum: getSolidityTypes() },
           },
           required: ['name', 'type'],
         },
@@ -75,6 +75,21 @@ export const TYPED_MESSAGE_SCHEMA = {
   },
   required: ['types', 'primaryType', 'domain', 'message'],
 };
+
+function getSolidityTypes() {
+  const types = ['bool', 'address', 'int', 'uint', 'string', 'byte'];
+  const ints = Array.from(new Array(32)).map(
+    (_, index) => `int${(index + 1) * 8}`,
+  );
+  const uints = Array.from(new Array(32)).map(
+    (_, index) => `uint${(index + 1) * 8}`,
+  );
+  const bytes = Array.from(new Array(32)).map(
+    (_, index) => `bytes${index + 1}`,
+  );
+
+  return types.concat(ints).concat(uints).concat(bytes);
+}
 
 /**
  * Encodes an object by encoding and concatenating each of its members
