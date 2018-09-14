@@ -1,4 +1,3 @@
-const test = require('tape')
 const sigUtil = require('../')
 const ethUtil = require('ethereumjs-util')
 
@@ -40,40 +39,40 @@ const typedData = {
   },
 }
 
-test('normalize address lower cases', function (t) {
-  t.plan(1)
+test('normalize address lower cases', function () {
+  expect.assertions(1)
   const initial = '0xA06599BD35921CfB5B71B4BE3869740385b0B306'
   const result = sigUtil.normalize(initial)
-  t.equal(result, initial.toLowerCase())
+  expect(result).toBe(initial.toLowerCase())
 })
 
-test('normalize address adds hex prefix', function (t) {
-  t.plan(1)
+test('normalize address adds hex prefix', function () {
+  expect.assertions(1)
   const initial = 'A06599BD35921CfB5B71B4BE3869740385b0B306'
   const result = sigUtil.normalize(initial)
-  t.equal(result, '0x' + initial.toLowerCase())
+  expect(result).toBe('0x' + initial.toLowerCase())
 })
 
-test('normalize an integer converts to byte-pair hex', function (t) {
-  t.plan(1)
+test('normalize an integer converts to byte-pair hex', function () {
+  expect.assertions(1)
   const initial = 1
   const result = sigUtil.normalize(initial)
-  t.equal(result, '0x01')
+  expect(result).toBe('0x01')
 })
 
-test('normalize an unsupported type throws', function (t) {
-  t.plan(1)
+test('normalize an unsupported type throws', function () {
+  expect.assertions(1)
   const initial = {}
   try {
     const result = sigUtil.normalize(initial)
-    t.ok(false, 'did not throw')
+    expect(false).toBeTruthy()
   } catch (e) {
-    t.ok(e, 'should throw')
+    expect(e).toBeTruthy()
   }
 })
 
-test('personalSign and recover', function (t) {
-  t.plan(1)
+test('personalSign and recover', function () {
+  expect.assertions(1)
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
   console.log('for address ' + address)
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
@@ -85,11 +84,11 @@ test('personalSign and recover', function (t) {
   msgParams.sig = signed
   const recovered = sigUtil.recoverPersonalSignature(msgParams)
 
-  t.equal(recovered, address)
+  expect(recovered).toBe(address)
 })
 
-test('personalSign and extractPublicKey', function (t) {
-  t.plan(1)
+test('personalSign and extractPublicKey', function () {
+  expect.assertions(1)
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
   const pubKeyHex = '0x9e9e45b2ec5f070b4e26f57c7fedf647afa7a03e894789816fbd12fedc5acd79d0dfeea925688e177caccb8f5e09f0c289bbcfc7adb98d76f5f8c5259478903a'
 
@@ -101,11 +100,11 @@ test('personalSign and extractPublicKey', function (t) {
   msgParams.sig = signed
   const publicKey = sigUtil.extractPublicKey(msgParams)
 
-  t.equal(publicKey, pubKeyHex)
+  expect(publicKey).toBe(pubKeyHex)
 })
 
-test('signTypedDataLegacy and recoverTypedSignatureLegacy - single message', function (t) {
-  t.plan(1)
+test('signTypedDataLegacy and recoverTypedSignatureLegacy - single message', function () {
+  expect.assertions(1)
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
 
@@ -124,11 +123,11 @@ test('signTypedDataLegacy and recoverTypedSignatureLegacy - single message', fun
   const signature = sigUtil.signTypedDataLegacy(privKey, msgParams)
   const recovered = sigUtil.recoverTypedSignatureLegacy({ data: msgParams.data, sig: signature })
 
-  t.equal(address, recovered)
+  expect(address).toBe(recovered)
 })
 
-test('signTypedDataLegacy and recoverTypedSignatureLegacy - multiple messages', function (t) {
-  t.plan(1)
+test('signTypedDataLegacy and recoverTypedSignatureLegacy - multiple messages', function () {
+  expect.assertions(1)
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
 
@@ -152,11 +151,11 @@ test('signTypedDataLegacy and recoverTypedSignatureLegacy - multiple messages', 
   const signature = sigUtil.signTypedDataLegacy(privKey, msgParams)
   const recovered = sigUtil.recoverTypedSignatureLegacy({ data: msgParams.data, sig: signature })
 
-  t.equal(address, recovered)
+  expect(address).toBe(recovered)
 })
 
-test('typedSignatureHash - single value', function (t) {
-  t.plan(1)
+test('typedSignatureHash - single value', function () {
+  expect.assertions(1)
   const typedData = [
     {
       type: 'string',
@@ -165,11 +164,11 @@ test('typedSignatureHash - single value', function (t) {
     }
   ]
   const hash = sigUtil.typedSignatureHash(typedData)
-  t.equal(hash, '0x14b9f24872e28cc49e72dc104d7380d8e0ba84a3fe2e712704bcac66a5702bd5')
+  expect(hash).toBe('0x14b9f24872e28cc49e72dc104d7380d8e0ba84a3fe2e712704bcac66a5702bd5')
 })
 
-test('typedSignatureHash - multiple values', function (t) {
-  t.plan(1)
+test('typedSignatureHash - multiple values', function () {
+  expect.assertions(1)
   const typedData = [
     {
       type: 'string',
@@ -183,11 +182,11 @@ test('typedSignatureHash - multiple values', function (t) {
     },
   ]
   const hash = sigUtil.typedSignatureHash(typedData)
-  t.equal(hash, '0xf7ad23226db5c1c00ca0ca1468fd49c8f8bbc1489bc1c382de5adc557a69c229')
+  expect(hash).toBe('0xf7ad23226db5c1c00ca0ca1468fd49c8f8bbc1489bc1c382de5adc557a69c229')
 })
 
-test('typedSignatureHash - bytes', function (t) {
-    t.plan(1)
+test('typedSignatureHash - bytes', function () {
+    expect.assertions(1)
     const typedData = [
         {
             type: 'bytes',
@@ -196,7 +195,7 @@ test('typedSignatureHash - bytes', function (t) {
         }
     ]
     const hash = sigUtil.typedSignatureHash(typedData)
-    t.equal(hash, '0x6c69d03412450b174def7d1e48b3bcbbbd8f51df2e76e2c5b3a5d951125be3a9')
+    expect(hash).toBe('0x6c69d03412450b174def7d1e48b3bcbbbd8f51df2e76e2c5b3a5d951125be3a9')
 })
 
 typedSignatureHashThrowsTest({
@@ -279,8 +278,8 @@ signatureTest({
 })
 
 function signatureTest(opts) {
-  test(opts.testLabel, function (t) {
-    t.plan(2)
+  test(opts.testLabel, function () {
+    expect.assertions(2)
 
     const address = opts.addressHex
     const privKey = opts.privateKey
@@ -288,25 +287,25 @@ function signatureTest(opts) {
     const msgParams = { data: message }
 
     const signed = sigUtil.personalSign(privKey, msgParams)
-    t.equal(signed, opts.signature)
+    expect(signed).toBe(opts.signature)
 
     msgParams.sig = signed
     const recovered = sigUtil.recoverPersonalSignature(msgParams)
 
-    t.equal(recovered, address)
+    expect(recovered).toBe(address)
   })
 }
 
 function typedSignatureHashThrowsTest(opts) {
   const label = `typedSignatureHash - malformed arguments - ${opts.testLabel}`
-  test(label, function (t) {
-    t.plan(1)
+  test(label, function () {
+    expect.assertions(1)
 
     const argument = opts.argument
 
-    t.throws(() => {
+    expect(() => {
       sigUtil.typedSignatureHash(argument)
-    })
+    }).toThrow()
   })
 }
 
@@ -322,18 +321,18 @@ nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
 ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
 ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
 
-test("Getting bob's encryptionPublicKey", async t => {
-  t.plan(1);
+test("Getting bob's encryptionPublicKey", async () => {
+  expect.assertions(1);
 
   const result = await sigUtil.getEncryptionPublicKey(bob.ethereumPrivateKey)
-  t.equal(result, bob.encryptionPublicKey);
+  expect(result).toBe(bob.encryptionPublicKey);
 });
 
 //encryption test
-test("Alice encrypts message with bob's encryptionPublicKey", async t => {
+test("Alice encrypts message with bob's encryptionPublicKey", async () => {
   
 
-  t.plan(4);
+  expect.assertions(4);
 
   const result = await sigUtil.encrypt(
     bob.encryptionPublicKey,
@@ -343,34 +342,34 @@ test("Alice encrypts message with bob's encryptionPublicKey", async t => {
 
   console.log("RESULT", result)
 
-  t.ok(result.version);
-  t.ok(result.nonce);
-  t.ok(result.ephemPublicKey);
-  t.ok(result.ciphertext);
+  expect(result.version).toBeTruthy();
+  expect(result.nonce).toBeTruthy();
+  expect(result.ephemPublicKey).toBeTruthy();
+  expect(result.ciphertext).toBeTruthy();
 
 });
 
 // decryption test
-test("Bob decrypts message that Alice sent to him", t => {
-  t.plan(1);
+test("Bob decrypts message that Alice sent to him", () => {
+  expect.assertions(1);
 
   const result = sigUtil.decrypt(encryptedData, bob.ethereumPrivateKey);
-  t.equal(result, secretMessage.data);
+  expect(result).toBe(secretMessage.data);
 });
 
-test('Decryption failed because version is wrong or missing', t =>{
-  t.plan(1)
+test('Decryption failed because version is wrong or missing', () => {
+  expect.assertions(1)
 
   const badVersionData = { version: 'x256k1-aes256cbc',
   nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
   ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
   ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
 
-  t.throws( function() { sigUtil.decrypt(badVersionData, bob.ethereumPrivateKey)}, 'Encryption type/version not supported.')
+  expect(function() { sigUtil.decrypt(badVersionData, bob.ethereumPrivateKey)}).toThrow()
 });
 
-test('Decryption failed because nonce is wrong or missing', t => {
-  t.plan(1);
+test('Decryption failed because nonce is wrong or missing', () => {
+  expect.assertions(1);
 
     //encrypted data
   const badNonceData = { version: 'x25519-xsalsa20-poly1305',
@@ -378,12 +377,12 @@ test('Decryption failed because nonce is wrong or missing', t => {
   ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
   ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
 
-  t.throws(function() { sigUtil.decrypt(badNonceData, bob.ethereumPrivateKey)}, 'Decryption failed.')
+  expect(function() { sigUtil.decrypt(badNonceData, bob.ethereumPrivateKey)}).toThrow()
 
 });
 
-test('Decryption failed because ephemPublicKey is wrong or missing', t => {
-  t.plan(1);
+test('Decryption failed because ephemPublicKey is wrong or missing', () => {
+  expect.assertions(1);
 
     //encrypted data
   const badEphemData = { version: 'x25519-xsalsa20-poly1305',
@@ -391,11 +390,11 @@ test('Decryption failed because ephemPublicKey is wrong or missing', t => {
   ephemPublicKey: 'FFFF/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
   ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
 
-  t.throws(function() { sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)}, 'Decryption failed.')
+  expect(function() { sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)}).toThrow()
 });
 
-test('Decryption failed because cyphertext is wrong or missing', async t => {
-  t.plan(1);
+test('Decryption failed because cyphertext is wrong or missing', async () => {
+  expect.assertions(1);
 
     //encrypted data
   const badCypherData = { version: 'x25519-xsalsa20-poly1305',
@@ -403,34 +402,40 @@ test('Decryption failed because cyphertext is wrong or missing', async t => {
   ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
   ciphertext: 'ffffff/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
 
-  t.throws(function() { sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)}, 'Decryption failed.')
+  expect(function() { sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)}).toThrow()
 });
 
-test("Decryption fails because you are not the recipient", t => {
-  t.plan(1);
+test("Decryption fails because you are not the recipient", () => {
+  expect.assertions(1);
 
-  t.throws(function() { sigUtil.decrypt(encryptedData, alice.ethereumPrivateKey)}, 'Decryption failed.')
+  expect(function() { sigUtil.decrypt(encryptedData, alice.ethereumPrivateKey)}).toThrow()
 });
 
-test('signedTypeData', (t) => {
-  t.plan(8)
+test('signedTypeData', () => {
+  expect.assertions(8)
   const utils = sigUtil.TypedDataUtils
   const privateKey = ethUtil.sha3('cow')
   const address = ethUtil.privateToAddress(privateKey)
   const sig = sigUtil.signTypedData(privateKey, { data: typedData })
 
-  t.equal(utils.encodeType('Mail', typedData.types),
-    'Mail(Person from,Person to,string contents)Person(string name,address wallet)')
-  t.equal(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types)),
-    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2')
-  t.equal(ethUtil.bufferToHex(utils.encodeData(typedData.primaryType, typedData.message, typedData.types)),
-    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8')
-  t.equal(ethUtil.bufferToHex(utils.hashStruct(typedData.primaryType, typedData.message, typedData.types)),
-    '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e')
-  t.equal(ethUtil.bufferToHex(utils.hashStruct('EIP712Domain', typedData.domain, typedData.types)),
-    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f')
-  t.equal(ethUtil.bufferToHex(utils.sign(typedData)),
-    '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2')
-  t.equal(ethUtil.bufferToHex(address), '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826')
-  t.equal(sig, '0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b915621c')
+  expect(utils.encodeType('Mail', typedData.types)).toBe(
+    'Mail(Person from,Person to,string contents)Person(string name,address wallet)'
+  )
+  expect(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types))).toBe('0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2')
+  expect(
+    ethUtil.bufferToHex(utils.encodeData(typedData.primaryType, typedData.message, typedData.types))
+  ).toBe(
+    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8'
+  )
+  expect(
+    ethUtil.bufferToHex(utils.hashStruct(typedData.primaryType, typedData.message, typedData.types))
+  ).toBe('0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e')
+  expect(
+    ethUtil.bufferToHex(utils.hashStruct('EIP712Domain', typedData.domain, typedData.types))
+  ).toBe('0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f')
+  expect(ethUtil.bufferToHex(utils.sign(typedData))).toBe('0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2')
+  expect(ethUtil.bufferToHex(address)).toBe('0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826')
+  expect(sig).toBe(
+    '0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b915621c'
+  )
 })
