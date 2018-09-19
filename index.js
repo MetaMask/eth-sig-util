@@ -1,3 +1,4 @@
+const { Buffer } = require('buffer');
 const ethUtil = require('ethereumjs-util');
 const ethAbi = require('ethereumjs-abi');
 const nacl = require('tweetnacl');
@@ -267,6 +268,42 @@ module.exports = {
     }
   },
 
+  encryptSafely: function(receiverPublicKey, msgParams, version) {
+
+    const DEFAULT_PADDING_LENGTH = (2 ** 11);
+    const NACL_EXTRA_BYTES = 16;
+
+    let data = msgParams.data;
+    if (!data) {
+      throw new Error('Cannot encrypt empty msg.data');
+    }
+
+    if (typeof data === 'object' && data.toJSON) {
+      // remove toJSON attack vector
+      // TODO, check all possible children
+      throw new Error('Cannot encrypt with toJSON property.  Please remove toJSON property');
+    }
+
+    // add padding
+    const dataWithPadding = {
+      data,
+      padding: '',
+    };
+
+    // calculate padding
+    const dataLength = Buffer.byteLength(JSON.stringify(dataWithPadding), 'utf-8');
+    const modVal = (dataLength % DEFAULT_PADDING_LENGTH);
+    let padLength = 0;
+    // Only pad if necessary
+    if (modVal > 0) {
+      padLength = (DEFAULT_PADDING_LENGTH - modVal) - NACL_EXTRA_BYTES; // nacl extra bytes
+    }
+    dataWithPadding.padding = '0'.repeat(padLength);
+
+    const paddedMsgParams = {data:JSON.stringify(dataWithPadding)};
+    return this.encrypt(receiverPublicKey, paddedMsgParams, version);
+  },
+
   decrypt: function(encryptedData, receiverPrivateKey) {
 
     switch(encryptedData.version) {
@@ -300,8 +337,13 @@ module.exports = {
       default:
         throw new Error('Encryption type/version not supported.')
     }
-
   },
+
+  decryptSafely: function(encryptedData, receiverPrivateKey) {
+    const dataWithPadding = JSON.parse(this.decrypt(encryptedData, receiverPrivateKey));
+    return dataWithPadding.data;
+  },
+
 
   getEncryptionPublicKey: function(privateKey){
     var privateKeyUint8Array = nacl_decodeHex(privateKey)

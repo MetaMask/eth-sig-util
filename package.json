@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/MetaMask/eth-sig-util#readme",
   "dependencies": {
+    "buffer": "^5.2.1",
     "elliptic": "^6.4.0",
     "ethereumjs-abi": "0.6.5",
     "ethereumjs-util": "^5.1.1",

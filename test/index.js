@@ -331,7 +331,7 @@ test("Getting bob's encryptionPublicKey", async t => {
 
 //encryption test
 test("Alice encrypts message with bob's encryptionPublicKey", async t => {
-  
+
 
   t.plan(4);
 
@@ -348,6 +348,39 @@ test("Alice encrypts message with bob's encryptionPublicKey", async t => {
   t.ok(result.ephemPublicKey);
   t.ok(result.ciphertext);
 
+});
+
+// safe encryption test
+test("Alice encryptsSafely message with bob's encryptionPublicKey", async t => {
+  t.plan(5);
+  const VERSION = 'x25519-xsalsa20-poly1305';
+  const result = await sigUtil.encryptSafely(
+     bob.encryptionPublicKey,
+     secretMessage,
+     VERSION
+  );
+
+  console.log("RESULT", result)
+
+  t.equals(result.version,VERSION);
+  t.ok(result.nonce);
+  t.ok(result.ephemPublicKey);
+  t.ok(result.ciphertext);
+  t.ok(result.ciphertext.length > 1048)
+});
+
+// safe decryption test
+test("Bob decryptSafely message that Alice encryptSafely for him", async t => {
+  t.plan(1);
+  const VERSION = 'x25519-xsalsa20-poly1305';
+  const result = await sigUtil.encryptSafely(
+     bob.encryptionPublicKey,
+     secretMessage,
+     VERSION
+  );
+
+  const plaintext = sigUtil.decryptSafely(result, bob.ethereumPrivateKey);
+  t.equal(plaintext, secretMessage.data);
 });
 
 // decryption test
