@@ -415,7 +415,7 @@ function padWithZeroes (number, length) {
 
 //converts hex strings to the Uint8Array format used by nacl
 function nacl_decodeHex(msgHex) {
-  var msgBase64 = (new Buffer(msgHex, 'hex')).toString('base64');
+  var msgBase64 = (Buffer.from(msgHex, 'hex')).toString('base64');
   return nacl.util.decodeBase64(msgBase64);
 }
 

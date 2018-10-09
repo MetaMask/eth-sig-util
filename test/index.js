@@ -77,7 +77,7 @@ test('personalSign and recover', function (t) {
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
   console.log('for address ' + address)
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
-  const privKey = new Buffer(privKeyHex, 'hex')
+  const privKey = Buffer.from(privKeyHex, 'hex')
   const message = 'Hello, world!'
   const msgParams = { data: message }
 
@@ -93,7 +93,7 @@ test('personalSign and extractPublicKey', function (t) {
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
   const pubKeyHex = '0x9e9e45b2ec5f070b4e26f57c7fedf647afa7a03e894789816fbd12fedc5acd79d0dfeea925688e177caccb8f5e09f0c289bbcfc7adb98d76f5f8c5259478903a'
 
-  const privKey = new Buffer(privKeyHex, 'hex')
+  const privKey = Buffer.from(privKeyHex, 'hex')
   const message = 'Hello, world!'
   const msgParams = { data: message }
 
@@ -255,7 +255,7 @@ signatureTest({
   message: '0x68656c6c6f20776f726c64',
   signature: '0xce909e8ea6851bc36c007a0072d0524b07a3ff8d4e623aca4c71ca8e57250c4d0a3fc38fa8fbaaa81ead4b9f6bd03356b6f8bf18bccad167d78891636e1d69561b',
   addressHex: '0xbe93f9bacbcffc8ee6663f2647917ed7a20a57bb',
-  privateKey: new Buffer('6969696969696969696969696969696969696969696969696969696969696969', 'hex'),
+  privateKey: Buffer.from('6969696969696969696969696969696969696969696969696969696969696969', 'hex'),
 })
 
 signatureTest({
@@ -264,7 +264,7 @@ signatureTest({
   message: '0x0cc175b9c0f1b6a831c399e26977266192eb5ffee6ae2fec3ad71c777531578f',
   signature: '0x9ff8350cc7354b80740a3580d0e0fd4f1f02062040bc06b893d70906f8728bb5163837fd376bf77ce03b55e9bd092b32af60e86abce48f7b8d3539988ee5a9be1c',
   addressHex: '0xbe93f9bacbcffc8ee6663f2647917ed7a20a57bb',
-  privateKey: new Buffer('6969696969696969696969696969696969696969696969696969696969696969', 'hex'),
+  privateKey: Buffer.from('6969696969696969696969696969696969696969696969696969696969696969', 'hex'),
 })
 
 signatureTest({
@@ -275,7 +275,7 @@ signatureTest({
   message: '0x0cc175b9c0f1b6a831c399e26977266192eb5ffee6ae2fec3ad71c777531578f',
   signature: '0xa2870db1d0c26ef93c7b72d2a0830fa6b841e0593f7186bc6c7cc317af8cf3a42fda03bd589a49949aa05db83300cdb553116274518dbe9d90c65d0213f4af491b',
   addressHex: '0xe0da1edcea030875cd0f199d96eb70f6ab78faf2',
-  privateKey: new Buffer('4545454545454545454545454545454545454545454545454545454545454545', 'hex'),
+  privateKey: Buffer.from('4545454545454545454545454545454545454545454545454545454545454545', 'hex'),
 })
 
 function signatureTest(opts) {

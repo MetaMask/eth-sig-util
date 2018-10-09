@@ -12,14 +12,14 @@ module.exports = {
 		const twoStripped = privateKey.replace(/^.{2}/g, '');
 		console.log(twoStripped)
 		const encryptedBuffer = {
-        iv: new Buffer(encrypted.iv, 'hex'),
-        ephemPublicKey: new Buffer(encrypted.ephemPublicKey, 'hex'),
-        ciphertext: new Buffer(encrypted.ciphertext, 'hex'),
-        mac: new Buffer(encrypted.mac, 'hex')
+        iv: Buffer.from(encrypted.iv, 'hex'),
+        ephemPublicKey: Buffer.from(encrypted.ephemPublicKey, 'hex'),
+        ciphertext: Buffer.from(encrypted.ciphertext, 'hex'),
+        mac: Buffer.from(encrypted.mac, 'hex')
     };
 
     const decryptedBuffer = await decrypt(
-        new Buffer(twoStripped, 'hex'),
+        Buffer.from(twoStripped, 'hex'),
         encryptedBuffer
     );
     return decryptedBuffer.toString();
@@ -29,7 +29,7 @@ module.exports = {
 	encryptWithPublicKey: async function(receiverPublicKey, payload) {
 		const pubString = '04' + receiverPublicKey;
 		const encryptedBuffers = await encrypt(
-        new Buffer(pubString, 'hex'),
+        Buffer.from(pubString, 'hex'),
         Buffer(payload)
     );
 		const encrypted = {
@@ -51,12 +51,12 @@ function assert(condition, message) {
 function randomBytes(size) {
   var arr = new Uint8Array(size);
   global.crypto.getRandomValues(arr);
-  return new Buffer(arr);
+  return Buffer.from(arr);
 }
 
 function sha512(msg) {
   return subtle.digest({name: "SHA-512"}, msg).then(function(hash) {
-    return new Buffer(new Uint8Array(hash));
+    return Buffer.from(new Uint8Array(hash));
   });
 }
 
@@ -68,7 +68,7 @@ function getAes(op) {
       var encAlgorithm = {name: "AES-CBC", iv: iv};
       return subtle[op](encAlgorithm, cryptoKey, data);
     }).then(function(result) {
-      return new Buffer(new Uint8Array(result));
+      return Buffer.from(new Uint8Array(result));
     });
   };
 }
@@ -82,7 +82,7 @@ function hmacSha256Sign(key, msg) {
   return keyp.then(function(cryptoKey) {
     return subtle.sign(algorithm, cryptoKey, msg);
   }).then(function(sig) {
-    return new Buffer(new Uint8Array(sig));
+    return Buffer.from(new Uint8Array(sig));
   });
 }
 
@@ -96,7 +96,7 @@ function hmacSha256Verify(key, msg, sig) {
 
 var getPublic = exports.getPublic = function(privateKey) {
   assert(privateKey.length === 32, "Bad private key");
-  return new Buffer(ec.keyFromPrivate(privateKey).getPublic("arr"));
+  return Buffer.from(ec.keyFromPrivate(privateKey).getPublic("arr"));
 };
 
 
@@ -110,7 +110,7 @@ var derive = exports.derive = function(privateKeyA, publicKeyB) {
     var keyA = ec.keyFromPrivate(privateKeyA);
     var keyB = ec.keyFromPublic(publicKeyB);
     var Px = keyA.derive(keyB.getPublic());  // BN instance
-    resolve(new Buffer(Px.toArray()));
+    resolve(Buffer.from(Px.toArray()));
   });
 };
 
@@ -162,6 +162,6 @@ const decrypt = function(privateKey, opts) {
     assert(macGood, "Bad MAC");
     return aesCbcDecrypt(opts.iv, encryptionKey, opts.ciphertext);
   }).then(function(msg) {
-    return new Buffer(new Uint8Array(msg));
+    return Buffer.from(new Uint8Array(msg));
   });
 };
