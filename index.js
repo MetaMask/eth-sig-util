@@ -81,9 +81,9 @@ const TypedDataUtils = {
     for (const type of deps) {
       const children = types[type]
       if (!children) {
-        throw new Error(`No type definition specified: ${type}`)
+        throw new Error('No type definition specified: ' + type)
       }
-      result += `${type}(${types[type].map(({ name, type }) => `${type} ${name}`).join(',')})`
+      result += type + '(' + types[type].map(({ name, type }) => type + ' ' + name).join(',') + ')'
     }
     return result
   },
