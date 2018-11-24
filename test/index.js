@@ -310,6 +310,141 @@ function typedSignatureHashThrowsTest(opts) {
   })
 }
 
+const bob = { 
+  ethereumPrivateKey: '7e5374ec2ef0d91761a6e72fdf8f6ac665519bfdf6da0a2329cf0d804514b816',
+  encryptionPrivateKey: 'flN07C7w2Rdhpucv349qxmVRm/322gojKc8NgEUUuBY=',
+  encryptionPublicKey: 'C5YMNdqE4kLgxQhJO1MfuQcHP5hjVSXzamzd/TxlR0U=' }
+
+const secretMessage = {data:'My name is Satoshi Buterin'};
+
+const encryptedData = { version: 'x25519-xsalsa20-poly1305',
+nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
+ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
+
+test("Getting bob's encryptionPublicKey", async t => {
+  t.plan(1);
+
+  const result = await sigUtil.getEncryptionPublicKey(bob.ethereumPrivateKey)
+  t.equal(result, bob.encryptionPublicKey);
+});
+
+//encryption test
+test("Alice encrypts message with bob's encryptionPublicKey", async t => {
+
+
+  t.plan(4);
+
+  const result = await sigUtil.encrypt(
+    bob.encryptionPublicKey,
+    secretMessage,
+    'x25519-xsalsa20-poly1305'
+  );
+
+  console.log("RESULT", result)
+
+  t.ok(result.version);
+  t.ok(result.nonce);
+  t.ok(result.ephemPublicKey);
+  t.ok(result.ciphertext);
+
+});
+
+// safe encryption test
+test("Alice encryptsSafely message with bob's encryptionPublicKey", async t => {
+  t.plan(5);
+  const VERSION = 'x25519-xsalsa20-poly1305';
+  const result = await sigUtil.encryptSafely(
+     bob.encryptionPublicKey,
+     secretMessage,
+     VERSION
+  );
+
+  console.log("RESULT", result)
+
+  t.equals(result.version,VERSION);
+  t.ok(result.nonce);
+  t.ok(result.ephemPublicKey);
+  t.ok(result.ciphertext);
+  t.ok(result.ciphertext.length > 1048)
+});
+
+// safe decryption test
+test("Bob decryptSafely message that Alice encryptSafely for him", async t => {
+  t.plan(1);
+  const VERSION = 'x25519-xsalsa20-poly1305';
+  const result = await sigUtil.encryptSafely(
+     bob.encryptionPublicKey,
+     secretMessage,
+     VERSION
+  );
+
+  const plaintext = sigUtil.decryptSafely(result, bob.ethereumPrivateKey);
+  t.equal(plaintext, secretMessage.data);
+});
+
+// decryption test
+test("Bob decrypts message that Alice sent to him", t => {
+  t.plan(1);
+
+  const result = sigUtil.decrypt(encryptedData, bob.ethereumPrivateKey);
+  t.equal(result, secretMessage.data);
+});
+
+test('Decryption failed because version is wrong or missing', t =>{
+  t.plan(1)
+
+  const badVersionData = { version: 'x256k1-aes256cbc',
+  nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
+  ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+  ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
+
+  t.throws( function() { sigUtil.decrypt(badVersionData, bob.ethereumPrivateKey)}, 'Encryption type/version not supported.')
+});
+
+test('Decryption failed because nonce is wrong or missing', t => {
+  t.plan(1);
+
+    //encrypted data
+  const badNonceData = { version: 'x25519-xsalsa20-poly1305',
+  nonce: '',
+  ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+  ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
+
+  t.throws(function() { sigUtil.decrypt(badNonceData, bob.ethereumPrivateKey)}, 'Decryption failed.')
+
+});
+
+test('Decryption failed because ephemPublicKey is wrong or missing', t => {
+  t.plan(1);
+
+    //encrypted data
+  const badEphemData = { version: 'x25519-xsalsa20-poly1305',
+  nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
+  ephemPublicKey: 'FFFF/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+  ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
+
+  t.throws(function() { sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)}, 'Decryption failed.')
+});
+
+test('Decryption failed because cyphertext is wrong or missing', async t => {
+  t.plan(1);
+
+    //encrypted data
+  const badCypherData = { version: 'x25519-xsalsa20-poly1305',
+  nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
+  ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+  ciphertext: 'ffffff/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
+
+  t.throws(function() { sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)}, 'Decryption failed.')
+});
+
+test("Decryption fails because you are not the recipient", t => {
+  t.plan(1);
+
+  t.throws(function() { sigUtil.decrypt(encryptedData, alice.ethereumPrivateKey)}, 'Decryption failed.')
+});
+
 test('signedTypeData', (t) => {
   t.plan(8)
   const utils = sigUtil.TypedDataUtils

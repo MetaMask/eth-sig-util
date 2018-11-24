@@ -1,5 +1,8 @@
-const ethUtil = require('ethereumjs-util')
-const ethAbi = require('ethereumjs-abi')
+const { Buffer } = require('buffer');
+const ethUtil = require('ethereumjs-util');
+const ethAbi = require('ethereumjs-abi');
+const nacl = require('tweetnacl');
+nacl.util = require('tweetnacl-util');
 
 const TYPED_MESSAGE_SCHEMA = {
   type: 'object',
@@ -66,7 +69,7 @@ const TypedDataUtils = {
 
   /**
    * Encodes the type of an object by encoding a comma delimited list of its members
-   * 
+   *
    * @param {string} primaryType - Root type to encode
    * @param {Object} types - Type definitions
    * @returns {string} - Encoded representation of the type of an object
@@ -129,7 +132,7 @@ const TypedDataUtils = {
 
   /**
    * Removes properties from a message object that are not defined per EIP-712
-   * 
+   *
    * @param {Object} data - typed message object
    * @returns {Object} - typed message object with only allowed fields
    */
@@ -144,7 +147,7 @@ const TypedDataUtils = {
   /**
    * Signs a typed message as per EIP-712 and returns its sha3 hash
    *
-   * @param {Object} typedData - Types message data to sign 
+   * @param {Object} typedData - Types message data to sign
    * @returns {string} - sha3 hash of the resulting signed message
    */
   sign (typedData) {
@@ -225,6 +228,129 @@ module.exports = {
     return ethUtil.bufferToHex(sender)
   },
 
+  encrypt: function(receiverPublicKey, msgParams, version) {
+
+    switch(version) {
+      case 'x25519-xsalsa20-poly1305':
+        console.log(typeof msgParams.data )
+        if( typeof msgParams.data == 'undefined'){
+          throw new Error('Cannot detect secret message, message params should be of the form {data: "secret message"} ')
+        }
+        //generate ephemeral keypair
+        var ephemeralKeyPair = nacl.box.keyPair()
+
+        // assemble encryption parameters - from string to UInt8
+        try {
+          var pubKeyUInt8Array = nacl.util.decodeBase64(receiverPublicKey);
+        } catch (err){
+          throw new Error('Bad public key')
+        }
+
+        var msgParamsUInt8Array = nacl.util.decodeUTF8(msgParams.data);
+        var nonce = nacl.randomBytes(nacl.box.nonceLength);
+
+        // encrypt
+        var encryptedMessage = nacl.box(msgParamsUInt8Array, nonce, pubKeyUInt8Array, ephemeralKeyPair.secretKey);
+
+        // handle encrypted data
+        var output = {
+          version: 'x25519-xsalsa20-poly1305',
+          nonce: nacl.util.encodeBase64(nonce),
+          ephemPublicKey: nacl.util.encodeBase64(ephemeralKeyPair.publicKey),
+          ciphertext: nacl.util.encodeBase64(encryptedMessage)
+        };
+        // return encrypted msg data
+        return output;
+
+      default:
+        throw new Error('Encryption type/version not supported')
+
+    }
+  },
+
+  encryptSafely: function(receiverPublicKey, msgParams, version) {
+
+    const DEFAULT_PADDING_LENGTH = (2 ** 11);
+    const NACL_EXTRA_BYTES = 16;
+
+    let data = msgParams.data;
+    if (!data) {
+      throw new Error('Cannot encrypt empty msg.data');
+    }
+
+    if (typeof data === 'object' && data.toJSON) {
+      // remove toJSON attack vector
+      // TODO, check all possible children
+      throw new Error('Cannot encrypt with toJSON property.  Please remove toJSON property');
+    }
+
+    // add padding
+    const dataWithPadding = {
+      data,
+      padding: '',
+    };
+
+    // calculate padding
+    const dataLength = Buffer.byteLength(JSON.stringify(dataWithPadding), 'utf-8');
+    const modVal = (dataLength % DEFAULT_PADDING_LENGTH);
+    let padLength = 0;
+    // Only pad if necessary
+    if (modVal > 0) {
+      padLength = (DEFAULT_PADDING_LENGTH - modVal) - NACL_EXTRA_BYTES; // nacl extra bytes
+    }
+    dataWithPadding.padding = '0'.repeat(padLength);
+
+    const paddedMsgParams = {data:JSON.stringify(dataWithPadding)};
+    return this.encrypt(receiverPublicKey, paddedMsgParams, version);
+  },
+
+  decrypt: function(encryptedData, receiverPrivateKey) {
+
+    switch(encryptedData.version) {
+      case 'x25519-xsalsa20-poly1305':
+        //string to buffer to UInt8Array
+        var recieverPrivateKeyUint8Array = nacl_decodeHex(receiverPrivateKey)
+        var recieverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(recieverPrivateKeyUint8Array).secretKey
+
+        // assemble decryption parameters
+        var nonce = nacl.util.decodeBase64(encryptedData.nonce);
+        var ciphertext = nacl.util.decodeBase64(encryptedData.ciphertext);
+        var ephemPublicKey = nacl.util.decodeBase64(encryptedData.ephemPublicKey);
+
+        // decrypt
+        var decryptedMessage = nacl.box.open(ciphertext, nonce, ephemPublicKey, recieverEncryptionPrivateKey);
+
+        // return decrypted msg data
+        try {
+          var output = nacl.util.encodeUTF8(decryptedMessage);
+        }catch(err) {
+          throw new Error('Decryption failed.')
+        }
+
+        if (output){
+          return output;
+        }else{
+          throw new Error('Decryption failed.')
+        }
+
+
+      default:
+        throw new Error('Encryption type/version not supported.')
+    }
+  },
+
+  decryptSafely: function(encryptedData, receiverPrivateKey) {
+    const dataWithPadding = JSON.parse(this.decrypt(encryptedData, receiverPrivateKey));
+    return dataWithPadding.data;
+  },
+
+
+  getEncryptionPublicKey: function(privateKey){
+    var privateKeyUint8Array = nacl_decodeHex(privateKey)
+    var encryptionPublicKey = nacl.box.keyPair.fromSecretKey(privateKeyUint8Array).publicKey
+    return nacl.util.encodeBase64(encryptionPublicKey)
+  },
+
   signTypedData: function (privateKey, msgParams) {
     const message = TypedDataUtils.sign(msgParams.data)
     const sig = ethUtil.ecsign(message, privateKey)
@@ -286,3 +412,12 @@ function padWithZeroes (number, length) {
   }
   return myString
 }
+
+//converts hex strings to the Uint8Array format used by nacl
+function nacl_decodeHex(msgHex) {
+  var msgBase64 = (new Buffer(msgHex, 'hex')).toString('base64');
+  return nacl.util.decodeBase64(msgBase64);
+}
+
+
+
