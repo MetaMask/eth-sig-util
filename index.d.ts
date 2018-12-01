@@ -1,4 +1,4 @@
-type TPrivateKey = Buffer | Uint8Array;
+type TBuffer = Buffer | Uint8Array;
 type TMsgParams = {
   data: any;
   sig?: any;
@@ -6,9 +6,9 @@ type TMsgParams = {
 type TEncryptVersion = "x25519-xsalsa20-poly1305";
 type TEncryptResult = {
   version: TEncryptVersion;
-  nonce: any;
-  ephemPublicKey: any;
-  ciphertext: any;
+  nonce: string;
+  ephemPublicKey: string;
+  ciphertext: string;
 };
 
 declare module "eth-sig-util" {
@@ -56,33 +56,39 @@ declare module "eth-sig-util" {
     function hashStruct(primaryType: string, data: {}, types: {}): string;
     function hashType(primaryType: string, types: {}): string;
     function sanitizeData(data: {}): {};
-    function sign(typedData): string;
+    function sign(typedData): TBuffer;
   }
 
   function concatSig(v, r, s): string;
   function normalize(input: number | string): string;
-  function personalSign(privateKey: TPrivateKey, msgParams: TMsgParams): string;
+  function personalSign(privateKey: TBuffer, msgParams: TMsgParams): string;
   function recoverPersonalSignature(msgParams: TMsgParams): string;
   function extractPublicKey(msgParams: TMsgParams): string;
   function typedSignatureHash(typedData: any[]): string;
   function signTypedDataLegacy(
-    privateKey: TPrivateKey,
+    privateKey: TBuffer,
     msgParams: TMsgParams
   ): string;
   function recoverTypedSignatureLegacy(msgParams: TMsgParams): string;
   function encrypt(
-    receiverPublicKey,
+    receiverPublicKey: string,
     msgParams: TMsgParams,
     version: TEncryptVersion
   ): TEncryptResult;
   function encryptSafely(
-    receiverPublicKey,
+    receiverPublicKey: string,
     msgParams: TMsgParams,
     version: TEncryptVersion
   ): TEncryptResult;
-  function decrypt(encryptedData: TEncryptResult, receiverPrivateKey);
-  function decryptSafely(encryptedData: TEncryptResult, receiverPrivateKey);
-  function getEncryptionPublicKey(privateKey);
-  function signTypedData(privateKey: TPrivateKey, msgParams: TMsgParams);
-  function recoverTypedSignature(msgParams: TMsgParams);
+  function decrypt(
+    encryptedData: TEncryptResult,
+    receiverPrivateKey: string
+  ): string;
+  function decryptSafely(
+    encryptedData: TEncryptResult,
+    receiverPrivateKey: string
+  ): string;
+  function getEncryptionPublicKey(privateKey: string): string;
+  function signTypedData(privateKey: TBuffer, msgParams: TMsgParams): string;
+  function recoverTypedSignature(msgParams: TMsgParams): string;
 }
