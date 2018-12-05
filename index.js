@@ -215,6 +215,24 @@ module.exports = {
     return ethUtil.bufferToHex(hashBuffer)
   },
 
+  typedSignatureHashV0: function (typedData) {
+    const hashBuffer = typedSignatureHashV0(typedData)
+    return ethUtil.bufferToHex(hashBuffer)
+  },
+
+  signTypedDataV0: function (privateKey, msgParams) {
+    const msgHash = typedSignatureHashV0(msgParams.data)
+    const sig = ethUtil.ecsign(msgHash, privateKey)
+    return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
+  },
+
+  recoverTypedSignatureV0: function (msgParams) {
+    const msgHash = typedSignatureHashV0(msgParams.data)
+    const publicKey = recoverPublicKey(msgHash, msgParams.sig)
+    const sender = ethUtil.publicToAddress(publicKey)
+    return ethUtil.bufferToHex(sender)
+  },
+
   signTypedDataLegacy: function (privateKey, msgParams) {
     const msgHash = typedSignatureHash(msgParams.data)
     const sig = ethUtil.ecsign(msgHash, privateKey)
@@ -392,6 +410,27 @@ function typedSignatureHash(typedData) {
   )
 }
 
+/**
+ * @param typedData - Array of data along with types, as per ERC191v0.
+ * @returns Buffer
+ */
+function typedSignatureHashV0(typedData) {
+  if (typeof typedData !== 'object' || !typedData.length) throw Error('Expect argument to be non-empty array')
+
+  const [staticAddress, ...dynamicData] = typedData
+
+  const staticArguments = [
+    {type: 'bytes1', value: '0x19'}, {type: 'bytes1', value: '0x00'}, {type: 'address', value: staticAddress}
+  ]
+  const dynamicArguments = dynamicData
+  const allArguments = staticArguments.concat(dynamicArguments)
+
+  return ethAbi.soliditySHA3(
+    allArguments.map(a => a.type),
+    allArguments.map(a => a.value)
+  )
+}
+
 function recoverPublicKey(hash, sig) {
   const signature = ethUtil.toBuffer(sig)
   const sigParams = ethUtil.fromRpcSig(signature)
@@ -418,6 +457,3 @@ function nacl_decodeHex(msgHex) {
   var msgBase64 = (new Buffer(msgHex, 'hex')).toString('base64');
   return nacl.util.decodeBase64(msgBase64);
 }
-
-
-
