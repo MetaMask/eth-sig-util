@@ -1,4 +1,4 @@
-const { Buffer } = require('buffer');
+// const { Buffer } = require('buffer');
 const ethUtil = require('ethereumjs-util');
 const ethAbi = require('ethereumjs-abi');
 const nacl = require('tweetnacl');
