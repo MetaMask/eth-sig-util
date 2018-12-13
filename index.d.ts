@@ -59,7 +59,7 @@ declare module "eth-sig-util" {
     function sign(typedData): TBuffer;
   }
 
-  function concatSig(v, r, s): string;
+  function concatSig(v: TBuffer, r: TBuffer, s: TBuffer): string;
   function normalize(input: number | string): string;
   function personalSign(privateKey: TBuffer, msgParams: TMsgParams): string;
   function recoverPersonalSignature(msgParams: TMsgParams): string;
