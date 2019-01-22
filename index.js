@@ -150,7 +150,7 @@ const TypedDataUtils = {
    * @returns {string} - sha3 hash of the resulting signed message
    */
   sign (typedData) {
-    sanitizedData = this.sanitizeData(typedData)
+    const sanitizedData = this.sanitizeData(typedData)
     const parts = [Buffer.from('1901', 'hex')]
     parts.push(this.hashStruct('EIP712Domain', sanitizedData.domain, sanitizedData.types))
     parts.push(this.hashStruct(sanitizedData.primaryType, sanitizedData.message, sanitizedData.types))
@@ -231,7 +231,6 @@ module.exports = {
 
     switch(version) {
       case 'x25519-xsalsa20-poly1305':
-        console.log(typeof msgParams.data )
         if( typeof msgParams.data == 'undefined'){
           throw new Error('Cannot detect secret message, message params should be of the form {data: "secret message"} ')
         }
