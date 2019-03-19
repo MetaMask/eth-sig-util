@@ -9,7 +9,7 @@ workflows:
 jobs:
   npm-test:
     docker:
-      - image: circleci/node:8.11.3-browsers
+      - image: circleci/node:8.15.1-browsers
     steps:
       - checkout
       - run:
