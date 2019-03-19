@@ -47,8 +47,16 @@ const TypedDataUtils = {
     for (const field of types[primaryType]) {
       let value = data[field.name]
       if (value !== undefined) {
-        if (field.type === 'string' || field.type === 'bytes') {
+        if (field.type === 'bytes') {
           encodedTypes.push('bytes32')
+          value = ethUtil.sha3(value)
+          encodedValues.push(value)
+        } else if (field.type === 'string') {
+          encodedTypes.push('bytes32')
+          // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
+          if (typeof value === 'string') {
+            value = Buffer.from(value, 'utf8')
+          }
           value = ethUtil.sha3(value)
           encodedValues.push(value)
         } else if (types[field.type] !== undefined) {
