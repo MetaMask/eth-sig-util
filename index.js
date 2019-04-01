@@ -47,8 +47,16 @@ const TypedDataUtils = {
     for (const field of types[primaryType]) {
       let value = data[field.name]
       if (value !== undefined) {
-        if (field.type === 'string' || field.type === 'bytes') {
+        if (field.type === 'bytes') {
           encodedTypes.push('bytes32')
+          value = ethUtil.sha3(value)
+          encodedValues.push(value)
+        } else if (field.type === 'string') {
+          encodedTypes.push('bytes32')
+          // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
+          if (typeof value === 'string') {
+            value = Buffer.from(value, 'utf8')
+          }
           value = ethUtil.sha3(value)
           encodedValues.push(value)
         } else if (types[field.type] !== undefined) {
@@ -81,9 +89,9 @@ const TypedDataUtils = {
     for (const type of deps) {
       const children = types[type]
       if (!children) {
-        throw new Error(`No type definition specified: ${type}`)
+        throw new Error('No type definition specified: ' + type)
       }
-      result += `${type}(${types[type].map(({ name, type }) => `${type} ${name}`).join(',')})`
+      result += type + '(' + types[type].map(({ name, type }) => type + ' ' + name).join(',') + ')'
     }
     return result
   },
@@ -151,7 +159,7 @@ const TypedDataUtils = {
    * @returns {string} - sha3 hash of the resulting signed message
    */
   sign (typedData) {
-    sanitizedData = this.sanitizeData(typedData)
+    const sanitizedData = this.sanitizeData(typedData)
     const parts = [Buffer.from('1901', 'hex')]
     parts.push(this.hashStruct('EIP712Domain', sanitizedData.domain, sanitizedData.types))
     parts.push(this.hashStruct(sanitizedData.primaryType, sanitizedData.message, sanitizedData.types))
@@ -232,7 +240,6 @@ module.exports = {
 
     switch(version) {
       case 'x25519-xsalsa20-poly1305':
-        console.log(typeof msgParams.data )
         if( typeof msgParams.data == 'undefined'){
           throw new Error('Cannot detect secret message, message params should be of the form {data: "secret message"} ')
         }
