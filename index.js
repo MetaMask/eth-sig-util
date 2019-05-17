@@ -162,7 +162,9 @@ const TypedDataUtils = {
     const sanitizedData = this.sanitizeData(typedData)
     const parts = [Buffer.from('1901', 'hex')]
     parts.push(this.hashStruct('EIP712Domain', sanitizedData.domain, sanitizedData.types))
-    parts.push(this.hashStruct(sanitizedData.primaryType, sanitizedData.message, sanitizedData.types))
+    if (sanitizedData.primaryType !== 'EIP712Domain') {
+      parts.push(this.hashStruct(sanitizedData.primaryType, sanitizedData.message, sanitizedData.types))
+    }
     return ethUtil.sha3(Buffer.concat(parts))
   },
 }
