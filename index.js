@@ -44,35 +44,43 @@ const TypedDataUtils = {
     const encodedTypes = ['bytes32']
     const encodedValues = [this.hashType(primaryType, types)]
 
-    for (const field of types[primaryType]) {
-      let value = data[field.name]
-      if (value !== undefined) {
-        if (field.type === 'bytes') {
-          encodedTypes.push('bytes32')
-          value = ethUtil.sha3(value)
-          encodedValues.push(value)
-        } else if (field.type === 'string') {
-          encodedTypes.push('bytes32')
-          // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
-          if (typeof value === 'string') {
-            value = Buffer.from(value, 'utf8')
-          }
-          value = ethUtil.sha3(value)
-          encodedValues.push(value)
-        } else if (types[field.type] !== undefined) {
-          encodedTypes.push('bytes32')
-          value = ethUtil.sha3(this.encodeData(field.type, value, types))
-          encodedValues.push(value)
-        } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
-          encodedTypes.push('bytes32')
-          const parsedType = field.type.slice(0, field.type.lastIndexOf('['))
-          value = ethUtil.sha3(value.map(item => this.encodeData(parsedType, item, types)).join(''))
-          encodedValues.push(value)
-        } else {
-          encodedTypes.push(field.type)
-          encodedValues.push(value)
-        }
+    const encodeField = (name, type, value) => {
+      if(value === undefined)
+        throw new Error(`missing value for field ${name} of type ${type}`)
+
+      if (type === 'bytes') {
+        return ['bytes32', ethUtil.sha3(value)]
       }
+
+      if (type === 'string') {
+        // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
+        if (typeof value === 'string') {
+          value = Buffer.from(value, 'utf8')
+        }
+        return ['bytes32', ethUtil.sha3(value)]
+      }
+
+      if (types[type] !== undefined) {
+        return ['bytes32', ethUtil.sha3(this.encodeData(type, value, types))]
+      }
+
+      if (type.lastIndexOf(']') === type.length - 1) {
+        const parsedType = type.slice(0, type.lastIndexOf('['))
+        const typeValuePairs = value.map(item =>
+          encodeField(name, parsedType, item))
+        return ['bytes32', ethUtil.sha3(ethAbi.rawEncode(
+          typeValuePairs.map(([type]) => type),
+          typeValuePairs.map(([, value]) => value),
+        ))]
+      }
+
+      return [type, value]
+    }
+
+    for (const field of types[primaryType]) {
+      const [type, value] = encodeField(field.name, field.type, data[field.name])
+      encodedTypes.push(type)
+      encodedValues.push(value)
     }
 
     return ethAbi.rawEncode(encodedTypes, encodedValues)
