@@ -408,7 +408,7 @@ test("Decryption fails because you are not the recipient", t => {
 });
 
 test('signedTypeData', (t) => {
-  t.plan(14)
+  t.plan(15)
 
   const typedData = {
     types: {
@@ -426,6 +426,10 @@ test('signedTypeData', (t) => {
             { name: 'from', type: 'Person' },
             { name: 'to', type: 'Person[]' },
             { name: 'contents', type: 'string' },
+        ],
+        Group: [
+            { name: 'name', type: 'string' },
+            { name: 'members', type: 'Person[]' },
         ],
     },
     domain: {
@@ -456,6 +460,9 @@ test('signedTypeData', (t) => {
   }
 
   const utils = sigUtil.TypedDataUtils
+
+  t.equal(utils.encodeType('Group', typedData.types),
+    'Group(string name,Person[] members)Person(string name,address[] wallets)')
 
   t.equal(utils.encodeType('Person', typedData.types),
     'Person(string name,address[] wallets)')

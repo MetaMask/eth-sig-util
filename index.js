@@ -116,6 +116,7 @@ const TypedDataUtils = {
    * @returns {Array} - Set of all types found in the type definition
    */
   findTypeDependencies (primaryType, types, results = []) {
+    primaryType = primaryType.match(/^\w*/)[0]
     if (results.includes(primaryType) || types[primaryType] === undefined) { return results }
     results.push(primaryType)
     for (const field of types[primaryType]) {
