@@ -40,47 +40,77 @@ const TypedDataUtils = {
    * @param {Object} types - Type definitions
    * @returns {string} - Encoded representation of an object
    */
-  encodeData (primaryType, data, types) {
+  encodeData (primaryType, data, types, useV4 = true) {
     const encodedTypes = ['bytes32']
     const encodedValues = [this.hashType(primaryType, types)]
 
-    const encodeField = (name, type, value) => {
-      if(value === undefined)
-        throw new Error(`missing value for field ${name} of type ${type}`)
+    if(useV4) {
+      const encodeField = (name, type, value) => {
+        if(value === undefined)
+          throw new Error(`missing value for field ${name} of type ${type}`)
 
-      if (type === 'bytes') {
-        return ['bytes32', ethUtil.sha3(value)]
-      }
-
-      if (type === 'string') {
-        // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
-        if (typeof value === 'string') {
-          value = Buffer.from(value, 'utf8')
+        if (type === 'bytes') {
+          return ['bytes32', ethUtil.sha3(value)]
         }
-        return ['bytes32', ethUtil.sha3(value)]
+
+        if (type === 'string') {
+          // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
+          if (typeof value === 'string') {
+            value = Buffer.from(value, 'utf8')
+          }
+          return ['bytes32', ethUtil.sha3(value)]
+        }
+
+        if (types[type] !== undefined) {
+          return ['bytes32', ethUtil.sha3(this.encodeData(type, value, types, useV4))]
+        }
+
+        if (type.lastIndexOf(']') === type.length - 1) {
+          const parsedType = type.slice(0, type.lastIndexOf('['))
+          const typeValuePairs = value.map(item =>
+            encodeField(name, parsedType, item))
+          return ['bytes32', ethUtil.sha3(ethAbi.rawEncode(
+            typeValuePairs.map(([type]) => type),
+            typeValuePairs.map(([, value]) => value),
+          ))]
+        }
+
+        return [type, value]
       }
 
-      if (types[type] !== undefined) {
-        return ['bytes32', ethUtil.sha3(this.encodeData(type, value, types))]
+      for (const field of types[primaryType]) {
+        const [type, value] = encodeField(field.name, field.type, data[field.name])
+        encodedTypes.push(type)
+        encodedValues.push(value)
       }
-
-      if (type.lastIndexOf(']') === type.length - 1) {
-        const parsedType = type.slice(0, type.lastIndexOf('['))
-        const typeValuePairs = value.map(item =>
-          encodeField(name, parsedType, item))
-        return ['bytes32', ethUtil.sha3(ethAbi.rawEncode(
-          typeValuePairs.map(([type]) => type),
-          typeValuePairs.map(([, value]) => value),
-        ))]
+    } else {
+      for (const field of types[primaryType]) {
+        let value = data[field.name]
+        if (value !== undefined) {
+          if (field.type === 'bytes') {
+            encodedTypes.push('bytes32')
+            value = ethUtil.sha3(value)
+            encodedValues.push(value)
+          } else if (field.type === 'string') {
+            encodedTypes.push('bytes32')
+            // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
+            if (typeof value === 'string') {
+              value = Buffer.from(value, 'utf8')
+            }
+            value = ethUtil.sha3(value)
+            encodedValues.push(value)
+          } else if (types[field.type] !== undefined) {
+            encodedTypes.push('bytes32')
+            value = ethUtil.sha3(this.encodeData(field.type, value, types, useV4))
+            encodedValues.push(value)
+          } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
+            throw new Error('Arrays currently unimplemented in encodeData')
+          } else {
+            encodedTypes.push(field.type)
+            encodedValues.push(value)
+          }
+        }
       }
-
-      return [type, value]
-    }
-
-    for (const field of types[primaryType]) {
-      const [type, value] = encodeField(field.name, field.type, data[field.name])
-      encodedTypes.push(type)
-      encodedValues.push(value)
     }
 
     return ethAbi.rawEncode(encodedTypes, encodedValues)
@@ -135,8 +165,8 @@ const TypedDataUtils = {
    * @param {Object} types - Type definitions
    * @returns {string} - Hash of an object
    */
-  hashStruct (primaryType, data, types) {
-    return ethUtil.sha3(this.encodeData(primaryType, data, types))
+  hashStruct (primaryType, data, types, useV4 = true) {
+    return ethUtil.sha3(this.encodeData(primaryType, data, types, useV4))
   },
 
   /**
@@ -173,12 +203,12 @@ const TypedDataUtils = {
    * @param {Object} typedData - Types message data to sign
    * @returns {string} - sha3 hash of the resulting signed message
    */
-  sign (typedData) {
+  sign (typedData, useV4 = true) {
     const sanitizedData = this.sanitizeData(typedData)
     const parts = [Buffer.from('1901', 'hex')]
-    parts.push(this.hashStruct('EIP712Domain', sanitizedData.domain, sanitizedData.types))
+    parts.push(this.hashStruct('EIP712Domain', sanitizedData.domain, sanitizedData.types, useV4))
     if (sanitizedData.primaryType !== 'EIP712Domain') {
-      parts.push(this.hashStruct(sanitizedData.primaryType, sanitizedData.message, sanitizedData.types))
+      parts.push(this.hashStruct(sanitizedData.primaryType, sanitizedData.message, sanitizedData.types, useV4))
     }
     return ethUtil.sha3(Buffer.concat(parts))
   },
@@ -376,12 +406,25 @@ module.exports = {
   },
 
   signTypedData: function (privateKey, msgParams) {
+    const message = TypedDataUtils.sign(msgParams.data, false)
+    const sig = ethUtil.ecsign(message, privateKey)
+    return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
+  },
+
+  signTypedData_v4: function (privateKey, msgParams) {
     const message = TypedDataUtils.sign(msgParams.data)
     const sig = ethUtil.ecsign(message, privateKey)
     return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
   },
 
   recoverTypedSignature: function (msgParams) {
+    const message = TypedDataUtils.sign(msgParams.data, false)
+    const publicKey = recoverPublicKey(message, msgParams.sig)
+    const sender = ethUtil.publicToAddress(publicKey)
+    return ethUtil.bufferToHex(sender)
+  },
+
+  recoverTypedSignature_v4: function (msgParams) {
     const message = TypedDataUtils.sign(msgParams.data)
     const publicKey = recoverPublicKey(message, msgParams.sig)
     const sender = ethUtil.publicToAddress(publicKey)

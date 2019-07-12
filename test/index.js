@@ -408,6 +408,68 @@ test("Decryption fails because you are not the recipient", t => {
 });
 
 test('signedTypeData', (t) => {
+  t.plan(8)
+
+  const typedData = {
+    types: {
+        EIP712Domain: [
+            { name: 'name', type: 'string' },
+            { name: 'version', type: 'string' },
+            { name: 'chainId', type: 'uint256' },
+            { name: 'verifyingContract', type: 'address' },
+        ],
+        Person: [
+            { name: 'name', type: 'string' },
+            { name: 'wallet', type: 'address' }
+        ],
+        Mail: [
+            { name: 'from', type: 'Person' },
+            { name: 'to', type: 'Person' },
+            { name: 'contents', type: 'string' }
+        ],
+    },
+    primaryType: 'Mail',
+    domain: {
+        name: 'Ether Mail',
+        version: '1',
+        chainId: 1,
+        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+    },
+    message: {
+        from: {
+            name: 'Cow',
+            wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+            name: 'Bob',
+            wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+    },
+  }
+
+  const utils = sigUtil.TypedDataUtils
+  const privateKey = ethUtil.sha3('cow')
+  const address = ethUtil.privateToAddress(privateKey)
+  const sig = sigUtil.signTypedData(privateKey, { data: typedData })
+
+  t.equal(utils.encodeType('Mail', typedData.types),
+    'Mail(Person from,Person to,string contents)Person(string name,address wallet)')
+  t.equal(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types)),
+    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2')
+  t.equal(ethUtil.bufferToHex(utils.encodeData(typedData.primaryType, typedData.message, typedData.types)),
+    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8')
+  t.equal(ethUtil.bufferToHex(utils.hashStruct(typedData.primaryType, typedData.message, typedData.types)),
+    '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e')
+  t.equal(ethUtil.bufferToHex(utils.hashStruct('EIP712Domain', typedData.domain, typedData.types)),
+    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f')
+  t.equal(ethUtil.bufferToHex(utils.sign(typedData)),
+    '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2')
+  t.equal(ethUtil.bufferToHex(address), '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826')
+  t.equal(sig, '0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b915621c')
+})
+
+test('signedTypeData_v4', (t) => {
   t.plan(15)
 
   const typedData = {
@@ -513,7 +575,7 @@ test('signedTypeData', (t) => {
   const address = ethUtil.privateToAddress(privateKey)
   t.equal(ethUtil.bufferToHex(address), '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826')
 
-  const sig = sigUtil.signTypedData(privateKey, { data: typedData })
+  const sig = sigUtil.signTypedData_v4(privateKey, { data: typedData })
 
   t.equal(sig, '0x65cbd956f2fae28a601bebc9b906cea0191744bd4c4247bcd27cd08f8eb6b71c78efdf7a31dc9abee78f492292721f362d296cf86b4538e07b51303b67f749061b')
 })
