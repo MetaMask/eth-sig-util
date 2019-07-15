@@ -46,6 +46,12 @@ const TypedDataUtils = {
 
     if(useV4) {
       const encodeField = (name, type, value) => {
+        if (types[type] !== undefined) {
+          return ['bytes32', value == null ?
+            '0x0000000000000000000000000000000000000000000000000000000000000000' :
+            ethUtil.sha3(this.encodeData(type, value, types, useV4))]
+        }
+
         if(value === undefined)
           throw new Error(`missing value for field ${name} of type ${type}`)
 
@@ -59,10 +65,6 @@ const TypedDataUtils = {
             value = Buffer.from(value, 'utf8')
           }
           return ['bytes32', ethUtil.sha3(value)]
-        }
-
-        if (types[type] !== undefined) {
-          return ['bytes32', ethUtil.sha3(this.encodeData(type, value, types, useV4))]
         }
 
         if (type.lastIndexOf(']') === type.length - 1) {
