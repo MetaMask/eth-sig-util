@@ -1,5 +1,8 @@
-const ethUtil = require('ethereumjs-util')
-const ethAbi = require('ethereumjs-abi')
+const { Buffer } = require('buffer');
+const ethUtil = require('ethereumjs-util');
+const ethAbi = require('ethereumjs-abi');
+const nacl = require('tweetnacl');
+nacl.util = require('tweetnacl-util');
 
 const TYPED_MESSAGE_SCHEMA = {
   type: 'object',
@@ -37,26 +40,77 @@ const TypedDataUtils = {
    * @param {Object} types - Type definitions
    * @returns {string} - Encoded representation of an object
    */
-  encodeData (primaryType, data, types) {
+  encodeData (primaryType, data, types, useV4 = true) {
     const encodedTypes = ['bytes32']
     const encodedValues = [this.hashType(primaryType, types)]
 
-    for (const field of types[primaryType]) {
-      let value = data[field.name]
-      if (value !== undefined) {
-        if (field.type === 'string' || field.type === 'bytes') {
-          encodedTypes.push('bytes32')
-          value = ethUtil.sha3(value)
-          encodedValues.push(value)
-        } else if (types[field.type] !== undefined) {
-          encodedTypes.push('bytes32')
-          value = ethUtil.sha3(this.encodeData(field.type, value, types))
-          encodedValues.push(value)
-        } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
-          throw new Error('Arrays currently unimplemented in encodeData')
-        } else {
-          encodedTypes.push(field.type)
-          encodedValues.push(value)
+    if(useV4) {
+      const encodeField = (name, type, value) => {
+        if (types[type] !== undefined) {
+          return ['bytes32', value == null ?
+            '0x0000000000000000000000000000000000000000000000000000000000000000' :
+            ethUtil.sha3(this.encodeData(type, value, types, useV4))]
+        }
+
+        if(value === undefined)
+          throw new Error(`missing value for field ${name} of type ${type}`)
+
+        if (type === 'bytes') {
+          return ['bytes32', ethUtil.sha3(value)]
+        }
+
+        if (type === 'string') {
+          // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
+          if (typeof value === 'string') {
+            value = Buffer.from(value, 'utf8')
+          }
+          return ['bytes32', ethUtil.sha3(value)]
+        }
+
+        if (type.lastIndexOf(']') === type.length - 1) {
+          const parsedType = type.slice(0, type.lastIndexOf('['))
+          const typeValuePairs = value.map(item =>
+            encodeField(name, parsedType, item))
+          return ['bytes32', ethUtil.sha3(ethAbi.rawEncode(
+            typeValuePairs.map(([type]) => type),
+            typeValuePairs.map(([, value]) => value),
+          ))]
+        }
+
+        return [type, value]
+      }
+
+      for (const field of types[primaryType]) {
+        const [type, value] = encodeField(field.name, field.type, data[field.name])
+        encodedTypes.push(type)
+        encodedValues.push(value)
+      }
+    } else {
+      for (const field of types[primaryType]) {
+        let value = data[field.name]
+        if (value !== undefined) {
+          if (field.type === 'bytes') {
+            encodedTypes.push('bytes32')
+            value = ethUtil.sha3(value)
+            encodedValues.push(value)
+          } else if (field.type === 'string') {
+            encodedTypes.push('bytes32')
+            // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
+            if (typeof value === 'string') {
+              value = Buffer.from(value, 'utf8')
+            }
+            value = ethUtil.sha3(value)
+            encodedValues.push(value)
+          } else if (types[field.type] !== undefined) {
+            encodedTypes.push('bytes32')
+            value = ethUtil.sha3(this.encodeData(field.type, value, types, useV4))
+            encodedValues.push(value)
+          } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
+            throw new Error('Arrays currently unimplemented in encodeData')
+          } else {
+            encodedTypes.push(field.type)
+            encodedValues.push(value)
+          }
         }
       }
     }
@@ -66,7 +120,7 @@ const TypedDataUtils = {
 
   /**
    * Encodes the type of an object by encoding a comma delimited list of its members
-   * 
+   *
    * @param {string} primaryType - Root type to encode
    * @param {Object} types - Type definitions
    * @returns {string} - Encoded representation of the type of an object
@@ -78,9 +132,9 @@ const TypedDataUtils = {
     for (const type of deps) {
       const children = types[type]
       if (!children) {
-        throw new Error(`No type definition specified: ${type}`)
+        throw new Error('No type definition specified: ' + type)
       }
-      result += `${type}(${types[type].map(({ name, type }) => `${type} ${name}`).join(',')})`
+      result += type + '(' + types[type].map(({ name, type }) => type + ' ' + name).join(',') + ')'
     }
     return result
   },
@@ -94,6 +148,7 @@ const TypedDataUtils = {
    * @returns {Array} - Set of all types found in the type definition
    */
   findTypeDependencies (primaryType, types, results = []) {
+    primaryType = primaryType.match(/^\w*/)[0]
     if (results.includes(primaryType) || types[primaryType] === undefined) { return results }
     results.push(primaryType)
     for (const field of types[primaryType]) {
@@ -112,8 +167,8 @@ const TypedDataUtils = {
    * @param {Object} types - Type definitions
    * @returns {string} - Hash of an object
    */
-  hashStruct (primaryType, data, types) {
-    return ethUtil.sha3(this.encodeData(primaryType, data, types))
+  hashStruct (primaryType, data, types, useV4 = true) {
+    return ethUtil.sha3(this.encodeData(primaryType, data, types, useV4))
   },
 
   /**
@@ -129,7 +184,7 @@ const TypedDataUtils = {
 
   /**
    * Removes properties from a message object that are not defined per EIP-712
-   * 
+   *
    * @param {Object} data - typed message object
    * @returns {Object} - typed message object with only allowed fields
    */
@@ -138,20 +193,25 @@ const TypedDataUtils = {
     for (const key in TYPED_MESSAGE_SCHEMA.properties) {
       data[key] && (sanitizedData[key] = data[key])
     }
+    if (sanitizedData.types) {
+      sanitizedData.types = Object.assign({ EIP712Domain: [] }, sanitizedData.types)
+    }
     return sanitizedData
   },
 
   /**
    * Signs a typed message as per EIP-712 and returns its sha3 hash
    *
-   * @param {Object} typedData - Types message data to sign 
+   * @param {Object} typedData - Types message data to sign
    * @returns {string} - sha3 hash of the resulting signed message
    */
-  sign (typedData) {
+  sign (typedData, useV4 = true) {
     const sanitizedData = this.sanitizeData(typedData)
     const parts = [Buffer.from('1901', 'hex')]
-    parts.push(this.hashStruct('EIP712Domain', sanitizedData.domain, sanitizedData.types))
-    parts.push(this.hashStruct(sanitizedData.primaryType, sanitizedData.message, sanitizedData.types))
+    parts.push(this.hashStruct('EIP712Domain', sanitizedData.domain, sanitizedData.types, useV4))
+    if (sanitizedData.primaryType !== 'EIP712Domain') {
+      parts.push(this.hashStruct(sanitizedData.primaryType, sanitizedData.message, sanitizedData.types, useV4))
+    }
     return ethUtil.sha3(Buffer.concat(parts))
   },
 }
@@ -225,13 +285,148 @@ module.exports = {
     return ethUtil.bufferToHex(sender)
   },
 
+  encrypt: function(receiverPublicKey, msgParams, version) {
+
+    switch(version) {
+      case 'x25519-xsalsa20-poly1305':
+        if( typeof msgParams.data == 'undefined'){
+          throw new Error('Cannot detect secret message, message params should be of the form {data: "secret message"} ')
+        }
+        //generate ephemeral keypair
+        var ephemeralKeyPair = nacl.box.keyPair()
+
+        // assemble encryption parameters - from string to UInt8
+        try {
+          var pubKeyUInt8Array = nacl.util.decodeBase64(receiverPublicKey);
+        } catch (err){
+          throw new Error('Bad public key')
+        }
+
+        var msgParamsUInt8Array = nacl.util.decodeUTF8(msgParams.data);
+        var nonce = nacl.randomBytes(nacl.box.nonceLength);
+
+        // encrypt
+        var encryptedMessage = nacl.box(msgParamsUInt8Array, nonce, pubKeyUInt8Array, ephemeralKeyPair.secretKey);
+
+        // handle encrypted data
+        var output = {
+          version: 'x25519-xsalsa20-poly1305',
+          nonce: nacl.util.encodeBase64(nonce),
+          ephemPublicKey: nacl.util.encodeBase64(ephemeralKeyPair.publicKey),
+          ciphertext: nacl.util.encodeBase64(encryptedMessage)
+        };
+        // return encrypted msg data
+        return output;
+
+      default:
+        throw new Error('Encryption type/version not supported')
+
+    }
+  },
+
+  encryptSafely: function(receiverPublicKey, msgParams, version) {
+
+    const DEFAULT_PADDING_LENGTH = (2 ** 11);
+    const NACL_EXTRA_BYTES = 16;
+
+    let data = msgParams.data;
+    if (!data) {
+      throw new Error('Cannot encrypt empty msg.data');
+    }
+
+    if (typeof data === 'object' && data.toJSON) {
+      // remove toJSON attack vector
+      // TODO, check all possible children
+      throw new Error('Cannot encrypt with toJSON property.  Please remove toJSON property');
+    }
+
+    // add padding
+    const dataWithPadding = {
+      data,
+      padding: '',
+    };
+
+    // calculate padding
+    const dataLength = Buffer.byteLength(JSON.stringify(dataWithPadding), 'utf-8');
+    const modVal = (dataLength % DEFAULT_PADDING_LENGTH);
+    let padLength = 0;
+    // Only pad if necessary
+    if (modVal > 0) {
+      padLength = (DEFAULT_PADDING_LENGTH - modVal) - NACL_EXTRA_BYTES; // nacl extra bytes
+    }
+    dataWithPadding.padding = '0'.repeat(padLength);
+
+    const paddedMsgParams = {data:JSON.stringify(dataWithPadding)};
+    return this.encrypt(receiverPublicKey, paddedMsgParams, version);
+  },
+
+  decrypt: function(encryptedData, receiverPrivateKey) {
+
+    switch(encryptedData.version) {
+      case 'x25519-xsalsa20-poly1305':
+        //string to buffer to UInt8Array
+        var recieverPrivateKeyUint8Array = nacl_decodeHex(receiverPrivateKey)
+        var recieverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(recieverPrivateKeyUint8Array).secretKey
+
+        // assemble decryption parameters
+        var nonce = nacl.util.decodeBase64(encryptedData.nonce);
+        var ciphertext = nacl.util.decodeBase64(encryptedData.ciphertext);
+        var ephemPublicKey = nacl.util.decodeBase64(encryptedData.ephemPublicKey);
+
+        // decrypt
+        var decryptedMessage = nacl.box.open(ciphertext, nonce, ephemPublicKey, recieverEncryptionPrivateKey);
+
+        // return decrypted msg data
+        try {
+          var output = nacl.util.encodeUTF8(decryptedMessage);
+        }catch(err) {
+          throw new Error('Decryption failed.')
+        }
+
+        if (output){
+          return output;
+        }else{
+          throw new Error('Decryption failed.')
+        }
+
+
+      default:
+        throw new Error('Encryption type/version not supported.')
+    }
+  },
+
+  decryptSafely: function(encryptedData, receiverPrivateKey) {
+    const dataWithPadding = JSON.parse(this.decrypt(encryptedData, receiverPrivateKey));
+    return dataWithPadding.data;
+  },
+
+
+  getEncryptionPublicKey: function(privateKey){
+    var privateKeyUint8Array = nacl_decodeHex(privateKey)
+    var encryptionPublicKey = nacl.box.keyPair.fromSecretKey(privateKeyUint8Array).publicKey
+    return nacl.util.encodeBase64(encryptionPublicKey)
+  },
+
   signTypedData: function (privateKey, msgParams) {
+    const message = TypedDataUtils.sign(msgParams.data, false)
+    const sig = ethUtil.ecsign(message, privateKey)
+    return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
+  },
+
+  signTypedData_v4: function (privateKey, msgParams) {
     const message = TypedDataUtils.sign(msgParams.data)
     const sig = ethUtil.ecsign(message, privateKey)
     return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
   },
 
   recoverTypedSignature: function (msgParams) {
+    const message = TypedDataUtils.sign(msgParams.data, false)
+    const publicKey = recoverPublicKey(message, msgParams.sig)
+    const sender = ethUtil.publicToAddress(publicKey)
+    return ethUtil.bufferToHex(sender)
+  },
+
+  recoverTypedSignature_v4: function (msgParams) {
     const message = TypedDataUtils.sign(msgParams.data)
     const publicKey = recoverPublicKey(message, msgParams.sig)
     const sender = ethUtil.publicToAddress(publicKey)
@@ -286,3 +481,12 @@ function padWithZeroes (number, length) {
   }
   return myString
 }
+
+//converts hex strings to the Uint8Array format used by nacl
+function nacl_decodeHex(msgHex) {
+  var msgBase64 = (new Buffer(msgHex, 'hex')).toString('base64');
+  return nacl.util.decodeBase64(msgBase64);
+}
+
+
+
