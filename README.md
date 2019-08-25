@@ -4,13 +4,13 @@
 
 A small collection of ethereum signing functions.
 
-You can find usage examples [here](https://github.com/flyswatter/js-eth-personal-sign-examples) 
+You can find usage examples [here](https://github.com/flyswatter/js-eth-personal-sign-examples)
 
 [Available on NPM](https://www.npmjs.com/package/eth-sig-util)
 
 ## Supported Signing Methods
 
-Currently there is only one supported signing protocol. More will be added as standardized. 
+Currently there is only one supported signing protocol. More will be added as standardized.
 
 - Personal Sign (`personal_sign`) [geth thread](https://github.com/ethereum/go-ethereum/pull/2940)
 
@@ -47,7 +47,21 @@ Returns a hex-encoded sender address.
 
 ### signTypedData (privateKeyBuffer, msgParams)
 
-Signs typed data as per [EIP712](https://github.com/ethereum/EIPs/pull/712).
+Signs typed data as per [an early draft of EIP 712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca).
+
+Data should be under `data` key of `msgParams`. The method returns prefixed signature.
+
+### signTypedData_v3 (privateKeyBuffer, msgParams)
+
+Signs typed data as per the published version of [EIP 712](https://github.com/ethereum/EIPs/pull/712).
+
+Data should be under `data` key of `msgParams`. The method returns prefixed signature.
+
+### signTypedData_v4 (privateKeyBuffer, msgParams)
+
+Signs typed data as per an extension of the published version of [EIP 712](https://github.com/MetaMask/eth-sig-util/pull/54).
+
+This extension adds support for arrays and recursive data types.
 
 Data should be under `data` key of `msgParams`. The method returns prefixed signature.
 
