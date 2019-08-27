@@ -15,8 +15,9 @@ type EthEncryptedData = {
   ciphertext: string
 }
 
-interface TypedDataParam extends MsgParams {
+interface TypedDataParam {
   data: TypedData,
+  sig: string,
 }
 
 declare module "eth-sig-util" {
@@ -26,7 +27,7 @@ declare module "eth-sig-util" {
   export function normalize (input: number | string ): hexPrefixedHex
   export function personalSign (privateKeyBuffer: Buffer, msgParams: MsgParams): string
   export function recoverPersonalSignature(msgParams: SignedMsgParams): string
-  export function extractPublicKey(msgParams: SignedMsgParams)
+  export function extractPublicKey(msgParams: SignedMsgParams): hexPrefixedHex
   export function typedSignatureHash(typedData: TypedData): EthJsBinary
 
   export function getEncryptionPublicKey (privateKey: string): string
