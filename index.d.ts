@@ -13,8 +13,8 @@ export interface ITypedValue {
 
 export type ITypedData = {
   types: {
-    EIP712Domain: { [typeName: string]: Array<ITypedField> }
-    [ typeName:string ]: { [typeName: string]: Array<ITypedField> }
+    EIP712Domain?: Array<ITypedField>
+    [ typeName:string ]: Array<ITypedField>
   }
   domain?: {
     name?: string
