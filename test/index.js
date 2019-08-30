@@ -67,7 +67,6 @@ test('personalSign and extractPublicKey', function (t) {
 })
 
 test('signTypedDataLegacy and recoverTypedSignatureLegacy - single message', function (t) {
-  t.plan(1)
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
 
@@ -85,8 +84,10 @@ test('signTypedDataLegacy and recoverTypedSignatureLegacy - single message', fun
 
   const signature = sigUtil.signTypedDataLegacy(privKey, msgParams)
   const recovered = sigUtil.recoverTypedSignatureLegacy({ data: msgParams.data, sig: signature })
+  t.equal(signature, '0x49e75d475d767de7fcc67f521e0d86590723d872e6111e51c393e8c1e2f21d032dfaf5833af158915f035db6af4f37bf2d5d29781cd81f28a44c5cb4b9d241531b', 'Signature matches test value.')
 
   t.equal(address, recovered)
+  t.end()
 })
 
 test('signTypedDataLegacy and recoverTypedSignatureLegacy - multiple messages', function (t) {
@@ -272,7 +273,7 @@ function typedSignatureHashThrowsTest(opts) {
   })
 }
 
-const bob = { 
+const bob = {
   ethereumPrivateKey: '7e5374ec2ef0d91761a6e72fdf8f6ac665519bfdf6da0a2329cf0d804514b816',
   encryptionPrivateKey: 'flN07C7w2Rdhpucv349qxmVRm/322gojKc8NgEUUuBY=',
   encryptionPublicKey: 'C5YMNdqE4kLgxQhJO1MfuQcHP5hjVSXzamzd/TxlR0U=' }
