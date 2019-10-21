@@ -407,6 +407,34 @@ module.exports = {
     return nacl.util.encodeBase64(encryptionPublicKey)
   },
 
+
+  /**
+   * A generic entry point for all typed data methods to be passed, includes a version parameter.
+   */
+  signTypedMessage: function (privateKey, msgParams, version = 'V4') {
+    switch (version) {
+      case 'V1':
+        return this.signTypedDataLegacy(privateKey, msgParams)
+      case 'V3':
+        return this.signTypedData(privateKey, msgParams)
+      case 'V4':
+      default:
+        return this.signTypedData_v4(privateKey, msgParams)
+    }
+  },
+
+  recoverTypedMessage: function (msgParams, version = 'V4') {
+    switch (version) {
+      case 'V1':
+        return this.recoverTypedSignatureLegacy(msgParams)
+      case 'V3':
+        return this.recoverTypedSignature(msgParams)
+      case 'V4':
+      default:
+        return this.recoverTypedSignature_v4(msgParams)
+    }
+  },
+
   signTypedData: function (privateKey, msgParams) {
     const message = TypedDataUtils.sign(msgParams.data, false)
     const sig = ethUtil.ecsign(message, privateKey)
