@@ -272,8 +272,6 @@ module.exports = {
     return ethUtil.bufferToHex(hashBuffer)
   },
 
-
-
   signTypedDataLegacy: function (privateKey, msgParams) {
     const msgHash = typedSignatureHash(msgParams.data)
     const sig = ethUtil.ecsign(msgHash, privateKey)
