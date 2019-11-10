@@ -21,6 +21,17 @@ Currently there is only one supported signing protocol. More will be added as st
 npm install eth-sig-util --save
 ```
 
+## Typed Signature Versions
+
+| Version | Explanation                                                  |
+| ------- | ------------------------------------------------------------ |
+| `V1`    | This early version of the spec lacked some later security improvements, and should generally be neglected in favor of `V3`. |
+| `V3`    | Currently represents the latest version of the [EIP 712 spec](https://eips.ethereum.org/EIPS/eip-712), making it the most secure method for signing cheap-to-verify data on-chain that we have yet. |
+| `V4`    | Currently represents the latest version of the [EIP 712 spec](https://eips.ethereum.org/EIPS/eip-712), with added support for arrays and with a breaking fix for the way structs are encoded |
+
+
+
+
 ## Methods
 
 ### concatSig(v, r, s)
@@ -45,27 +56,13 @@ msgParams should have a `data` key that is hex-encoded data unsigned, and a `sig
 
 Returns a hex-encoded sender address.
 
-### signTypedData (privateKeyBuffer, msgParams)
+### signTypedData (privateKeyBuffer, msgParams, typedSignatureVersion)
 
 Signs typed data as per [an early draft of EIP 712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca).
 
 Data should be under `data` key of `msgParams`. The method returns prefixed signature.
 
-### signTypedData_v3 (privateKeyBuffer, msgParams)
-
-Signs typed data as per the published version of [EIP 712](https://github.com/ethereum/EIPs/pull/712).
-
-Data should be under `data` key of `msgParams`. The method returns prefixed signature.
-
-### signTypedData_v4 (privateKeyBuffer, msgParams)
-
-Signs typed data as per an extension of the published version of [EIP 712](https://github.com/MetaMask/eth-sig-util/pull/54).
-
-This extension adds support for arrays and recursive data types.
-
-Data should be under `data` key of `msgParams`. The method returns prefixed signature.
-
-### recoverTypedSignature ({data, sig})
+### recoverTypedSignature ({data, sig}, typedSignatureVersion)
 
 Return address of a signer that did `signTypedData`.
 
@@ -80,4 +77,3 @@ Return hex-encoded hash of typed data params according to [EIP712](https://githu
 msgParams should have a `data` key that is hex-encoded data unsigned, and a `sig` key that is hex-encoded and already signed.
 
 Returns a hex-encoded public key.
-

@@ -40,16 +40,17 @@ const TypedDataUtils = {
    * @param {Object} types - Type definitions
    * @returns {string} - Encoded representation of an object
    */
-  encodeData (primaryType, data, types, useV4 = true) {
+  encodeData (primaryType, data, types, typedSignatureVersion) {
+    TypedDataUtils.assertValidTypedSignatureVersion(typedSignatureVersion)
     const encodedTypes = ['bytes32']
     const encodedValues = [this.hashType(primaryType, types)]
 
-    if(useV4) {
+    if(typedSignatureVersion === 'V4') {
       const encodeField = (name, type, value) => {
         if (types[type] !== undefined) {
           return ['bytes32', value == null ?
             '0x0000000000000000000000000000000000000000000000000000000000000000' :
-            ethUtil.sha3(this.encodeData(type, value, types, useV4))]
+            ethUtil.sha3(this.encodeData(type, value, types, typedSignatureVersion))]
         }
 
         if(value === undefined)
@@ -103,7 +104,7 @@ const TypedDataUtils = {
             encodedValues.push(value)
           } else if (types[field.type] !== undefined) {
             encodedTypes.push('bytes32')
-            value = ethUtil.sha3(this.encodeData(field.type, value, types, useV4))
+            value = ethUtil.sha3(this.encodeData(field.type, value, types, typedSignatureVersion))
             encodedValues.push(value)
           } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
             throw new Error('Arrays currently unimplemented in encodeData')
@@ -167,8 +168,9 @@ const TypedDataUtils = {
    * @param {Object} types - Type definitions
    * @returns {string} - Hash of an object
    */
-  hashStruct (primaryType, data, types, useV4 = true) {
-    return ethUtil.sha3(this.encodeData(primaryType, data, types, useV4))
+  hashStruct (primaryType, data, types, typedSignatureVersion) {
+    TypedDataUtils.assertValidTypedSignatureVersion(typedSignatureVersion)
+    return ethUtil.sha3(this.encodeData(primaryType, data, types, typedSignatureVersion))
   },
 
   /**
@@ -205,14 +207,34 @@ const TypedDataUtils = {
    * @param {Object} typedData - Types message data to sign
    * @returns {string} - sha3 hash of the resulting signed message
    */
-  sign (typedData, useV4 = true) {
+  sign (typedData, typedSignatureVersion) {
+    TypedDataUtils.assertValidTypedSignatureVersion(typedSignatureVersion)
+    if (typedSignatureVersion === 'V1') {
+      return typedSignatureHash(typedData)
+    }
     const sanitizedData = this.sanitizeData(typedData)
     const parts = [Buffer.from('1901', 'hex')]
-    parts.push(this.hashStruct('EIP712Domain', sanitizedData.domain, sanitizedData.types, useV4))
+    parts.push(this.hashStruct('EIP712Domain', sanitizedData.domain, sanitizedData.types, typedSignatureVersion))
     if (sanitizedData.primaryType !== 'EIP712Domain') {
-      parts.push(this.hashStruct(sanitizedData.primaryType, sanitizedData.message, sanitizedData.types, useV4))
+      parts.push(this.hashStruct(sanitizedData.primaryType, sanitizedData.message, sanitizedData.types, typedSignatureVersion))
     }
     return ethUtil.sha3(Buffer.concat(parts))
+  },
+
+  /**
+   * Assert version
+   *
+   * @param {string} typedSignatureVersion - Version
+   */
+  assertValidTypedSignatureVersion (typedSignatureVersion) {
+    switch(typedSignatureVersion) {
+      case 'V1':
+      case 'V3':
+      case 'V4':
+        return
+      default:
+        throw new Error(`Invalid Typed Signature Version: ${typedSignatureVersion}`)
+    }
   },
 }
 
@@ -270,19 +292,6 @@ module.exports = {
   typedSignatureHash: function (typedData) {
     const hashBuffer = typedSignatureHash(typedData)
     return ethUtil.bufferToHex(hashBuffer)
-  },
-
-  signTypedDataLegacy: function (privateKey, msgParams) {
-    const msgHash = typedSignatureHash(msgParams.data)
-    const sig = ethUtil.ecsign(msgHash, privateKey)
-    return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
-  },
-
-  recoverTypedSignatureLegacy: function (msgParams) {
-    const msgHash = typedSignatureHash(msgParams.data)
-    const publicKey = recoverPublicKey(msgHash, msgParams.sig)
-    const sender = ethUtil.publicToAddress(publicKey)
-    return ethUtil.bufferToHex(sender)
   },
 
   encrypt: function(receiverPublicKey, msgParams, version) {
@@ -411,51 +420,17 @@ module.exports = {
   /**
    * A generic entry point for all typed data methods to be passed, includes a version parameter.
    */
-  signTypedMessage: function (privateKey, msgParams, version = 'V4') {
-    switch (version) {
-      case 'V1':
-        return this.signTypedDataLegacy(privateKey, msgParams)
-      case 'V3':
-        return this.signTypedData(privateKey, msgParams)
-      case 'V4':
-      default:
-        return this.signTypedData_v4(privateKey, msgParams)
-    }
-  },
 
-  recoverTypedMessage: function (msgParams, version = 'V4') {
-    switch (version) {
-      case 'V1':
-        return this.recoverTypedSignatureLegacy(msgParams)
-      case 'V3':
-        return this.recoverTypedSignature(msgParams)
-      case 'V4':
-      default:
-        return this.recoverTypedSignature_v4(msgParams)
-    }
-  },
-
-  signTypedData: function (privateKey, msgParams) {
-    const message = TypedDataUtils.sign(msgParams.data, false)
+  signTypedData: function (privateKey, msgParams, typedSignatureVersion) {
+    TypedDataUtils.assertValidTypedSignatureVersion(typedSignatureVersion)
+    const message = TypedDataUtils.sign(msgParams.data, typedSignatureVersion)
     const sig = ethUtil.ecsign(message, privateKey)
     return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
   },
 
-  signTypedData_v4: function (privateKey, msgParams) {
-    const message = TypedDataUtils.sign(msgParams.data)
-    const sig = ethUtil.ecsign(message, privateKey)
-    return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
-  },
-
-  recoverTypedSignature: function (msgParams) {
-    const message = TypedDataUtils.sign(msgParams.data, false)
-    const publicKey = recoverPublicKey(message, msgParams.sig)
-    const sender = ethUtil.publicToAddress(publicKey)
-    return ethUtil.bufferToHex(sender)
-  },
-
-  recoverTypedSignature_v4: function (msgParams) {
-    const message = TypedDataUtils.sign(msgParams.data)
+  recoverTypedSignature: function (msgParams, typedSignatureVersion) {
+    TypedDataUtils.assertValidTypedSignatureVersion(typedSignatureVersion)
+    const message = TypedDataUtils.sign(msgParams.data, typedSignatureVersion)
     const publicKey = recoverPublicKey(message, msgParams.sig)
     const sender = ethUtil.publicToAddress(publicKey)
     return ethUtil.bufferToHex(sender)
@@ -515,6 +490,3 @@ function nacl_decodeHex(msgHex) {
   var msgBase64 = (Buffer.from(msgHex, 'hex')).toString('base64');
   return nacl.util.decodeBase64(msgBase64);
 }
-
-
-
