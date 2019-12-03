@@ -1,4 +1,4 @@
-const test = require('tape')
+import * as test from 'tape';
 const sigUtil = require('../')
 const ethUtil = require('ethereumjs-util')
 
@@ -41,7 +41,7 @@ test('personalSign and recover', function (t) {
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
   const privKey = Buffer.from(privKeyHex, 'hex')
   const message = 'Hello, world!'
-  const msgParams = { data: message }
+  const msgParams: any = { data: message }
 
   const signed = sigUtil.personalSign(privKey, msgParams)
   msgParams.sig = signed
@@ -57,7 +57,7 @@ test('personalSign and extractPublicKey', function (t) {
 
   const privKey = Buffer.from(privKeyHex, 'hex')
   const message = 'Hello, world!'
-  const msgParams = { data: message }
+  const msgParams: any = { data: message }
 
   const signed = sigUtil.personalSign(privKey, msgParams)
   msgParams.sig = signed
@@ -272,7 +272,7 @@ function signatureTest(opts) {
     const address = opts.addressHex
     const privKey = opts.privateKey
     const message = opts.message
-    const msgParams = { data: message }
+    const msgParams: any = { data: message }
 
     const signed = sigUtil.personalSign(privKey, msgParams)
     t.equal(signed, opts.signature)
@@ -423,12 +423,12 @@ test('Decryption failed because cyphertext is wrong or missing', async t => {
   ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
   ciphertext: 'ffffff/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
 
-  t.throws(function() { sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)}, 'Decryption failed.')
+  t.throws(function() { sigUtil.decrypt(badCypherData, bob.ethereumPrivateKey)}, 'Decryption failed.')
 });
 
 test("Decryption fails because you are not the recipient", t => {
   t.plan(1);
-
+  const alice: any = {};
   t.throws(function() { sigUtil.decrypt(encryptedData, alice.ethereumPrivateKey)}, 'Decryption failed.')
 });
 
