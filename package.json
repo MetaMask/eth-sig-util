@@ -4,6 +4,7 @@
   "description": "A few useful functions for signing ethereum data",
   "main": "index.js",
   "scripts": {
+    "build": "tsc --declaration",
     "test": "ts-node test/index.ts"
   },
   "repository": {

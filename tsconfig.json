@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "outDir": "./build",
+        "allowJs": true,
+        "target": "es5",
+        "lib": ["es6", "ES2017"],
+        "esModuleInterop": true
+    },
+    "include": [ "index.ts" ]
+}

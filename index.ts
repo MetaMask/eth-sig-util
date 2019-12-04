@@ -1,8 +1,8 @@
-const { Buffer } = require('buffer');
-const ethUtil = require('ethereumjs-util');
-const ethAbi = require('ethereumjs-abi');
-const nacl = require('tweetnacl');
-nacl.util = require('tweetnacl-util');
+import { Buffer } from 'buffer';
+import * as ethUtil from 'ethereumjs-util';
+import * as ethAbi from 'ethereumjs-abi';
+import nacl from 'tweetnacl';
+import naclUtil from 'tweetnacl-util';
 
 const TYPED_MESSAGE_SCHEMA = {
   type: 'object',
@@ -40,7 +40,7 @@ const TypedDataUtils = {
    * @param {Object} types - Type definitions
    * @returns {string} - Encoded representation of an object
    */
-  encodeData (primaryType, data, types, useV4 = true) {
+  encodeData (primaryType, data, types, useV4 = true): any {
     const encodedTypes = ['bytes32']
     const encodedValues = [this.hashType(primaryType, types)]
 
@@ -189,7 +189,7 @@ const TypedDataUtils = {
    * @returns {Object} - typed message object with only allowed fields
    */
   sanitizeData (data) {
-    const sanitizedData = {}
+    const sanitizedData: any = {}
     for (const key in TYPED_MESSAGE_SCHEMA.properties) {
       data[key] && (sanitizedData[key] = data[key])
     }
@@ -216,7 +216,7 @@ const TypedDataUtils = {
   },
 }
 
-module.exports = {
+export = {
   TYPED_MESSAGE_SCHEMA,
   TypedDataUtils,
 
@@ -297,12 +297,12 @@ module.exports = {
 
         // assemble encryption parameters - from string to UInt8
         try {
-          var pubKeyUInt8Array = nacl.util.decodeBase64(receiverPublicKey);
+          var pubKeyUInt8Array = naclUtil.decodeBase64(receiverPublicKey);
         } catch (err){
           throw new Error('Bad public key')
         }
 
-        var msgParamsUInt8Array = nacl.util.decodeUTF8(msgParams.data);
+        var msgParamsUInt8Array = naclUtil.decodeUTF8(msgParams.data);
         var nonce = nacl.randomBytes(nacl.box.nonceLength);
 
         // encrypt
@@ -311,9 +311,9 @@ module.exports = {
         // handle encrypted data
         var output = {
           version: 'x25519-xsalsa20-poly1305',
-          nonce: nacl.util.encodeBase64(nonce),
-          ephemPublicKey: nacl.util.encodeBase64(ephemeralKeyPair.publicKey),
-          ciphertext: nacl.util.encodeBase64(encryptedMessage)
+          nonce: naclUtil.encodeBase64(nonce),
+          ephemPublicKey: naclUtil.encodeBase64(ephemeralKeyPair.publicKey),
+          ciphertext: naclUtil.encodeBase64(encryptedMessage)
         };
         // return encrypted msg data
         return output;
@@ -369,16 +369,16 @@ module.exports = {
         var recieverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(recieverPrivateKeyUint8Array).secretKey
 
         // assemble decryption parameters
-        var nonce = nacl.util.decodeBase64(encryptedData.nonce);
-        var ciphertext = nacl.util.decodeBase64(encryptedData.ciphertext);
-        var ephemPublicKey = nacl.util.decodeBase64(encryptedData.ephemPublicKey);
+        var nonce = naclUtil.decodeBase64(encryptedData.nonce);
+        var ciphertext = naclUtil.decodeBase64(encryptedData.ciphertext);
+        var ephemPublicKey = naclUtil.decodeBase64(encryptedData.ephemPublicKey);
 
         // decrypt
         var decryptedMessage = nacl.box.open(ciphertext, nonce, ephemPublicKey, recieverEncryptionPrivateKey);
 
         // return decrypted msg data
         try {
-          var output = nacl.util.encodeUTF8(decryptedMessage);
+          var output = naclUtil.encodeUTF8(decryptedMessage);
         }catch(err) {
           throw new Error('Decryption failed.')
         }
@@ -404,7 +404,7 @@ module.exports = {
   getEncryptionPublicKey: function(privateKey){
     var privateKeyUint8Array = nacl_decodeHex(privateKey)
     var encryptionPublicKey = nacl.box.keyPair.fromSecretKey(privateKeyUint8Array).publicKey
-    return nacl.util.encodeBase64(encryptionPublicKey)
+    return naclUtil.encodeBase64(encryptionPublicKey)
   },
 
 
@@ -513,7 +513,7 @@ function padWithZeroes (number, length) {
 //converts hex strings to the Uint8Array format used by nacl
 function nacl_decodeHex(msgHex) {
   var msgBase64 = (Buffer.from(msgHex, 'hex')).toString('base64');
-  return nacl.util.decodeBase64(msgBase64);
+  return naclUtil.decodeBase64(msgBase64);
 }
 
 
