@@ -1,5 +1,5 @@
 const test = require('tape')
-const sigUtil = require('../')
+const sigUtil = require('../index.js')
 const ethUtil = require('ethereumjs-util')
 
 test('normalize address lower cases', function (t) {
