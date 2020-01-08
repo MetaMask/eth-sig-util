@@ -1,6 +1,6 @@
-const test = require('tape')
-const sigUtil = require('../')
-const ethUtil = require('ethereumjs-util')
+import * as test from 'tape';
+import * as sigUtil from '../index';
+import * as ethUtil from 'ethereumjs-util';
 
 test('normalize address lower cases', function (t) {
   t.plan(1)

@@ -1,8 +1,42 @@
-const { Buffer } = require('buffer');
-const ethUtil = require('ethereumjs-util');
-const ethAbi = require('ethereumjs-abi');
-const nacl = require('tweetnacl');
-nacl.util = require('tweetnacl-util');
+import * as ethUtil from 'ethereumjs-util';
+import * as ethAbi from 'ethereumjs-abi';
+import * as nacl from 'tweetnacl';
+import * as naclUtil from 'tweetnacl-util';
+
+interface EIP712TypedData {
+  name: string;
+  type: string;
+  value: any;
+}
+
+export type Version = 'V1' | 'V2' | 'V3' | 'V4';
+
+export interface EncryptedMessageData {
+  version: string;
+  nonce: string;
+  ephemPublicKey: string;
+  ciphertext: string;
+}
+
+export interface MessageParameters {
+  data: EIP712TypedData[];
+  sig: any;
+}
+
+export interface AdditionalProperties {
+  name: string;
+  type: string;
+}
+
+export interface TypedMessage {
+  types: {
+    EIP712Domain: any;
+    additionalProperties: AdditionalProperties[];
+  };
+  primaryType: string;
+  domain: object;
+  message: object;
+}
 
 const TYPED_MESSAGE_SCHEMA = {
   type: 'object',
@@ -40,7 +74,7 @@ const TypedDataUtils = {
    * @param {Object} types - Type definitions
    * @returns {string} - Encoded representation of an object
    */
-  encodeData (primaryType, data, types, useV4 = true) {
+  encodeData (primaryType: string, data: object, types: object, useV4: boolean = true): string {
     const encodedTypes = ['bytes32']
     const encodedValues = [this.hashType(primaryType, types)]
 
@@ -125,7 +159,7 @@ const TypedDataUtils = {
    * @param {Object} types - Type definitions
    * @returns {string} - Encoded representation of the type of an object
    */
-  encodeType (primaryType, types) {
+  encodeType (primaryType: string, types: object): string {
     let result = ''
     let deps = this.findTypeDependencies(primaryType, types).filter(dep => dep !== primaryType)
     deps = [primaryType].concat(deps.sort())
@@ -147,7 +181,7 @@ const TypedDataUtils = {
    * @param {Array} results - current set of accumulated types
    * @returns {Array} - Set of all types found in the type definition
    */
-  findTypeDependencies (primaryType, types, results = []) {
+  findTypeDependencies (primaryType: string, types: object, results: string[] = []): string[] {
     primaryType = primaryType.match(/^\w*/)[0]
     if (results.includes(primaryType) || types[primaryType] === undefined) { return results }
     results.push(primaryType)
@@ -167,7 +201,7 @@ const TypedDataUtils = {
    * @param {Object} types - Type definitions
    * @returns {string} - Hash of an object
    */
-  hashStruct (primaryType, data, types, useV4 = true) {
+  hashStruct (primaryType: string, data: object, types: object, useV4: boolean = true): string {
     return ethUtil.sha3(this.encodeData(primaryType, data, types, useV4))
   },
 
@@ -178,7 +212,7 @@ const TypedDataUtils = {
    * @param {Object} types - Type definitions
    * @returns {string} - Hash of an object
    */
-  hashType (primaryType, types) {
+  hashType (primaryType: string, types: object): string {
     return ethUtil.sha3(this.encodeType(primaryType, types))
   },
 
@@ -188,24 +222,24 @@ const TypedDataUtils = {
    * @param {Object} data - typed message object
    * @returns {Object} - typed message object with only allowed fields
    */
-  sanitizeData (data) {
-    const sanitizedData = {}
+  sanitizeData<T extends TypedMessage> (data: T): TypedMessage {
+    const sanitizedData: Partial<TypedMessage> = {}
     for (const key in TYPED_MESSAGE_SCHEMA.properties) {
       data[key] && (sanitizedData[key] = data[key])
     }
     if (sanitizedData.types) {
       sanitizedData.types = Object.assign({ EIP712Domain: [] }, sanitizedData.types)
     }
-    return sanitizedData
+    return sanitizedData as TypedMessage
   },
 
   /**
    * Signs a typed message as per EIP-712 and returns its sha3 hash
    *
    * @param {Object} typedData - Types message data to sign
-   * @returns {string} - sha3 hash of the resulting signed message
+   * @returns {Buffer} - sha3 hash of the resulting signed message
    */
-  sign (typedData, useV4 = true) {
+  sign<T extends TypedMessage> (typedData: T, useV4: boolean = true): Buffer {
     const sanitizedData = this.sanitizeData(typedData)
     const parts = [Buffer.from('1901', 'hex')]
     parts.push(this.hashStruct('EIP712Domain', sanitizedData.domain, sanitizedData.types, useV4))
@@ -216,11 +250,11 @@ const TypedDataUtils = {
   },
 }
 
-module.exports = {
+exports = {
   TYPED_MESSAGE_SCHEMA,
   TypedDataUtils,
 
-  concatSig: function (v, r, s) {
+  concatSig: function (v: Buffer, r: Buffer, s: Buffer): string {
     const rSig = ethUtil.fromSigned(r)
     const sSig = ethUtil.fromSigned(s)
     const vSig = ethUtil.bufferToInt(v)
@@ -230,7 +264,7 @@ module.exports = {
     return ethUtil.addHexPrefix(rStr.concat(sStr, vStr)).toString('hex')
   },
 
-  normalize: function (input) {
+  normalize: function (input: number | string): string {
     if (!input) return
 
     if (typeof input === 'number') {
@@ -247,7 +281,7 @@ module.exports = {
     return ethUtil.addHexPrefix(input.toLowerCase())
   },
 
-  personalSign: function (privateKey, msgParams) {
+  personalSign: function (privateKey: Buffer, msgParams: MessageParameters): string {
     var message = ethUtil.toBuffer(msgParams.data)
     var msgHash = ethUtil.hashPersonalMessage(message)
     var sig = ethUtil.ecsign(msgHash, privateKey)
@@ -255,37 +289,37 @@ module.exports = {
     return serialized
   },
 
-  recoverPersonalSignature: function (msgParams) {
+  recoverPersonalSignature: function (msgParams: MessageParameters): string {
     const publicKey = getPublicKeyFor(msgParams)
     const sender = ethUtil.publicToAddress(publicKey)
     const senderHex = ethUtil.bufferToHex(sender)
     return senderHex
   },
 
-  extractPublicKey: function (msgParams) {
+  extractPublicKey: function (msgParams: MessageParameters): string {
     const publicKey = getPublicKeyFor(msgParams)
     return '0x' + publicKey.toString('hex')
   },
 
-  typedSignatureHash: function (typedData) {
+  typedSignatureHash: function (typedData: EIP712TypedData[]): string {
     const hashBuffer = typedSignatureHash(typedData)
     return ethUtil.bufferToHex(hashBuffer)
   },
 
-  signTypedDataLegacy: function (privateKey, msgParams) {
+  signTypedDataLegacy: function (privateKey: Buffer, msgParams: MessageParameters): string {
     const msgHash = typedSignatureHash(msgParams.data)
     const sig = ethUtil.ecsign(msgHash, privateKey)
     return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
   },
 
-  recoverTypedSignatureLegacy: function (msgParams) {
+  recoverTypedSignatureLegacy: function (msgParams: MessageParameters): string {
     const msgHash = typedSignatureHash(msgParams.data)
     const publicKey = recoverPublicKey(msgHash, msgParams.sig)
     const sender = ethUtil.publicToAddress(publicKey)
     return ethUtil.bufferToHex(sender)
   },
 
-  encrypt: function(receiverPublicKey, msgParams, version) {
+  encrypt: function(receiverPublicKey: string, msgParams: MessageParameters, version: string): EncryptedMessageData {
 
     switch(version) {
       case 'x25519-xsalsa20-poly1305':
@@ -297,12 +331,12 @@ module.exports = {
 
         // assemble encryption parameters - from string to UInt8
         try {
-          var pubKeyUInt8Array = nacl.util.decodeBase64(receiverPublicKey);
+          var pubKeyUInt8Array = naclUtil.decodeBase64(receiverPublicKey);
         } catch (err){
           throw new Error('Bad public key')
         }
 
-        var msgParamsUInt8Array = nacl.util.decodeUTF8(msgParams.data);
+        var msgParamsUInt8Array = naclUtil.decodeUTF8(msgParams.data);
         var nonce = nacl.randomBytes(nacl.box.nonceLength);
 
         // encrypt
@@ -311,9 +345,9 @@ module.exports = {
         // handle encrypted data
         var output = {
           version: 'x25519-xsalsa20-poly1305',
-          nonce: nacl.util.encodeBase64(nonce),
-          ephemPublicKey: nacl.util.encodeBase64(ephemeralKeyPair.publicKey),
-          ciphertext: nacl.util.encodeBase64(encryptedMessage)
+          nonce: naclUtil.encodeBase64(nonce),
+          ephemPublicKey: naclUtil.encodeBase64(ephemeralKeyPair.publicKey),
+          ciphertext: naclUtil.encodeBase64(encryptedMessage)
         };
         // return encrypted msg data
         return output;
@@ -324,7 +358,7 @@ module.exports = {
     }
   },
 
-  encryptSafely: function(receiverPublicKey, msgParams, version) {
+  encryptSafely: function(receiverPublicKey: string, msgParams: MessageParameters, version: string): EncryptedMessageData {
 
     const DEFAULT_PADDING_LENGTH = (2 ** 11);
     const NACL_EXTRA_BYTES = 16;
@@ -360,7 +394,7 @@ module.exports = {
     return this.encrypt(receiverPublicKey, paddedMsgParams, version);
   },
 
-  decrypt: function(encryptedData, receiverPrivateKey) {
+  decrypt: function(encryptedData: EncryptedMessageData, receiverPrivateKey: string): string {
 
     switch(encryptedData.version) {
       case 'x25519-xsalsa20-poly1305':
@@ -369,16 +403,16 @@ module.exports = {
         var recieverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(recieverPrivateKeyUint8Array).secretKey
 
         // assemble decryption parameters
-        var nonce = nacl.util.decodeBase64(encryptedData.nonce);
-        var ciphertext = nacl.util.decodeBase64(encryptedData.ciphertext);
-        var ephemPublicKey = nacl.util.decodeBase64(encryptedData.ephemPublicKey);
+        var nonce = naclUtil.decodeBase64(encryptedData.nonce);
+        var ciphertext = naclUtil.decodeBase64(encryptedData.ciphertext);
+        var ephemPublicKey = naclUtil.decodeBase64(encryptedData.ephemPublicKey);
 
         // decrypt
         var decryptedMessage = nacl.box.open(ciphertext, nonce, ephemPublicKey, recieverEncryptionPrivateKey);
 
         // return decrypted msg data
         try {
-          var output = nacl.util.encodeUTF8(decryptedMessage);
+          var output = naclUtil.encodeUTF8(decryptedMessage);
         }catch(err) {
           throw new Error('Decryption failed.')
         }
@@ -395,23 +429,23 @@ module.exports = {
     }
   },
 
-  decryptSafely: function(encryptedData, receiverPrivateKey) {
+  decryptSafely: function(encryptedData: EncryptedMessageData, receiverPrivateKey: string): string {
     const dataWithPadding = JSON.parse(this.decrypt(encryptedData, receiverPrivateKey));
     return dataWithPadding.data;
   },
 
 
-  getEncryptionPublicKey: function(privateKey){
+  getEncryptionPublicKey: function(privateKey: string): string {
     var privateKeyUint8Array = nacl_decodeHex(privateKey)
     var encryptionPublicKey = nacl.box.keyPair.fromSecretKey(privateKeyUint8Array).publicKey
-    return nacl.util.encodeBase64(encryptionPublicKey)
+    return naclUtil.encodeBase64(encryptionPublicKey)
   },
 
 
   /**
    * A generic entry point for all typed data methods to be passed, includes a version parameter.
    */
-  signTypedMessage: function (privateKey, msgParams, version = 'V4') {
+  signTypedMessage: function (privateKey: Buffer, msgParams: MessageParameters, version: Version = 'V4'): string {
     switch (version) {
       case 'V1':
         return this.signTypedDataLegacy(privateKey, msgParams)
@@ -423,7 +457,7 @@ module.exports = {
     }
   },
 
-  recoverTypedMessage: function (msgParams, version = 'V4') {
+  recoverTypedMessage: function (msgParams: MessageParameters, version: Version = 'V4'): string {
     switch (version) {
       case 'V1':
         return this.recoverTypedSignatureLegacy(msgParams)
@@ -435,26 +469,26 @@ module.exports = {
     }
   },
 
-  signTypedData: function (privateKey, msgParams) {
+  signTypedData: function (privateKey: Buffer, msgParams: MessageParameters): string {
     const message = TypedDataUtils.sign(msgParams.data, false)
     const sig = ethUtil.ecsign(message, privateKey)
     return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
   },
 
-  signTypedData_v4: function (privateKey, msgParams) {
+  signTypedData_v4: function (privateKey: Buffer, msgParams: MessageParameters): string {
     const message = TypedDataUtils.sign(msgParams.data)
     const sig = ethUtil.ecsign(message, privateKey)
     return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
   },
 
-  recoverTypedSignature: function (msgParams) {
+  recoverTypedSignature: function (msgParams: MessageParameters): string {
     const message = TypedDataUtils.sign(msgParams.data, false)
     const publicKey = recoverPublicKey(message, msgParams.sig)
     const sender = ethUtil.publicToAddress(publicKey)
     return ethUtil.bufferToHex(sender)
   },
 
-  recoverTypedSignature_v4: function (msgParams) {
+  recoverTypedSignature_v4: function (msgParams: MessageParameters): string {
     const message = TypedDataUtils.sign(msgParams.data)
     const publicKey = recoverPublicKey(message, msgParams.sig)
     const sender = ethUtil.publicToAddress(publicKey)
@@ -467,7 +501,7 @@ module.exports = {
  * @param typedData - Array of data along with types, as per EIP712.
  * @returns Buffer
  */
-function typedSignatureHash(typedData) {
+function typedSignatureHash(typedData: EIP712TypedData[]): Buffer {
   const error = new Error('Expect argument to be non-empty array')
   if (typeof typedData !== 'object' || !typedData.length) throw error
 
@@ -489,20 +523,20 @@ function typedSignatureHash(typedData) {
   )
 }
 
-function recoverPublicKey(hash, sig) {
+function recoverPublicKey(hash: Buffer, sig: any): Buffer {
   const signature = ethUtil.toBuffer(sig)
   const sigParams = ethUtil.fromRpcSig(signature)
   return ethUtil.ecrecover(hash, sigParams.v, sigParams.r, sigParams.s)
 }
 
-function getPublicKeyFor (msgParams) {
+function getPublicKeyFor (msgParams: MessageParameters): Buffer {
   const message = ethUtil.toBuffer(msgParams.data)
   const msgHash = ethUtil.hashPersonalMessage(message)
   return recoverPublicKey(msgHash, msgParams.sig)
 }
 
 
-function padWithZeroes (number, length) {
+function padWithZeroes (number: string, length: number): string {
   var myString = '' + number
   while (myString.length < length) {
     myString = '0' + myString
@@ -511,9 +545,9 @@ function padWithZeroes (number, length) {
 }
 
 //converts hex strings to the Uint8Array format used by nacl
-function nacl_decodeHex(msgHex) {
+function nacl_decodeHex(msgHex: string): Uint8Array {
   var msgBase64 = (Buffer.from(msgHex, 'hex')).toString('base64');
-  return nacl.util.decodeBase64(msgBase64);
+  return naclUtil.decodeBase64(msgBase64);
 }
 
 
