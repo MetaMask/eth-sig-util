@@ -19,19 +19,19 @@ export interface EncryptedMessageData {
 }
 
 export interface MessageParameters {
-  data: EIP712TypedData[];
-  sig: any;
+  data: TypedMessage;
+  sig?: string;
 }
 
-export interface AdditionalProperties {
+export interface TypedMessageProperties {
   name: string;
   type: string;
 }
 
 export interface TypedMessage {
   types: {
-    EIP712Domain: any;
-    additionalProperties: AdditionalProperties[];
+    EIP712Domain: TypedMessageProperties;
+    [additionalProperties: string]: TypedMessageProperties;
   };
   primaryType: string;
   domain: object;
@@ -250,258 +250,274 @@ const TypedDataUtils = {
   },
 }
 
-exports = {
+function concatSig (v: Buffer, r: Buffer, s: Buffer): string {
+  const rSig = ethUtil.fromSigned(r)
+  const sSig = ethUtil.fromSigned(s)
+  const vSig = ethUtil.bufferToInt(v)
+  const rStr = padWithZeroes(ethUtil.toUnsigned(rSig).toString('hex'), 64)
+  const sStr = padWithZeroes(ethUtil.toUnsigned(sSig).toString('hex'), 64)
+  const vStr = ethUtil.stripHexPrefix(ethUtil.intToHex(vSig))
+  return ethUtil.addHexPrefix(rStr.concat(sStr, vStr)).toString('hex')
+}
+
+function normalize (input: number | string): string {
+  if (!input) return
+
+  if (typeof input === 'number') {
+    const buffer = ethUtil.toBuffer(input)
+    input = ethUtil.bufferToHex(buffer)
+  }
+
+  if (typeof input !== 'string') {
+    var msg = 'eth-sig-util.normalize() requires hex string or integer input.'
+    msg += ' received ' + (typeof input) + ': ' + input
+    throw new Error(msg)
+  }
+
+  return ethUtil.addHexPrefix(input.toLowerCase())
+}
+
+function personalSign (privateKey: Buffer, msgParams: MessageParameters): string {
+  var message = ethUtil.toBuffer(msgParams.data)
+  var msgHash = ethUtil.hashPersonalMessage(message)
+  var sig = ethUtil.ecsign(msgHash, privateKey)
+  var serialized = ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
+  return serialized
+}
+
+function recoverPersonalSignature (msgParams: MessageParameters): string {
+  const publicKey = getPublicKeyFor(msgParams)
+  const sender = ethUtil.publicToAddress(publicKey)
+  const senderHex = ethUtil.bufferToHex(sender)
+  return senderHex
+}
+
+function extractPublicKey (msgParams: MessageParameters): string {
+  const publicKey = getPublicKeyFor(msgParams)
+  return '0x' + publicKey.toString('hex')
+}
+
+function externalTypedSignatureHash (typedData: EIP712TypedData[]): string {
+  const hashBuffer = typedSignatureHash(typedData)
+  return ethUtil.bufferToHex(hashBuffer)
+}
+
+function signTypedDataLegacy (privateKey: Buffer, msgParams: MessageParameters): string {
+  const msgHash = typedSignatureHash(msgParams.data)
+  const sig = ethUtil.ecsign(msgHash, privateKey)
+  return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
+}
+
+function recoverTypedSignatureLegacy (msgParams: MessageParameters): string {
+  const msgHash = typedSignatureHash(msgParams.data)
+  const publicKey = recoverPublicKey(msgHash, msgParams.sig)
+  const sender = ethUtil.publicToAddress(publicKey)
+  return ethUtil.bufferToHex(sender)
+}
+
+function encrypt (receiverPublicKey: string, msgParams: MessageParameters, version: string): EncryptedMessageData {
+
+  switch(version) {
+    case 'x25519-xsalsa20-poly1305':
+      if( typeof msgParams.data == 'undefined'){
+        throw new Error('Cannot detect secret message, message params should be of the form {data: "secret message"} ')
+      }
+      //generate ephemeral keypair
+      var ephemeralKeyPair = nacl.box.keyPair()
+
+      // assemble encryption parameters - from string to UInt8
+      try {
+        var pubKeyUInt8Array = naclUtil.decodeBase64(receiverPublicKey);
+      } catch (err){
+        throw new Error('Bad public key')
+      }
+
+      var msgParamsUInt8Array = naclUtil.decodeUTF8(msgParams.data);
+      var nonce = nacl.randomBytes(nacl.box.nonceLength);
+
+      // encrypt
+      var encryptedMessage = nacl.box(msgParamsUInt8Array, nonce, pubKeyUInt8Array, ephemeralKeyPair.secretKey);
+
+      // handle encrypted data
+      var output = {
+        version: 'x25519-xsalsa20-poly1305',
+        nonce: naclUtil.encodeBase64(nonce),
+        ephemPublicKey: naclUtil.encodeBase64(ephemeralKeyPair.publicKey),
+        ciphertext: naclUtil.encodeBase64(encryptedMessage)
+      };
+      // return encrypted msg data
+      return output;
+
+    default:
+      throw new Error('Encryption type/version not supported')
+
+  }
+}
+
+function encryptSafely (receiverPublicKey: string, msgParams: MessageParameters, version: string): EncryptedMessageData {
+
+  const DEFAULT_PADDING_LENGTH = (2 ** 11);
+  const NACL_EXTRA_BYTES = 16;
+
+  let data = msgParams.data;
+  if (!data) {
+    throw new Error('Cannot encrypt empty msg.data');
+  }
+
+  if (typeof data === 'object' && data.toJSON) {
+    // remove toJSON attack vector
+    // TODO, check all possible children
+    throw new Error('Cannot encrypt with toJSON property.  Please remove toJSON property');
+  }
+
+  // add padding
+  const dataWithPadding = {
+    data,
+    padding: '',
+  };
+
+  // calculate padding
+  const dataLength = Buffer.byteLength(JSON.stringify(dataWithPadding), 'utf-8');
+  const modVal = (dataLength % DEFAULT_PADDING_LENGTH);
+  let padLength = 0;
+  // Only pad if necessary
+  if (modVal > 0) {
+    padLength = (DEFAULT_PADDING_LENGTH - modVal) - NACL_EXTRA_BYTES; // nacl extra bytes
+  }
+  dataWithPadding.padding = '0'.repeat(padLength);
+
+  const paddedMsgParams = {data:JSON.stringify(dataWithPadding)};
+  return this.encrypt(receiverPublicKey, paddedMsgParams, version);
+}
+
+function decrypt (encryptedData: EncryptedMessageData, receiverPrivateKey: string): string {
+
+  switch(encryptedData.version) {
+    case 'x25519-xsalsa20-poly1305':
+      //string to buffer to UInt8Array
+      var recieverPrivateKeyUint8Array = nacl_decodeHex(receiverPrivateKey)
+      var recieverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(recieverPrivateKeyUint8Array).secretKey
+
+      // assemble decryption parameters
+      var nonce = naclUtil.decodeBase64(encryptedData.nonce);
+      var ciphertext = naclUtil.decodeBase64(encryptedData.ciphertext);
+      var ephemPublicKey = naclUtil.decodeBase64(encryptedData.ephemPublicKey);
+
+      // decrypt
+      var decryptedMessage = nacl.box.open(ciphertext, nonce, ephemPublicKey, recieverEncryptionPrivateKey);
+
+      // return decrypted msg data
+      try {
+        var output = naclUtil.encodeUTF8(decryptedMessage);
+      }catch(err) {
+        throw new Error('Decryption failed.')
+      }
+
+      if (output){
+        return output;
+      }else{
+        throw new Error('Decryption failed.')
+      }
+
+
+    default:
+      throw new Error('Encryption type/version not supported.')
+  }
+}
+
+function decryptSafely (encryptedData: EncryptedMessageData, receiverPrivateKey: string): string {
+  const dataWithPadding = JSON.parse(this.decrypt(encryptedData, receiverPrivateKey));
+  return dataWithPadding.data;
+}
+
+function getEncryptionPublicKey (privateKey: string): string {
+  var privateKeyUint8Array = nacl_decodeHex(privateKey)
+  var encryptionPublicKey = nacl.box.keyPair.fromSecretKey(privateKeyUint8Array).publicKey
+  return naclUtil.encodeBase64(encryptionPublicKey)
+}
+
+/**
+ * A generic entry point for all typed data methods to be passed, includes a version parameter.
+ */
+function signTypedMessage (privateKey: Buffer, msgParams: MessageParameters, version: Version = 'V4'): string {
+  switch (version) {
+    case 'V1':
+      return this.signTypedDataLegacy(privateKey, msgParams)
+    case 'V3':
+      return this.signTypedData(privateKey, msgParams)
+    case 'V4':
+    default:
+      return this.signTypedData_v4(privateKey, msgParams)
+  }
+}
+
+function recoverTypedMessage (msgParams: MessageParameters, version: Version = 'V4'): string {
+  switch (version) {
+    case 'V1':
+      return this.recoverTypedSignatureLegacy(msgParams)
+    case 'V3':
+      return this.recoverTypedSignature(msgParams)
+    case 'V4':
+    default:
+      return this.recoverTypedSignature_v4(msgParams)
+  }
+}
+
+function signTypedData (privateKey: Buffer, msgParams: MessageParameters): string {
+  const message = TypedDataUtils.sign(msgParams.data, false)
+  const sig = ethUtil.ecsign(message, privateKey)
+  return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
+}
+
+function signTypedData_v4 (privateKey: Buffer, msgParams: MessageParameters): string {
+  const message = TypedDataUtils.sign(msgParams.data)
+  const sig = ethUtil.ecsign(message, privateKey)
+  return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
+}
+
+function recoverTypedSignature (msgParams: MessageParameters): string {
+  const message = TypedDataUtils.sign(msgParams.data, false)
+  const publicKey = recoverPublicKey(message, msgParams.sig)
+  const sender = ethUtil.publicToAddress(publicKey)
+  return ethUtil.bufferToHex(sender)
+}
+
+function recoverTypedSignature_v4 (msgParams: MessageParameters): string {
+  const message = TypedDataUtils.sign(msgParams.data)
+  const publicKey = recoverPublicKey(message, msgParams.sig)
+  const sender = ethUtil.publicToAddress(publicKey)
+  return ethUtil.bufferToHex(sender)
+}
+
+export {
   TYPED_MESSAGE_SCHEMA,
   TypedDataUtils,
-
-  concatSig: function (v: Buffer, r: Buffer, s: Buffer): string {
-    const rSig = ethUtil.fromSigned(r)
-    const sSig = ethUtil.fromSigned(s)
-    const vSig = ethUtil.bufferToInt(v)
-    const rStr = padWithZeroes(ethUtil.toUnsigned(rSig).toString('hex'), 64)
-    const sStr = padWithZeroes(ethUtil.toUnsigned(sSig).toString('hex'), 64)
-    const vStr = ethUtil.stripHexPrefix(ethUtil.intToHex(vSig))
-    return ethUtil.addHexPrefix(rStr.concat(sStr, vStr)).toString('hex')
-  },
-
-  normalize: function (input: number | string): string {
-    if (!input) return
-
-    if (typeof input === 'number') {
-      const buffer = ethUtil.toBuffer(input)
-      input = ethUtil.bufferToHex(buffer)
-    }
-
-    if (typeof input !== 'string') {
-      var msg = 'eth-sig-util.normalize() requires hex string or integer input.'
-      msg += ' received ' + (typeof input) + ': ' + input
-      throw new Error(msg)
-    }
-
-    return ethUtil.addHexPrefix(input.toLowerCase())
-  },
-
-  personalSign: function (privateKey: Buffer, msgParams: MessageParameters): string {
-    var message = ethUtil.toBuffer(msgParams.data)
-    var msgHash = ethUtil.hashPersonalMessage(message)
-    var sig = ethUtil.ecsign(msgHash, privateKey)
-    var serialized = ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
-    return serialized
-  },
-
-  recoverPersonalSignature: function (msgParams: MessageParameters): string {
-    const publicKey = getPublicKeyFor(msgParams)
-    const sender = ethUtil.publicToAddress(publicKey)
-    const senderHex = ethUtil.bufferToHex(sender)
-    return senderHex
-  },
-
-  extractPublicKey: function (msgParams: MessageParameters): string {
-    const publicKey = getPublicKeyFor(msgParams)
-    return '0x' + publicKey.toString('hex')
-  },
-
-  typedSignatureHash: function (typedData: EIP712TypedData[]): string {
-    const hashBuffer = typedSignatureHash(typedData)
-    return ethUtil.bufferToHex(hashBuffer)
-  },
-
-  signTypedDataLegacy: function (privateKey: Buffer, msgParams: MessageParameters): string {
-    const msgHash = typedSignatureHash(msgParams.data)
-    const sig = ethUtil.ecsign(msgHash, privateKey)
-    return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
-  },
-
-  recoverTypedSignatureLegacy: function (msgParams: MessageParameters): string {
-    const msgHash = typedSignatureHash(msgParams.data)
-    const publicKey = recoverPublicKey(msgHash, msgParams.sig)
-    const sender = ethUtil.publicToAddress(publicKey)
-    return ethUtil.bufferToHex(sender)
-  },
-
-  encrypt: function(receiverPublicKey: string, msgParams: MessageParameters, version: string): EncryptedMessageData {
-
-    switch(version) {
-      case 'x25519-xsalsa20-poly1305':
-        if( typeof msgParams.data == 'undefined'){
-          throw new Error('Cannot detect secret message, message params should be of the form {data: "secret message"} ')
-        }
-        //generate ephemeral keypair
-        var ephemeralKeyPair = nacl.box.keyPair()
-
-        // assemble encryption parameters - from string to UInt8
-        try {
-          var pubKeyUInt8Array = naclUtil.decodeBase64(receiverPublicKey);
-        } catch (err){
-          throw new Error('Bad public key')
-        }
-
-        var msgParamsUInt8Array = naclUtil.decodeUTF8(msgParams.data);
-        var nonce = nacl.randomBytes(nacl.box.nonceLength);
-
-        // encrypt
-        var encryptedMessage = nacl.box(msgParamsUInt8Array, nonce, pubKeyUInt8Array, ephemeralKeyPair.secretKey);
-
-        // handle encrypted data
-        var output = {
-          version: 'x25519-xsalsa20-poly1305',
-          nonce: naclUtil.encodeBase64(nonce),
-          ephemPublicKey: naclUtil.encodeBase64(ephemeralKeyPair.publicKey),
-          ciphertext: naclUtil.encodeBase64(encryptedMessage)
-        };
-        // return encrypted msg data
-        return output;
-
-      default:
-        throw new Error('Encryption type/version not supported')
-
-    }
-  },
-
-  encryptSafely: function(receiverPublicKey: string, msgParams: MessageParameters, version: string): EncryptedMessageData {
-
-    const DEFAULT_PADDING_LENGTH = (2 ** 11);
-    const NACL_EXTRA_BYTES = 16;
-
-    let data = msgParams.data;
-    if (!data) {
-      throw new Error('Cannot encrypt empty msg.data');
-    }
-
-    if (typeof data === 'object' && data.toJSON) {
-      // remove toJSON attack vector
-      // TODO, check all possible children
-      throw new Error('Cannot encrypt with toJSON property.  Please remove toJSON property');
-    }
-
-    // add padding
-    const dataWithPadding = {
-      data,
-      padding: '',
-    };
-
-    // calculate padding
-    const dataLength = Buffer.byteLength(JSON.stringify(dataWithPadding), 'utf-8');
-    const modVal = (dataLength % DEFAULT_PADDING_LENGTH);
-    let padLength = 0;
-    // Only pad if necessary
-    if (modVal > 0) {
-      padLength = (DEFAULT_PADDING_LENGTH - modVal) - NACL_EXTRA_BYTES; // nacl extra bytes
-    }
-    dataWithPadding.padding = '0'.repeat(padLength);
-
-    const paddedMsgParams = {data:JSON.stringify(dataWithPadding)};
-    return this.encrypt(receiverPublicKey, paddedMsgParams, version);
-  },
-
-  decrypt: function(encryptedData: EncryptedMessageData, receiverPrivateKey: string): string {
-
-    switch(encryptedData.version) {
-      case 'x25519-xsalsa20-poly1305':
-        //string to buffer to UInt8Array
-        var recieverPrivateKeyUint8Array = nacl_decodeHex(receiverPrivateKey)
-        var recieverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(recieverPrivateKeyUint8Array).secretKey
-
-        // assemble decryption parameters
-        var nonce = naclUtil.decodeBase64(encryptedData.nonce);
-        var ciphertext = naclUtil.decodeBase64(encryptedData.ciphertext);
-        var ephemPublicKey = naclUtil.decodeBase64(encryptedData.ephemPublicKey);
-
-        // decrypt
-        var decryptedMessage = nacl.box.open(ciphertext, nonce, ephemPublicKey, recieverEncryptionPrivateKey);
-
-        // return decrypted msg data
-        try {
-          var output = naclUtil.encodeUTF8(decryptedMessage);
-        }catch(err) {
-          throw new Error('Decryption failed.')
-        }
-
-        if (output){
-          return output;
-        }else{
-          throw new Error('Decryption failed.')
-        }
-
-
-      default:
-        throw new Error('Encryption type/version not supported.')
-    }
-  },
-
-  decryptSafely: function(encryptedData: EncryptedMessageData, receiverPrivateKey: string): string {
-    const dataWithPadding = JSON.parse(this.decrypt(encryptedData, receiverPrivateKey));
-    return dataWithPadding.data;
-  },
-
-
-  getEncryptionPublicKey: function(privateKey: string): string {
-    var privateKeyUint8Array = nacl_decodeHex(privateKey)
-    var encryptionPublicKey = nacl.box.keyPair.fromSecretKey(privateKeyUint8Array).publicKey
-    return naclUtil.encodeBase64(encryptionPublicKey)
-  },
-
-
-  /**
-   * A generic entry point for all typed data methods to be passed, includes a version parameter.
-   */
-  signTypedMessage: function (privateKey: Buffer, msgParams: MessageParameters, version: Version = 'V4'): string {
-    switch (version) {
-      case 'V1':
-        return this.signTypedDataLegacy(privateKey, msgParams)
-      case 'V3':
-        return this.signTypedData(privateKey, msgParams)
-      case 'V4':
-      default:
-        return this.signTypedData_v4(privateKey, msgParams)
-    }
-  },
-
-  recoverTypedMessage: function (msgParams: MessageParameters, version: Version = 'V4'): string {
-    switch (version) {
-      case 'V1':
-        return this.recoverTypedSignatureLegacy(msgParams)
-      case 'V3':
-        return this.recoverTypedSignature(msgParams)
-      case 'V4':
-      default:
-        return this.recoverTypedSignature_v4(msgParams)
-    }
-  },
-
-  signTypedData: function (privateKey: Buffer, msgParams: MessageParameters): string {
-    const message = TypedDataUtils.sign(msgParams.data, false)
-    const sig = ethUtil.ecsign(message, privateKey)
-    return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
-  },
-
-  signTypedData_v4: function (privateKey: Buffer, msgParams: MessageParameters): string {
-    const message = TypedDataUtils.sign(msgParams.data)
-    const sig = ethUtil.ecsign(message, privateKey)
-    return ethUtil.bufferToHex(this.concatSig(sig.v, sig.r, sig.s))
-  },
-
-  recoverTypedSignature: function (msgParams: MessageParameters): string {
-    const message = TypedDataUtils.sign(msgParams.data, false)
-    const publicKey = recoverPublicKey(message, msgParams.sig)
-    const sender = ethUtil.publicToAddress(publicKey)
-    return ethUtil.bufferToHex(sender)
-  },
-
-  recoverTypedSignature_v4: function (msgParams: MessageParameters): string {
-    const message = TypedDataUtils.sign(msgParams.data)
-    const publicKey = recoverPublicKey(message, msgParams.sig)
-    const sender = ethUtil.publicToAddress(publicKey)
-    return ethUtil.bufferToHex(sender)
-  },
-
-}
+  concatSig,
+  normalize,
+  personalSign,
+  recoverPersonalSignature,
+  extractPublicKey,
+  externalTypedSignatureHash as typedSignatureHash,
+  signTypedDataLegacy,
+  recoverTypedSignatureLegacy,
+  encrypt,
+  encryptSafely,
+  decrypt,
+  decryptSafely,
+  getEncryptionPublicKey,
+  signTypedMessage,
+  recoverTypedMessage,
+  signTypedData,
+  signTypedData_v4,
+  recoverTypedSignature,
+  recoverTypedSignature_v4,
+};
 
 /**
  * @param typedData - Array of data along with types, as per EIP712.
  * @returns Buffer
  */
-function typedSignatureHash(typedData: EIP712TypedData[]): Buffer {
+function typedSignatureHash(typedData: EIP712TypedData[] | string): Buffer {
   const error = new Error('Expect argument to be non-empty array')
   if (typeof typedData !== 'object' || !typedData.length) throw error
 
@@ -523,7 +539,7 @@ function typedSignatureHash(typedData: EIP712TypedData[]): Buffer {
   )
 }
 
-function recoverPublicKey(hash: Buffer, sig: any): Buffer {
+function recoverPublicKey(hash: Buffer, sig: string): Buffer {
   const signature = ethUtil.toBuffer(sig)
   const sigParams = ethUtil.fromRpcSig(signature)
   return ethUtil.ecrecover(hash, sigParams.v, sigParams.r, sigParams.s)

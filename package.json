@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc -d",
-    "test": "npm run build && node test/index.ts"
+    "test": "npm run build && ts-node test/index.ts"
   },
   "repository": {
     "type": "git",
@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "tape": "^4.9.1",
+    "ts-node": "^8.5.4",
     "typescript": "3.4.3"
   }
 }
