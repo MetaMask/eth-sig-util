@@ -531,7 +531,7 @@ export {
  */
 function typedSignatureHash<T extends MessageTypes>(typedData: TypedData<T>): Buffer {
   const error = new Error('Expect argument to be non-empty array')
-  if (typeof typedData !== 'object' || !('length' in typedData)) throw error
+  if (typeof typedData !== 'object' || !('length' in typedData) || !typedData.length) throw error
 
   const data = typedData.map(function (e) {
     return e.type === 'bytes' ? ethUtil.toBuffer(e.value) : e.value
