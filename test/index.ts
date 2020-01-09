@@ -426,12 +426,6 @@ test('Decryption failed because cyphertext is wrong or missing', async t => {
   t.throws(function() { sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)}, 'Decryption failed.')
 });
 
-test("Decryption fails because you are not the recipient", t => {
-  t.plan(1);
-
-  t.throws(function() { sigUtil.decrypt(encryptedData, alice.ethereumPrivateKey)}, 'Decryption failed.')
-});
-
 test('signedTypeData', (t) => {
   t.plan(8)
 
