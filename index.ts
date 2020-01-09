@@ -21,16 +21,11 @@ export interface EthEncryptedData {
   ciphertext: string;
 }
 
-export type SignedMsgParams = Required<MsgParams>;
+export type SignedMsgParams<T extends MessageTypes> = Required<MsgParams<T>>;
 
-export interface MsgParams {
-  data: string;
-  sig?: string;
-}
-
-export interface TypedMsgParams<T extends MessageTypes> {
-  from?: string;
+export interface MsgParams<T extends MessageTypes> {
   data: TypedData<T>;
+  sig?: string;
 }
 
 interface MessageTypeProperty {
@@ -294,7 +289,7 @@ function normalize (input: number | string): string {
   return ethUtil.addHexPrefix(input.toLowerCase())
 }
 
-function personalSign (privateKey: Buffer, msgParams: MsgParams): string {
+function personalSign<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<T>): string {
   var message = ethUtil.toBuffer(msgParams.data)
   var msgHash = ethUtil.hashPersonalMessage(message)
   var sig = ethUtil.ecsign(msgHash, privateKey)
@@ -302,14 +297,14 @@ function personalSign (privateKey: Buffer, msgParams: MsgParams): string {
   return serialized
 }
 
-function recoverPersonalSignature (msgParams: SignedMsgParams): string {
+function recoverPersonalSignature<T extends MessageTypes> (msgParams: SignedMsgParams<T>): string {
   const publicKey = getPublicKeyFor(msgParams)
   const sender = ethUtil.publicToAddress(publicKey)
   const senderHex = ethUtil.bufferToHex(sender)
   return senderHex
 }
 
-function extractPublicKey (msgParams: SignedMsgParams): string {
+function extractPublicKey<T extends MessageTypes> (msgParams: SignedMsgParams<T>): string {
   const publicKey = getPublicKeyFor(msgParams)
   return '0x' + publicKey.toString('hex')
 }
@@ -319,24 +314,24 @@ function externalTypedSignatureHash (typedData: EIP712TypedData[]): string {
   return ethUtil.bufferToHex(hashBuffer)
 }
 
-function signTypedDataLegacy<T extends MessageTypes> (privateKey: Buffer, msgParams: TypedMsgParams<T>): string {
+function signTypedDataLegacy<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<T>): string {
   const msgHash = typedSignatureHash(msgParams.data)
   const sig = ethUtil.ecsign(msgHash, privateKey)
   return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s))
 }
 
-function recoverTypedSignatureLegacy (msgParams: SignedMsgParams): string {
+function recoverTypedSignatureLegacy<T extends MessageTypes> (msgParams: SignedMsgParams<T>): string {
   const msgHash = typedSignatureHash(msgParams.data)
   const publicKey = recoverPublicKey(msgHash, msgParams.sig)
   const sender = ethUtil.publicToAddress(publicKey)
   return ethUtil.bufferToHex(sender)
 }
 
-function encrypt (receiverPublicKey: string, msgParams: MsgParams, version: string): EthEncryptedData {
+function encrypt<T extends MessageTypes> (receiverPublicKey: string, msgParams: MsgParams<T>, version: string): EthEncryptedData {
 
   switch(version) {
     case 'x25519-xsalsa20-poly1305':
-      if( typeof msgParams.data == 'undefined'){
+      if( typeof msgParams.data !== 'string'){
         throw new Error('Cannot detect secret message, message params should be of the form {data: "secret message"} ')
       }
       //generate ephemeral keypair
@@ -371,7 +366,7 @@ function encrypt (receiverPublicKey: string, msgParams: MsgParams, version: stri
   }
 }
 
-function encryptSafely (receiverPublicKey: string, msgParams: MsgParams, version: string): EthEncryptedData {
+function encryptSafely<T extends MessageTypes> (receiverPublicKey: string, msgParams: MsgParams<T>, version: string): EthEncryptedData {
 
   const DEFAULT_PADDING_LENGTH = (2 ** 11);
   const NACL_EXTRA_BYTES = 16;
@@ -456,7 +451,7 @@ function getEncryptionPublicKey (privateKey: string): string {
 /**
  * A generic entry point for all typed data methods to be passed, includes a version parameter.
  */
-function signTypedMessage<T extends MessageTypes> (privateKey: Buffer, msgParams: TypedMsgParams<T>, version: Version = 'V4'): string {
+function signTypedMessage<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<T>, version: Version = 'V4'): string {
   switch (version) {
     case 'V1':
       return signTypedDataLegacy(privateKey, msgParams)
@@ -468,7 +463,7 @@ function signTypedMessage<T extends MessageTypes> (privateKey: Buffer, msgParams
   }
 }
 
-function recoverTypedMessage (msgParams: SignedMsgParams, version: Version = 'V4'): string {
+function recoverTypedMessage<T extends MessageTypes> (msgParams: SignedMsgParams<T>, version: Version = 'V4'): string {
   switch (version) {
     case 'V1':
       return recoverTypedSignatureLegacy(msgParams)
@@ -480,26 +475,26 @@ function recoverTypedMessage (msgParams: SignedMsgParams, version: Version = 'V4
   }
 }
 
-function signTypedData<T extends MessageTypes> (privateKey: Buffer, msgParams: TypedMsgParams<T>): string {
+function signTypedData<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<T>): string {
   const message = TypedDataUtils.sign(msgParams.data, false)
   const sig = ethUtil.ecsign(message, privateKey)
   return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s))
 }
 
-function signTypedData_v4<T extends MessageTypes> (privateKey: Buffer, msgParams: TypedMsgParams<T>): string {
+function signTypedData_v4<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<T>): string {
   const message = TypedDataUtils.sign(msgParams.data)
   const sig = ethUtil.ecsign(message, privateKey)
   return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s))
 }
 
-function recoverTypedSignature (msgParams: SignedMsgParams): string {
+function recoverTypedSignature<T extends MessageTypes> (msgParams: SignedMsgParams<T>): string {
   const message = TypedDataUtils.sign(msgParams.data, false)
   const publicKey = recoverPublicKey(message, msgParams.sig)
   const sender = ethUtil.publicToAddress(publicKey)
   return ethUtil.bufferToHex(sender)
 }
 
-function recoverTypedSignature_v4 (msgParams: SignedMsgParams): string {
+function recoverTypedSignature_v4<T extends MessageTypes> (msgParams: SignedMsgParams<T>): string {
   const message = TypedDataUtils.sign(msgParams.data)
   const publicKey = recoverPublicKey(message, msgParams.sig)
   const sender = ethUtil.publicToAddress(publicKey)
@@ -562,7 +557,7 @@ function recoverPublicKey(hash: Buffer, sig: string): Buffer {
   return ethUtil.ecrecover(hash, sigParams.v, sigParams.r, sigParams.s)
 }
 
-function getPublicKeyFor (msgParams: MsgParams): Buffer {
+function getPublicKeyFor<T extends MessageTypes> (msgParams: MsgParams<T>): Buffer {
   const message = ethUtil.toBuffer(msgParams.data)
   const msgHash = ethUtil.hashPersonalMessage(message)
   return recoverPublicKey(msgHash, msgParams.sig)
