@@ -89,9 +89,9 @@ const TypedDataUtils = {
    * @param {string} primaryType - Root type
    * @param {Object} data - Object to encode
    * @param {Object} types - Type definitions
-   * @returns {string} - Encoded representation of an object
+   * @returns {Buffer} - Encoded representation of an object
    */
-  encodeData (primaryType: string, data: object, types: object, useV4: boolean = true): string {
+  encodeData (primaryType: string, data: object, types: object, useV4: boolean = true): Buffer {
     const encodedTypes = ['bytes32']
     const encodedValues = [this.hashType(primaryType, types)]
 
@@ -216,9 +216,9 @@ const TypedDataUtils = {
    * @param {string} primaryType - Root type
    * @param {Object} data - Object to hash
    * @param {Object} types - Type definitions
-   * @returns {string} - Hash of an object
+   * @returns {Buffer} - Hash of an object
    */
-  hashStruct (primaryType: string, data: object, types: object, useV4: boolean = true): string {
+  hashStruct (primaryType: string, data: object, types: object, useV4: boolean = true): Buffer {
     return ethUtil.sha3(this.encodeData(primaryType, data, types, useV4))
   },
 
@@ -227,9 +227,9 @@ const TypedDataUtils = {
    *
    * @param {string} primaryType - Root type to hash
    * @param {Object} types - Type definitions
-   * @returns {string} - Hash of an object
+   * @returns {Buffer} - Hash of an object
    */
-  hashType (primaryType: string, types: object): string {
+  hashType (primaryType: string, types: object): Buffer {
     return ethUtil.sha3(this.encodeType(primaryType, types))
   },
 
