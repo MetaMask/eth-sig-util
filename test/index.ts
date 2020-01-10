@@ -509,7 +509,7 @@ test('signedTypeData with V3 string', (t) => {
             { name: 'contents', type: 'string' }
         ],
     },
-    primaryType: 'Mail' as 'Mail',
+    primaryType: 'Mail' as const,
     domain: {
         name: 'Ether Mail',
         version: '1',
@@ -581,7 +581,7 @@ test('signedTypeData_v4', (t) => {
         chainId: 1,
         verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
-    primaryType: 'Mail' as 'Mail',
+    primaryType: 'Mail' as const,
     message: {
         from: {
             name: 'Cow',

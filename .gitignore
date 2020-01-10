@@ -4,3 +4,5 @@ package-lock.json
 
 # TypeScript
 /build
+**/*.d.ts
+**/*.js

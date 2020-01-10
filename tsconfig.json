@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
-    "outDir": "./build",
+    "declaration": true,
     "target": "es5"
   },
   "include": [
+    "./test/**/*",
     "./index.ts",
     "./utils/**/*"
   ]
