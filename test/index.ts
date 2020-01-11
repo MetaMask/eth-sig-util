@@ -447,7 +447,7 @@ test('signedTypeData', (t) => {
             { name: 'contents', type: 'string' }
         ],
     },
-    primaryType: 'Mail' as 'Mail',
+    primaryType: 'Mail' as const,
     domain: {
         name: 'Ether Mail',
         version: '1',
@@ -693,7 +693,7 @@ test('signedTypeData_v4', (t) => {
         chainId: 1,
         verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
-    primaryType: 'Mail' as 'Mail',
+    primaryType: 'Mail' as const,
     message: {
         from: {
             name: 'Cow',
@@ -796,7 +796,7 @@ test('signedTypeData_v4 with recursive types', (t) => {
         chainId: 1,
         verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
-    primaryType: 'Person' as 'Person',
+    primaryType: 'Person' as const,
     message: {
         name: 'Jon',
         mother: {
@@ -892,7 +892,7 @@ test('signedTypeMessage V4 with recursive types', (t) => {
         chainId: 1,
         verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
-    primaryType: 'Person' as 'Person',
+    primaryType: 'Person' as const,
     message: {
         name: 'Jon',
         mother: {
