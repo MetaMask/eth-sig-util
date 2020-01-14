@@ -41,11 +41,11 @@ test('personalSign and recover', function (t) {
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
   const privKey = Buffer.from(privKeyHex, 'hex')
   const message = 'Hello, world!'
-  const msgParams: sigUtil.MsgParams<never> = { data: message }
+  const msgParams: sigUtil.MsgParams<string> = { data: message }
 
   const signed = sigUtil.personalSign(privKey, msgParams)
   msgParams.sig = signed
-  const recovered = sigUtil.recoverPersonalSignature(msgParams as sigUtil.SignedMsgParams<never>)
+  const recovered = sigUtil.recoverPersonalSignature(msgParams as sigUtil.SignedMsgParams<string>)
 
   t.equal(recovered, address)
 })
@@ -57,11 +57,11 @@ test('personalSign and extractPublicKey', function (t) {
 
   const privKey = Buffer.from(privKeyHex, 'hex')
   const message = 'Hello, world!'
-  const msgParams: sigUtil.MsgParams<never> = { data: message }
+  const msgParams: sigUtil.MsgParams<string> = { data: message }
 
   const signed = sigUtil.personalSign(privKey, msgParams)
   msgParams.sig = signed
-  const publicKey = sigUtil.extractPublicKey(msgParams as sigUtil.SignedMsgParams<never>)
+  const publicKey = sigUtil.extractPublicKey(msgParams as sigUtil.SignedMsgParams<string>)
 
   t.equal(publicKey, pubKeyHex)
 })
@@ -272,13 +272,13 @@ function signatureTest(opts) {
     const address = opts.addressHex
     const privKey = opts.privateKey
     const message = opts.message
-    const msgParams: sigUtil.MsgParams<never> = { data: message }
+    const msgParams: sigUtil.MsgParams<string> = { data: message }
 
     const signed = sigUtil.personalSign(privKey, msgParams)
     t.equal(signed, opts.signature)
 
     msgParams.sig = signed
-    const recovered = sigUtil.recoverPersonalSignature(msgParams as sigUtil.SignedMsgParams<never>)
+    const recovered = sigUtil.recoverPersonalSignature(msgParams as sigUtil.SignedMsgParams<string>)
 
     t.equal(recovered, address)
   })

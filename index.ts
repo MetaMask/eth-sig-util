@@ -3,8 +3,7 @@ import * as ethAbi from 'ethereumjs-abi';
 import * as nacl from 'tweetnacl';
 import * as naclUtil from 'tweetnacl-util';
 
-export type TypedData<T extends MessageTypes> =
-  string | EIP712TypedData | EIP712TypedData[] | TypedMessage<T>;
+export type TypedData = string | EIP712TypedData | EIP712TypedData[];
 
 interface EIP712TypedData {
   name: string;
@@ -21,10 +20,10 @@ export interface EthEncryptedData {
   ciphertext: string;
 }
 
-export type SignedMsgParams<T extends MessageTypes> = Required<MsgParams<T>>;
+export type SignedMsgParams<D> = Required<MsgParams<D>>;
 
-export interface MsgParams<T extends MessageTypes> {
-  data: TypedData<T>;
+export interface MsgParams<D> {
+  data: D;
   sig?: string;
 }
 
@@ -234,15 +233,15 @@ const TypedDataUtils = {
    * @param {Object} data - typed message object
    * @returns {Object} - typed message object with only allowed fields
    */
-  sanitizeData<T extends MessageTypes> (data: TypedData<T>): TypedData<T> {
-    const sanitizedData: Partial<TypedData<T>> = {}
+  sanitizeData<T extends MessageTypes> (data: TypedData | TypedMessage<T>): TypedMessage<T> {
+    const sanitizedData: Partial<TypedMessage<T>> = {}
     for (const key in TYPED_MESSAGE_SCHEMA.properties) {
       data[key] && (sanitizedData[key] = data[key])
     }
     if ('types' in sanitizedData) {
       sanitizedData.types = Object.assign({ EIP712Domain: [] }, sanitizedData.types)
     }
-    return sanitizedData as Required<TypedData<T>>
+    return sanitizedData as Required<TypedMessage<T>>
   },
 
   /**
@@ -251,7 +250,7 @@ const TypedDataUtils = {
    * @param {Object} typedData - Types message data to sign
    * @returns {Buffer} - sha3 hash of the resulting signed message
    */
-  sign<T extends MessageTypes> (typedData: Partial<TypedData<T>>, useV4: boolean = true): Buffer {
+  sign<T extends MessageTypes> (typedData: Partial<TypedData | TypedMessage<T>>, useV4: boolean = true): Buffer {
     const sanitizedData = this.sanitizeData(typedData)
     const parts = [Buffer.from('1901', 'hex')]
     parts.push(this.hashStruct('EIP712Domain', sanitizedData.domain, sanitizedData.types, useV4))
@@ -289,7 +288,7 @@ function normalize (input: number | string): string {
   return ethUtil.addHexPrefix(input.toLowerCase())
 }
 
-function personalSign<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<T>): string {
+function personalSign<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<TypedData | TypedMessage<T>>): string {
   var message = ethUtil.toBuffer(msgParams.data)
   var msgHash = ethUtil.hashPersonalMessage(message)
   var sig = ethUtil.ecsign(msgHash, privateKey)
@@ -297,14 +296,14 @@ function personalSign<T extends MessageTypes> (privateKey: Buffer, msgParams: Ms
   return serialized
 }
 
-function recoverPersonalSignature<T extends MessageTypes> (msgParams: SignedMsgParams<T>): string {
+function recoverPersonalSignature<T extends MessageTypes> (msgParams: SignedMsgParams<TypedData | TypedMessage<T>>): string {
   const publicKey = getPublicKeyFor(msgParams)
   const sender = ethUtil.publicToAddress(publicKey)
   const senderHex = ethUtil.bufferToHex(sender)
   return senderHex
 }
 
-function extractPublicKey<T extends MessageTypes> (msgParams: SignedMsgParams<T>): string {
+function extractPublicKey<T extends MessageTypes> (msgParams: SignedMsgParams<TypedData | TypedMessage<T>>): string {
   const publicKey = getPublicKeyFor(msgParams)
   return '0x' + publicKey.toString('hex')
 }
@@ -314,20 +313,20 @@ function externalTypedSignatureHash (typedData: EIP712TypedData[]): string {
   return ethUtil.bufferToHex(hashBuffer)
 }
 
-function signTypedDataLegacy<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<T>): string {
+function signTypedDataLegacy<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<TypedData | TypedMessage<T>>): string {
   const msgHash = typedSignatureHash(msgParams.data)
   const sig = ethUtil.ecsign(msgHash, privateKey)
   return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s))
 }
 
-function recoverTypedSignatureLegacy<T extends MessageTypes> (msgParams: SignedMsgParams<T>): string {
+function recoverTypedSignatureLegacy<T extends MessageTypes> (msgParams: SignedMsgParams<TypedData | TypedMessage<T>>): string {
   const msgHash = typedSignatureHash(msgParams.data)
   const publicKey = recoverPublicKey(msgHash, msgParams.sig)
   const sender = ethUtil.publicToAddress(publicKey)
   return ethUtil.bufferToHex(sender)
 }
 
-function encrypt<T extends MessageTypes> (receiverPublicKey: string, msgParams: MsgParams<T>, version: string): EthEncryptedData {
+function encrypt<T extends MessageTypes> (receiverPublicKey: string, msgParams: MsgParams<TypedData | TypedMessage<T>>, version: string): EthEncryptedData {
 
   switch(version) {
     case 'x25519-xsalsa20-poly1305':
@@ -366,7 +365,7 @@ function encrypt<T extends MessageTypes> (receiverPublicKey: string, msgParams: 
   }
 }
 
-function encryptSafely<T extends MessageTypes> (receiverPublicKey: string, msgParams: MsgParams<T>, version: string): EthEncryptedData {
+function encryptSafely<T extends MessageTypes> (receiverPublicKey: string, msgParams: MsgParams<TypedData | TypedMessage<T>>, version: string): EthEncryptedData {
 
   const DEFAULT_PADDING_LENGTH = (2 ** 11);
   const NACL_EXTRA_BYTES = 16;
@@ -451,7 +450,7 @@ function getEncryptionPublicKey (privateKey: string): string {
 /**
  * A generic entry point for all typed data methods to be passed, includes a version parameter.
  */
-function signTypedMessage<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<T>, version: Version = 'V4'): string {
+function signTypedMessage<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<TypedData | TypedMessage<T>>, version: Version = 'V4'): string {
   switch (version) {
     case 'V1':
       return signTypedDataLegacy(privateKey, msgParams)
@@ -463,7 +462,7 @@ function signTypedMessage<T extends MessageTypes> (privateKey: Buffer, msgParams
   }
 }
 
-function recoverTypedMessage<T extends MessageTypes> (msgParams: SignedMsgParams<T>, version: Version = 'V4'): string {
+function recoverTypedMessage<T extends MessageTypes> (msgParams: SignedMsgParams<TypedData | TypedMessage<T>>, version: Version = 'V4'): string {
   switch (version) {
     case 'V1':
       return recoverTypedSignatureLegacy(msgParams)
@@ -475,26 +474,26 @@ function recoverTypedMessage<T extends MessageTypes> (msgParams: SignedMsgParams
   }
 }
 
-function signTypedData<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<T>): string {
+function signTypedData<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<TypedData | TypedMessage<T>>): string {
   const message = TypedDataUtils.sign(msgParams.data, false)
   const sig = ethUtil.ecsign(message, privateKey)
   return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s))
 }
 
-function signTypedData_v4<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<T>): string {
+function signTypedData_v4<T extends MessageTypes> (privateKey: Buffer, msgParams: MsgParams<TypedData | TypedMessage<T>>): string {
   const message = TypedDataUtils.sign(msgParams.data)
   const sig = ethUtil.ecsign(message, privateKey)
   return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s))
 }
 
-function recoverTypedSignature<T extends MessageTypes> (msgParams: SignedMsgParams<T>): string {
+function recoverTypedSignature<T extends MessageTypes> (msgParams: SignedMsgParams<TypedData | TypedMessage<T>>): string {
   const message = TypedDataUtils.sign(msgParams.data, false)
   const publicKey = recoverPublicKey(message, msgParams.sig)
   const sender = ethUtil.publicToAddress(publicKey)
   return ethUtil.bufferToHex(sender)
 }
 
-function recoverTypedSignature_v4<T extends MessageTypes> (msgParams: SignedMsgParams<T>): string {
+function recoverTypedSignature_v4<T extends MessageTypes> (msgParams: SignedMsgParams<TypedData | TypedMessage<T>>): string {
   const message = TypedDataUtils.sign(msgParams.data)
   const publicKey = recoverPublicKey(message, msgParams.sig)
   const sender = ethUtil.publicToAddress(publicKey)
@@ -529,7 +528,7 @@ export {
  * @param typedData - Array of data along with types, as per EIP712.
  * @returns Buffer
  */
-function typedSignatureHash<T extends MessageTypes>(typedData: TypedData<T>): Buffer {
+function typedSignatureHash<T extends MessageTypes>(typedData: TypedData | TypedMessage<T>): Buffer {
   const error = new Error('Expect argument to be non-empty array')
   if (typeof typedData !== 'object' || !('length' in typedData) || !typedData.length) throw error
 
@@ -557,7 +556,7 @@ function recoverPublicKey(hash: Buffer, sig: string): Buffer {
   return ethUtil.ecrecover(hash, sigParams.v, sigParams.r, sigParams.s)
 }
 
-function getPublicKeyFor<T extends MessageTypes> (msgParams: MsgParams<T>): Buffer {
+function getPublicKeyFor<T extends MessageTypes> (msgParams: MsgParams<TypedData | TypedMessage<T>>): Buffer {
   const message = ethUtil.toBuffer(msgParams.data)
   const msgHash = ethUtil.hashPersonalMessage(message)
   return recoverPublicKey(msgHash, msgParams.sig)
