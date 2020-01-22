@@ -1,6 +1,6 @@
-const test = require('tape')
-const sigUtil = require('../')
-const ethUtil = require('ethereumjs-util')
+import * as test from 'tape';
+import * as sigUtil from '../index';
+import * as ethUtil from 'ethereumjs-util';
 
 test('normalize address lower cases', function (t) {
   t.plan(1)
@@ -27,7 +27,7 @@ test('normalize an unsupported type throws', function (t) {
   t.plan(1)
   const initial = {}
   try {
-    const result = sigUtil.normalize(initial)
+    const result = sigUtil.normalize(initial as any)
     t.ok(false, 'did not throw')
   } catch (e) {
     t.ok(e, 'should throw')
@@ -41,11 +41,11 @@ test('personalSign and recover', function (t) {
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
   const privKey = Buffer.from(privKeyHex, 'hex')
   const message = 'Hello, world!'
-  const msgParams = { data: message }
+  const msgParams: sigUtil.MsgParams<string> = { data: message }
 
   const signed = sigUtil.personalSign(privKey, msgParams)
   msgParams.sig = signed
-  const recovered = sigUtil.recoverPersonalSignature(msgParams)
+  const recovered = sigUtil.recoverPersonalSignature(msgParams as sigUtil.SignedMsgParams<string>)
 
   t.equal(recovered, address)
 })
@@ -57,11 +57,11 @@ test('personalSign and extractPublicKey', function (t) {
 
   const privKey = Buffer.from(privKeyHex, 'hex')
   const message = 'Hello, world!'
-  const msgParams = { data: message }
+  const msgParams: sigUtil.MsgParams<string> = { data: message }
 
   const signed = sigUtil.personalSign(privKey, msgParams)
   msgParams.sig = signed
-  const publicKey = sigUtil.extractPublicKey(msgParams)
+  const publicKey = sigUtil.extractPublicKey(msgParams as sigUtil.SignedMsgParams<string>)
 
   t.equal(publicKey, pubKeyHex)
 })
@@ -272,13 +272,13 @@ function signatureTest(opts) {
     const address = opts.addressHex
     const privKey = opts.privateKey
     const message = opts.message
-    const msgParams = { data: message }
+    const msgParams: sigUtil.MsgParams<string> = { data: message }
 
     const signed = sigUtil.personalSign(privKey, msgParams)
     t.equal(signed, opts.signature)
 
     msgParams.sig = signed
-    const recovered = sigUtil.recoverPersonalSignature(msgParams)
+    const recovered = sigUtil.recoverPersonalSignature(msgParams as sigUtil.SignedMsgParams<string>)
 
     t.equal(recovered, address)
   })
@@ -418,18 +418,12 @@ test('Decryption failed because cyphertext is wrong or missing', async t => {
   t.plan(1);
 
     //encrypted data
-  const badCypherData = { version: 'x25519-xsalsa20-poly1305',
+  const badEphemData = { version: 'x25519-xsalsa20-poly1305',
   nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
   ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
   ciphertext: 'ffffff/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
 
   t.throws(function() { sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)}, 'Decryption failed.')
-});
-
-test("Decryption fails because you are not the recipient", t => {
-  t.plan(1);
-
-  t.throws(function() { sigUtil.decrypt(encryptedData, alice.ethereumPrivateKey)}, 'Decryption failed.')
 });
 
 test('signedTypeData', (t) => {
@@ -453,7 +447,7 @@ test('signedTypeData', (t) => {
             { name: 'contents', type: 'string' }
         ],
     },
-    primaryType: 'Mail',
+    primaryType: 'Mail' as const,
     domain: {
         name: 'Ether Mail',
         version: '1',
@@ -515,7 +509,7 @@ test('signedTypeData with V3 string', (t) => {
             { name: 'contents', type: 'string' }
         ],
     },
-    primaryType: 'Mail',
+    primaryType: 'Mail' as const,
     domain: {
         name: 'Ether Mail',
         version: '1',
@@ -587,7 +581,7 @@ test('signedTypeData_v4', (t) => {
         chainId: 1,
         verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
-    primaryType: 'Mail',
+    primaryType: 'Mail' as const,
     message: {
         from: {
             name: 'Cow',
@@ -699,7 +693,7 @@ test('signedTypeData_v4', (t) => {
         chainId: 1,
         verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
-    primaryType: 'Mail',
+    primaryType: 'Mail' as const,
     message: {
         from: {
             name: 'Cow',
@@ -802,7 +796,7 @@ test('signedTypeData_v4 with recursive types', (t) => {
         chainId: 1,
         verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
-    primaryType: 'Person',
+    primaryType: 'Person' as const,
     message: {
         name: 'Jon',
         mother: {
@@ -898,7 +892,7 @@ test('signedTypeMessage V4 with recursive types', (t) => {
         chainId: 1,
         verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
-    primaryType: 'Person',
+    primaryType: 'Person' as const,
     message: {
         name: 'Jon',
         mother: {

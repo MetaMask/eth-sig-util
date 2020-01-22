@@ -9,13 +9,12 @@ workflows:
 jobs:
   npm-test:
     docker:
-      - image: circleci/node:8.15.1-browsers
+      - image: circleci/node:10
     steps:
       - checkout
       - run:
-          name: Install npm 6 + deps via npm
-          command: |
-           sudo npm install -g npm@6 && npm install --no-save --no-audit
+          name: npm ci
+          command: npm ci
       - run:
           name: npm test
           command: npm test

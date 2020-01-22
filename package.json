@@ -4,7 +4,8 @@
   "description": "A few useful functions for signing ethereum data",
   "main": "index.js",
   "scripts": {
-    "test": "node test/index.js"
+    "build": "tsc --project .",
+    "test": "npm run build && node test/index.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,8 @@
     "tweetnacl-util": "^0.15.0"
   },
   "devDependencies": {
-    "tape": "^4.9.1"
+    "@types/node": "^10.17.13",
+    "tape": "^4.9.1",
+    "typescript": "3.7.4"
   }
 }
