@@ -3,9 +3,15 @@
   "version": "2.5.2",
   "description": "A few useful functions for signing ethereum data",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "utils/"
+  ],
   "scripts": {
     "build": "tsc --project .",
-    "test": "npm run build && node test/index.js"
+    "test": "npm run build && node test/index.js",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
