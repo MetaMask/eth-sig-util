@@ -1,7 +1,5 @@
 # Eth-Sig-Util [![CircleCI](https://circleci.com/gh/MetaMask/eth-sig-util.svg?style=svg)](https://circleci.com/gh/MetaMask/eth-sig-util)
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/MetaMask/eth-sig-util.svg)](https://greenkeeper.io/)
-
 A small collection of ethereum signing functions.
 
 You can find usage examples [here](https://github.com/flyswatter/js-eth-personal-sign-examples)
