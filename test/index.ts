@@ -578,7 +578,7 @@ test('signedTypeData_v4', (t) => {
     domain: {
         name: 'Ether Mail',
         version: '1',
-        chainId: 1,
+        chainId: 9007199254740992,
         verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
     primaryType: 'Mail' as const,
@@ -603,6 +603,8 @@ test('signedTypeData_v4', (t) => {
   }
 
   const utils = sigUtil.TypedDataUtils
+
+  try {
 
   t.equal(utils.encodeType('Group', typedData.types),
     'Group(string name,Person[] members)Person(string name,address[] wallets)')
@@ -659,6 +661,12 @@ test('signedTypeData_v4', (t) => {
   const sig = sigUtil.signTypedData_v4(privateKey, { data: typedData })
 
   t.equal(sig, '0x65cbd956f2fae28a601bebc9b906cea0191744bd4c4247bcd27cd08f8eb6b71c78efdf7a31dc9abee78f492292721f362d296cf86b4538e07b51303b67f749061b')
+
+  } catch (err) {
+    console.dir(err)
+    t.error(err, 'Error thrown by signTypedData_v4')
+  }
+
 })
 
 
