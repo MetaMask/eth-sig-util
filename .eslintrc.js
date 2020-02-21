@@ -13,4 +13,14 @@ module.exports = {
       sourceType: 'script',
     },
   }],
+  rules: {
+    'camelcase': ['error', {
+      'allow': [
+        'nacl_decodeHex',
+        'recoverTypedSignature_v4',
+        'signTypedData_v4',
+      ],
+    }],
+    'no-param-reassign': 'off',
+  },
 };
