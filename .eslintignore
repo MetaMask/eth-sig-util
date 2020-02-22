@@ -1,0 +1,6 @@
+*.js
+!.eslintrc.js
+node_modules
+dist
+coverage
+*.d.ts

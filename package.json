@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "build": "tsc --project .",
-    "lint": "echo",
+    "lint": "eslint . --ext .ts,.js",
     "test": "npm run build && node test/index.js",
     "prepublishOnly": "npm run build"
   },
@@ -37,7 +37,12 @@
     "tweetnacl-util": "^0.15.0"
   },
   "devDependencies": {
+    "@metamask/eslint-config": "^2.0.0",
     "@types/node": "^10.17.13",
+    "@typescript-eslint/eslint-plugin": "^2.20.0",
+    "@typescript-eslint/parser": "^2.20.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-import": "^2.20.1",
     "tape": "^4.9.1",
     "typescript": "3.7.4"
   }
