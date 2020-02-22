@@ -1,6 +1,6 @@
 const test = require('tape')
-const sigUtil = require('../')
 const ethUtil = require('ethereumjs-util')
+const sigUtil = require('..')
 
 test('normalize address lower cases', function (t) {
   t.plan(1)
@@ -13,7 +13,7 @@ test('normalize address adds hex prefix', function (t) {
   t.plan(1)
   const initial = 'A06599BD35921CfB5B71B4BE3869740385b0B306'
   const result = sigUtil.normalize(initial)
-  t.equal(result, '0x' + initial.toLowerCase())
+  t.equal(result, `0x${initial.toLowerCase()}`)
 })
 
 test('normalize an integer converts to byte-pair hex', function (t) {
@@ -27,7 +27,7 @@ test('normalize an unsupported type throws', function (t) {
   t.plan(1)
   const initial = {}
   try {
-    const result = sigUtil.normalize(initial)
+    sigUtil.normalize(initial)
     t.ok(false, 'did not throw')
   } catch (e) {
     t.ok(e, 'should throw')
@@ -37,7 +37,7 @@ test('normalize an unsupported type throws', function (t) {
 test('personalSign and recover', function (t) {
   t.plan(1)
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b'
-  console.log('for address ' + address)
+  console.log(`for address ${address}`)
   const privKeyHex = '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0'
   const privKey = Buffer.from(privKeyHex, 'hex')
   const message = 'Hello, world!'
@@ -76,8 +76,8 @@ test('signTypedDataLegacy and recoverTypedSignatureLegacy - single message', fun
     {
       type: 'string',
       name: 'message',
-      value: 'Hi, Alice!'
-    }
+      value: 'Hi, Alice!',
+    },
   ]
 
   const msgParams = { data: typedData }
@@ -100,8 +100,8 @@ test('signTypedDataLegacy as v1 and recoverTypedSignatureLegacy - single message
     {
       type: 'string',
       name: 'message',
-      value: 'Hi, Alice!'
-    }
+      value: 'Hi, Alice!',
+    },
   ]
 
   const msgParams = { data: typedData }
@@ -125,12 +125,12 @@ test('signTypedDataLegacy and recoverTypedSignatureLegacy - multiple messages', 
     {
       type: 'string',
       name: 'message',
-      value: 'Hi, Alice!'
+      value: 'Hi, Alice!',
     },
     {
       type: 'uint8',
       name: 'value',
-      value: 10
+      value: 10,
     },
   ]
 
@@ -148,8 +148,8 @@ test('typedSignatureHash - single value', function (t) {
     {
       type: 'string',
       name: 'message',
-      value: 'Hi, Alice!'
-    }
+      value: 'Hi, Alice!',
+    },
   ]
   const hash = sigUtil.typedSignatureHash(typedData)
   t.equal(hash, '0x14b9f24872e28cc49e72dc104d7380d8e0ba84a3fe2e712704bcac66a5702bd5')
@@ -161,12 +161,12 @@ test('typedSignatureHash - multiple values', function (t) {
     {
       type: 'string',
       name: 'message',
-      value: 'Hi, Alice!'
+      value: 'Hi, Alice!',
     },
     {
       type: 'uint8',
       name: 'value',
-      value: 10
+      value: 10,
     },
   ]
   const hash = sigUtil.typedSignatureHash(typedData)
@@ -174,31 +174,31 @@ test('typedSignatureHash - multiple values', function (t) {
 })
 
 test('typedSignatureHash - bytes', function (t) {
-    t.plan(1)
-    const typedData = [
-        {
-            type: 'bytes',
-            name: 'message',
-            value: '0xdeadbeaf'
-        }
-    ]
-    const hash = sigUtil.typedSignatureHash(typedData)
-    t.equal(hash, '0x6c69d03412450b174def7d1e48b3bcbbbd8f51df2e76e2c5b3a5d951125be3a9')
+  t.plan(1)
+  const typedData = [
+    {
+      type: 'bytes',
+      name: 'message',
+      value: '0xdeadbeaf',
+    },
+  ]
+  const hash = sigUtil.typedSignatureHash(typedData)
+  t.equal(hash, '0x6c69d03412450b174def7d1e48b3bcbbbd8f51df2e76e2c5b3a5d951125be3a9')
 })
 
 typedSignatureHashThrowsTest({
-    testLabel: 'empty array',
-    argument: []
+  testLabel: 'empty array',
+  argument: [],
 })
 
 typedSignatureHashThrowsTest({
-    testLabel: 'not array',
-    argument: 42
+  testLabel: 'not array',
+  argument: 42,
 })
 
 typedSignatureHashThrowsTest({
-    testLabel: 'null',
-    argument: null
+  testLabel: 'null',
+  argument: null,
 })
 
 typedSignatureHashThrowsTest({
@@ -207,9 +207,9 @@ typedSignatureHashThrowsTest({
     {
       type: 'jocker',
       name: 'message',
-      value: 'Hi, Alice!'
-    }
-  ]
+      value: 'Hi, Alice!',
+    },
+  ],
 })
 
 typedSignatureHashThrowsTest({
@@ -217,9 +217,9 @@ typedSignatureHashThrowsTest({
   argument: [
     {
       name: 'message',
-      value: 'Hi, Alice!'
-    }
-  ]
+      value: 'Hi, Alice!',
+    },
+  ],
 })
 
 typedSignatureHashThrowsTest({
@@ -227,9 +227,9 @@ typedSignatureHashThrowsTest({
   argument: [
     {
       type: 'string',
-      value: 'Hi, Alice!'
-    }
-  ]
+      value: 'Hi, Alice!',
+    },
+  ],
 })
 
 // personal_sign was declared without an explicit set of test data
@@ -265,13 +265,13 @@ signatureTest({
   privateKey: Buffer.from('4545454545454545454545454545454545454545454545454545454545454545', 'hex'),
 })
 
-function signatureTest(opts) {
+function signatureTest (opts) {
   test(opts.testLabel, function (t) {
     t.plan(2)
 
     const address = opts.addressHex
     const privKey = opts.privateKey
-    const message = opts.message
+    const { message } = opts
     const msgParams = { data: message }
 
     const signed = sigUtil.personalSign(privKey, msgParams)
@@ -284,12 +284,12 @@ function signatureTest(opts) {
   })
 }
 
-function typedSignatureHashThrowsTest(opts) {
+function typedSignatureHashThrowsTest (opts) {
   const label = `typedSignatureHash - malformed arguments - ${opts.testLabel}`
   test(label, function (t) {
     t.plan(1)
 
-    const argument = opts.argument
+    const { argument } = opts
 
     t.throws(() => {
       sigUtil.typedSignatureHash(argument)
@@ -300,176 +300,189 @@ function typedSignatureHashThrowsTest(opts) {
 const bob = {
   ethereumPrivateKey: '7e5374ec2ef0d91761a6e72fdf8f6ac665519bfdf6da0a2329cf0d804514b816',
   encryptionPrivateKey: 'flN07C7w2Rdhpucv349qxmVRm/322gojKc8NgEUUuBY=',
-  encryptionPublicKey: 'C5YMNdqE4kLgxQhJO1MfuQcHP5hjVSXzamzd/TxlR0U=' }
+  encryptionPublicKey: 'C5YMNdqE4kLgxQhJO1MfuQcHP5hjVSXzamzd/TxlR0U=',
+}
 
-const secretMessage = {data:'My name is Satoshi Buterin'};
+const secretMessage = { data: 'My name is Satoshi Buterin' }
 
-const encryptedData = { version: 'x25519-xsalsa20-poly1305',
-nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
-ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
-ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
+const encryptedData = {
+  version: 'x25519-xsalsa20-poly1305',
+  nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
+  ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+  ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
+}
 
-test("Getting bob's encryptionPublicKey", async t => {
-  t.plan(1);
+test("Getting bob's encryptionPublicKey", async (t) => {
+  t.plan(1)
 
   const result = await sigUtil.getEncryptionPublicKey(bob.ethereumPrivateKey)
-  t.equal(result, bob.encryptionPublicKey);
-});
+  t.equal(result, bob.encryptionPublicKey)
+})
 
-//encryption test
-test("Alice encrypts message with bob's encryptionPublicKey", async t => {
+// encryption test
+test("Alice encrypts message with bob's encryptionPublicKey", async (t) => {
 
 
-  t.plan(4);
+  t.plan(4)
 
   const result = await sigUtil.encrypt(
     bob.encryptionPublicKey,
     secretMessage,
-    'x25519-xsalsa20-poly1305'
-  );
+    'x25519-xsalsa20-poly1305',
+  )
 
-  console.log("RESULT", result)
+  console.log('RESULT', result)
 
-  t.ok(result.version);
-  t.ok(result.nonce);
-  t.ok(result.ephemPublicKey);
-  t.ok(result.ciphertext);
+  t.ok(result.version)
+  t.ok(result.nonce)
+  t.ok(result.ephemPublicKey)
+  t.ok(result.ciphertext)
 
-});
+})
 
 // safe encryption test
-test("Alice encryptsSafely message with bob's encryptionPublicKey", async t => {
-  t.plan(5);
-  const VERSION = 'x25519-xsalsa20-poly1305';
+test("Alice encryptsSafely message with bob's encryptionPublicKey", async (t) => {
+  t.plan(5)
+  const VERSION = 'x25519-xsalsa20-poly1305'
   const result = await sigUtil.encryptSafely(
-     bob.encryptionPublicKey,
-     secretMessage,
-     VERSION
-  );
+    bob.encryptionPublicKey,
+    secretMessage,
+    VERSION,
+  )
 
-  console.log("RESULT", result)
+  console.log('RESULT', result)
 
-  t.equals(result.version,VERSION);
-  t.ok(result.nonce);
-  t.ok(result.ephemPublicKey);
-  t.ok(result.ciphertext);
+  t.equals(result.version, VERSION)
+  t.ok(result.nonce)
+  t.ok(result.ephemPublicKey)
+  t.ok(result.ciphertext)
   t.ok(result.ciphertext.length > 1048)
-});
+})
 
 // safe decryption test
-test("Bob decryptSafely message that Alice encryptSafely for him", async t => {
-  t.plan(1);
-  const VERSION = 'x25519-xsalsa20-poly1305';
+test('Bob decryptSafely message that Alice encryptSafely for him', async (t) => {
+  t.plan(1)
+  const VERSION = 'x25519-xsalsa20-poly1305'
   const result = await sigUtil.encryptSafely(
-     bob.encryptionPublicKey,
-     secretMessage,
-     VERSION
-  );
+    bob.encryptionPublicKey,
+    secretMessage,
+    VERSION,
+  )
 
-  const plaintext = sigUtil.decryptSafely(result, bob.ethereumPrivateKey);
-  t.equal(plaintext, secretMessage.data);
-});
+  const plaintext = sigUtil.decryptSafely(result, bob.ethereumPrivateKey)
+  t.equal(plaintext, secretMessage.data)
+})
 
 // decryption test
-test("Bob decrypts message that Alice sent to him", t => {
-  t.plan(1);
-
-  const result = sigUtil.decrypt(encryptedData, bob.ethereumPrivateKey);
-  t.equal(result, secretMessage.data);
-});
-
-test('Decryption failed because version is wrong or missing', t =>{
+test('Bob decrypts message that Alice sent to him', (t) => {
   t.plan(1)
 
-  const badVersionData = { version: 'x256k1-aes256cbc',
-  nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
-  ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
-  ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
+  const result = sigUtil.decrypt(encryptedData, bob.ethereumPrivateKey)
+  t.equal(result, secretMessage.data)
+})
 
-  t.throws( function() { sigUtil.decrypt(badVersionData, bob.ethereumPrivateKey)}, 'Encryption type/version not supported.')
-});
+test('Decryption failed because version is wrong or missing', (t) => {
+  t.plan(1)
 
-test('Decryption failed because nonce is wrong or missing', t => {
-  t.plan(1);
+  const badVersionData = {
+    version: 'x256k1-aes256cbc',
+    nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
+    ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+    ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
+  }
 
-    //encrypted data
-  const badNonceData = { version: 'x25519-xsalsa20-poly1305',
-  nonce: '',
-  ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
-  ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
+  t.throws(function () {
+    sigUtil.decrypt(badVersionData, bob.ethereumPrivateKey)
+  }, 'Encryption type/version not supported.')
+})
 
-  t.throws(function() { sigUtil.decrypt(badNonceData, bob.ethereumPrivateKey)}, 'Decryption failed.')
+test('Decryption failed because nonce is wrong or missing', (t) => {
+  t.plan(1)
 
-});
+  // encrypted data
+  const badNonceData = {
+    version: 'x25519-xsalsa20-poly1305',
+    nonce: '',
+    ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+    ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
+  }
 
-test('Decryption failed because ephemPublicKey is wrong or missing', t => {
-  t.plan(1);
+  t.throws(function () {
+    sigUtil.decrypt(badNonceData, bob.ethereumPrivateKey)
+  }, 'Decryption failed.')
 
-    //encrypted data
-  const badEphemData = { version: 'x25519-xsalsa20-poly1305',
-  nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
-  ephemPublicKey: 'FFFF/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
-  ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
+})
 
-  t.throws(function() { sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)}, 'Decryption failed.')
-});
+test('Decryption failed because ephemPublicKey is wrong or missing', (t) => {
+  t.plan(1)
 
-test('Decryption failed because cyphertext is wrong or missing', async t => {
-  t.plan(1);
+  // encrypted data
+  const badEphemData = {
+    version: 'x25519-xsalsa20-poly1305',
+    nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
+    ephemPublicKey: 'FFFF/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+    ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
+  }
 
-    //encrypted data
-  const badCypherData = { version: 'x25519-xsalsa20-poly1305',
-  nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
-  ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
-  ciphertext: 'ffffff/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy' };
+  t.throws(function () {
+    sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)
+  }, 'Decryption failed.')
+})
 
-  t.throws(function() { sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)}, 'Decryption failed.')
-});
+test('Decryption failed because cyphertext is wrong or missing', (t) => {
+  t.plan(1)
 
-test("Decryption fails because you are not the recipient", t => {
-  t.plan(1);
+  // encrypted data
+  const badCypherData = {
+    version: 'x25519-xsalsa20-poly1305',
+    nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
+    ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+    ciphertext: 'ffffff/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
+  }
 
-  t.throws(function() { sigUtil.decrypt(encryptedData, alice.ethereumPrivateKey)}, 'Decryption failed.')
-});
+  t.throws(function () {
+    sigUtil.decrypt(badCypherData, bob.ethereumPrivateKey)
+  }, 'Decryption failed.')
+})
 
 test('signedTypeData', (t) => {
   t.plan(8)
 
   const typedData = {
     types: {
-        EIP712Domain: [
-            { name: 'name', type: 'string' },
-            { name: 'version', type: 'string' },
-            { name: 'chainId', type: 'uint256' },
-            { name: 'verifyingContract', type: 'address' },
-        ],
-        Person: [
-            { name: 'name', type: 'string' },
-            { name: 'wallet', type: 'address' }
-        ],
-        Mail: [
-            { name: 'from', type: 'Person' },
-            { name: 'to', type: 'Person' },
-            { name: 'contents', type: 'string' }
-        ],
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+      ],
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallet', type: 'address' },
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person' },
+        { name: 'contents', type: 'string' },
+      ],
     },
     primaryType: 'Mail',
     domain: {
-        name: 'Ether Mail',
-        version: '1',
-        chainId: 1,
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+      name: 'Ether Mail',
+      version: '1',
+      chainId: 1,
+      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
     message: {
-        from: {
-            name: 'Cow',
-            wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-        },
-        to: {
-            name: 'Bob',
-            wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-        },
-        contents: 'Hello, Bob!',
+      from: {
+        name: 'Cow',
+        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+      },
+      to: {
+        name: 'Bob',
+        wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+      },
+      contents: 'Hello, Bob!',
     },
   }
 
@@ -499,39 +512,39 @@ test('signedTypeData with V3 string', (t) => {
 
   const typedData = {
     types: {
-        EIP712Domain: [
-            { name: 'name', type: 'string' },
-            { name: 'version', type: 'string' },
-            { name: 'chainId', type: 'uint256' },
-            { name: 'verifyingContract', type: 'address' },
-        ],
-        Person: [
-            { name: 'name', type: 'string' },
-            { name: 'wallet', type: 'address' }
-        ],
-        Mail: [
-            { name: 'from', type: 'Person' },
-            { name: 'to', type: 'Person' },
-            { name: 'contents', type: 'string' }
-        ],
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+      ],
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallet', type: 'address' },
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person' },
+        { name: 'contents', type: 'string' },
+      ],
     },
     primaryType: 'Mail',
     domain: {
-        name: 'Ether Mail',
-        version: '1',
-        chainId: 1,
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+      name: 'Ether Mail',
+      version: '1',
+      chainId: 1,
+      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
     message: {
-        from: {
-            name: 'Cow',
-            wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-        },
-        to: {
-            name: 'Bob',
-            wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-        },
-        contents: 'Hello, Bob!',
+      from: {
+        name: 'Cow',
+        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+      },
+      to: {
+        name: 'Bob',
+        wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+      },
+      contents: 'Hello, Bob!',
     },
   }
 
@@ -561,50 +574,50 @@ test('signedTypeData_v4', (t) => {
 
   const typedData = {
     types: {
-        EIP712Domain: [
-            { name: 'name', type: 'string' },
-            { name: 'version', type: 'string' },
-            { name: 'chainId', type: 'uint256' },
-            { name: 'verifyingContract', type: 'address' },
-        ],
-        Person: [
-            { name: 'name', type: 'string' },
-            { name: 'wallets', type: 'address[]' },
-        ],
-        Mail: [
-            { name: 'from', type: 'Person' },
-            { name: 'to', type: 'Person[]' },
-            { name: 'contents', type: 'string' },
-        ],
-        Group: [
-            { name: 'name', type: 'string' },
-            { name: 'members', type: 'Person[]' },
-        ],
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+      ],
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallets', type: 'address[]' },
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person[]' },
+        { name: 'contents', type: 'string' },
+      ],
+      Group: [
+        { name: 'name', type: 'string' },
+        { name: 'members', type: 'Person[]' },
+      ],
     },
     domain: {
-        name: 'Ether Mail',
-        version: '1',
-        chainId: 1,
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+      name: 'Ether Mail',
+      version: '1',
+      chainId: 1,
+      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
     primaryType: 'Mail',
     message: {
-        from: {
-            name: 'Cow',
-            wallets: [
-              '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-              '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF',
-            ],
-        },
-        to: [{
-            name: 'Bob',
-            wallets: [
-              '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-              '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
-              '0xB0B0b0b0b0b0B000000000000000000000000000'
-            ]
-        }],
-        contents: 'Hello, Bob!',
+      from: {
+        name: 'Cow',
+        wallets: [
+          '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+          '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF',
+        ],
+      },
+      to: [{
+        name: 'Bob',
+        wallets: [
+          '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+          '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
+          '0xB0B0b0b0b0b0B000000000000000000000000000',
+        ],
+      }],
+      contents: 'Hello, Bob!',
     },
   }
 
@@ -619,22 +632,20 @@ test('signedTypeData_v4', (t) => {
     '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860')
 
   t.equal(ethUtil.bufferToHex(utils.encodeData('Person', typedData.message.from, typedData.types)),
-    '0x' + [
+    `0x${[
       'fabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
       '8c1d2bd5348394761719da11ec67eedae9502d137e8940fee8ecd6f641ee1648',
       '8a8bfe642b9fc19c25ada5dadfd37487461dc81dd4b0778f262c163ed81b5e2a',
-    ].join('')
-  )
+    ].join('')}`)
   t.equal(ethUtil.bufferToHex(utils.hashStruct('Person', typedData.message.from, typedData.types)),
     '0x9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f')
 
   t.equal(ethUtil.bufferToHex(utils.encodeData('Person', typedData.message.to[0], typedData.types)),
-    '0x' + [
+    `0x${[
       'fabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
       '28cac318a86c8a0a6a9156c2dba2c8c2363677ba0514ef616592d81557e679b6',
       'd2734f4c86cc3bd9cabf04c3097589d3165d95e4648fc72d943ed161f651ec6d',
-    ].join('')
-  )
+    ].join('')}`)
   t.equal(ethUtil.bufferToHex(utils.hashStruct('Person', typedData.message.to[0], typedData.types)),
     '0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168')
 
@@ -643,13 +654,12 @@ test('signedTypeData_v4', (t) => {
   t.equal(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types)),
     '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753')
   t.equal(ethUtil.bufferToHex(utils.encodeData(typedData.primaryType, typedData.message, typedData.types)),
-    '0x' + [
+    `0x${[
       '4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
       '9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f',
       'ca322beec85be24e374d18d582a6f2997f75c54e7993ab5bc07404ce176ca7cd',
       'b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
-    ].join('')
-  )
+    ].join('')}`)
   t.equal(ethUtil.bufferToHex(utils.hashStruct(typedData.primaryType, typedData.message, typedData.types)),
     '0xeb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8')
   t.equal(ethUtil.bufferToHex(utils.hashStruct('EIP712Domain', typedData.domain, typedData.types)),
@@ -673,50 +683,50 @@ test('signedTypeData_v4', (t) => {
 
   const typedData = {
     types: {
-        EIP712Domain: [
-            { name: 'name', type: 'string' },
-            { name: 'version', type: 'string' },
-            { name: 'chainId', type: 'uint256' },
-            { name: 'verifyingContract', type: 'address' },
-        ],
-        Person: [
-            { name: 'name', type: 'string' },
-            { name: 'wallets', type: 'address[]' },
-        ],
-        Mail: [
-            { name: 'from', type: 'Person' },
-            { name: 'to', type: 'Person[]' },
-            { name: 'contents', type: 'string' },
-        ],
-        Group: [
-            { name: 'name', type: 'string' },
-            { name: 'members', type: 'Person[]' },
-        ],
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+      ],
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallets', type: 'address[]' },
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person[]' },
+        { name: 'contents', type: 'string' },
+      ],
+      Group: [
+        { name: 'name', type: 'string' },
+        { name: 'members', type: 'Person[]' },
+      ],
     },
     domain: {
-        name: 'Ether Mail',
-        version: '1',
-        chainId: 1,
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+      name: 'Ether Mail',
+      version: '1',
+      chainId: 1,
+      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
     primaryType: 'Mail',
     message: {
-        from: {
-            name: 'Cow',
-            wallets: [
-              '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-              '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF',
-            ],
-        },
-        to: [{
-            name: 'Bob',
-            wallets: [
-              '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-              '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
-              '0xB0B0b0b0b0b0B000000000000000000000000000'
-            ]
-        }],
-        contents: 'Hello, Bob!',
+      from: {
+        name: 'Cow',
+        wallets: [
+          '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+          '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF',
+        ],
+      },
+      to: [{
+        name: 'Bob',
+        wallets: [
+          '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+          '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
+          '0xB0B0b0b0b0b0B000000000000000000000000000',
+        ],
+      }],
+      contents: 'Hello, Bob!',
     },
   }
 
@@ -731,22 +741,20 @@ test('signedTypeData_v4', (t) => {
     '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860')
 
   t.equal(ethUtil.bufferToHex(utils.encodeData('Person', typedData.message.from, typedData.types)),
-    '0x' + [
+    `0x${[
       'fabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
       '8c1d2bd5348394761719da11ec67eedae9502d137e8940fee8ecd6f641ee1648',
       '8a8bfe642b9fc19c25ada5dadfd37487461dc81dd4b0778f262c163ed81b5e2a',
-    ].join('')
-  )
+    ].join('')}`)
   t.equal(ethUtil.bufferToHex(utils.hashStruct('Person', typedData.message.from, typedData.types)),
     '0x9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f')
 
   t.equal(ethUtil.bufferToHex(utils.encodeData('Person', typedData.message.to[0], typedData.types)),
-    '0x' + [
+    `0x${[
       'fabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
       '28cac318a86c8a0a6a9156c2dba2c8c2363677ba0514ef616592d81557e679b6',
       'd2734f4c86cc3bd9cabf04c3097589d3165d95e4648fc72d943ed161f651ec6d',
-    ].join('')
-  )
+    ].join('')}`)
   t.equal(ethUtil.bufferToHex(utils.hashStruct('Person', typedData.message.to[0], typedData.types)),
     '0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168')
 
@@ -755,13 +763,12 @@ test('signedTypeData_v4', (t) => {
   t.equal(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types)),
     '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753')
   t.equal(ethUtil.bufferToHex(utils.encodeData(typedData.primaryType, typedData.message, typedData.types)),
-    '0x' + [
+    `0x${[
       '4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
       '9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f',
       'ca322beec85be24e374d18d582a6f2997f75c54e7993ab5bc07404ce176ca7cd',
       'b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
-    ].join('')
-  )
+    ].join('')}`)
   t.equal(ethUtil.bufferToHex(utils.hashStruct(typedData.primaryType, typedData.message, typedData.types)),
     '0xeb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8')
   t.equal(ethUtil.bufferToHex(utils.hashStruct('EIP712Domain', typedData.domain, typedData.types)),
@@ -784,39 +791,39 @@ test('signedTypeData_v4 with recursive types', (t) => {
 
   const typedData = {
     types: {
-        EIP712Domain: [
-            { name: 'name', type: 'string' },
-            { name: 'version', type: 'string' },
-            { name: 'chainId', type: 'uint256' },
-            { name: 'verifyingContract', type: 'address' },
-        ],
-        Person: [
-            { name: 'name', type: 'string' },
-            { name: 'mother', type: 'Person' },
-            { name: 'father', type: 'Person' },
-        ]
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+      ],
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'mother', type: 'Person' },
+        { name: 'father', type: 'Person' },
+      ],
     },
     domain: {
-        name: 'Family Tree',
-        version: '1',
-        chainId: 1,
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+      name: 'Family Tree',
+      version: '1',
+      chainId: 1,
+      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
     primaryType: 'Person',
     message: {
-        name: 'Jon',
-        mother: {
-          name: 'Lyanna',
-          father: {
-            name: 'Rickard',
-          },
-        },
+      name: 'Jon',
+      mother: {
+        name: 'Lyanna',
         father: {
-          name: 'Rhaegar',
-          father: {
-            name: 'Aeris II',
-          }
+          name: 'Rickard',
         },
+      },
+      father: {
+        name: 'Rhaegar',
+        father: {
+          name: 'Aeris II',
+        },
+      },
     },
   }
 
@@ -829,35 +836,32 @@ test('signedTypeData_v4 with recursive types', (t) => {
     '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116')
 
   t.equal(ethUtil.bufferToHex(utils.encodeData('Person', typedData.message.mother, typedData.types)),
-    '0x' + [
+    `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'afe4142a2b3e7b0503b44951e6030e0e2c5000ef83c61857e2e6003e7aef8570',
       '0000000000000000000000000000000000000000000000000000000000000000',
       '88f14be0dd46a8ec608ccbff6d3923a8b4e95cdfc9648f0db6d92a99a264cb36',
-    ].join('')
-  )
+    ].join('')}`)
   t.equal(ethUtil.bufferToHex(utils.hashStruct('Person', typedData.message.mother, typedData.types)),
     '0x9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b')
 
   t.equal(ethUtil.bufferToHex(utils.encodeData('Person', typedData.message.father, typedData.types)),
-    '0x' + [
+    `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'b2a7c7faba769181e578a391a6a6811a3e84080c6a3770a0bf8a856dfa79d333',
       '0000000000000000000000000000000000000000000000000000000000000000',
       '02cc7460f2c9ff107904cff671ec6fee57ba3dd7decf999fe9fe056f3fd4d56e',
-    ].join('')
-  )
+    ].join('')}`)
   t.equal(ethUtil.bufferToHex(utils.hashStruct('Person', typedData.message.father, typedData.types)),
     '0xb852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8')
 
   t.equal(ethUtil.bufferToHex(utils.encodeData(typedData.primaryType, typedData.message, typedData.types)),
-    '0x' + [
+    `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'e8d55aa98b6b411f04dbcf9b23f29247bb0e335a6bc5368220032fdcb9e5927f',
       '9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b',
       'b852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8',
-    ].join('')
-  )
+    ].join('')}`)
   t.equal(ethUtil.bufferToHex(utils.hashStruct(typedData.primaryType, typedData.message, typedData.types)),
     '0xfdc7b6d35bbd81f7fa78708604f57569a10edff2ca329c8011373f0667821a45')
   t.equal(ethUtil.bufferToHex(utils.hashStruct('EIP712Domain', typedData.domain, typedData.types)),
@@ -880,39 +884,39 @@ test('signedTypeMessage V4 with recursive types', (t) => {
 
   const typedData = {
     types: {
-        EIP712Domain: [
-            { name: 'name', type: 'string' },
-            { name: 'version', type: 'string' },
-            { name: 'chainId', type: 'uint256' },
-            { name: 'verifyingContract', type: 'address' },
-        ],
-        Person: [
-            { name: 'name', type: 'string' },
-            { name: 'mother', type: 'Person' },
-            { name: 'father', type: 'Person' },
-        ]
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+      ],
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'mother', type: 'Person' },
+        { name: 'father', type: 'Person' },
+      ],
     },
     domain: {
-        name: 'Family Tree',
-        version: '1',
-        chainId: 1,
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+      name: 'Family Tree',
+      version: '1',
+      chainId: 1,
+      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
     },
     primaryType: 'Person',
     message: {
-        name: 'Jon',
-        mother: {
-          name: 'Lyanna',
-          father: {
-            name: 'Rickard',
-          },
-        },
+      name: 'Jon',
+      mother: {
+        name: 'Lyanna',
         father: {
-          name: 'Rhaegar',
-          father: {
-            name: 'Aeris II',
-          }
+          name: 'Rickard',
         },
+      },
+      father: {
+        name: 'Rhaegar',
+        father: {
+          name: 'Aeris II',
+        },
+      },
     },
   }
 
@@ -925,35 +929,32 @@ test('signedTypeMessage V4 with recursive types', (t) => {
     '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116')
 
   t.equal(ethUtil.bufferToHex(utils.encodeData('Person', typedData.message.mother, typedData.types)),
-    '0x' + [
+    `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'afe4142a2b3e7b0503b44951e6030e0e2c5000ef83c61857e2e6003e7aef8570',
       '0000000000000000000000000000000000000000000000000000000000000000',
       '88f14be0dd46a8ec608ccbff6d3923a8b4e95cdfc9648f0db6d92a99a264cb36',
-    ].join('')
-  )
+    ].join('')}`)
   t.equal(ethUtil.bufferToHex(utils.hashStruct('Person', typedData.message.mother, typedData.types)),
     '0x9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b')
 
   t.equal(ethUtil.bufferToHex(utils.encodeData('Person', typedData.message.father, typedData.types)),
-    '0x' + [
+    `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'b2a7c7faba769181e578a391a6a6811a3e84080c6a3770a0bf8a856dfa79d333',
       '0000000000000000000000000000000000000000000000000000000000000000',
       '02cc7460f2c9ff107904cff671ec6fee57ba3dd7decf999fe9fe056f3fd4d56e',
-    ].join('')
-  )
+    ].join('')}`)
   t.equal(ethUtil.bufferToHex(utils.hashStruct('Person', typedData.message.father, typedData.types)),
     '0xb852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8')
 
   t.equal(ethUtil.bufferToHex(utils.encodeData(typedData.primaryType, typedData.message, typedData.types)),
-    '0x' + [
+    `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'e8d55aa98b6b411f04dbcf9b23f29247bb0e335a6bc5368220032fdcb9e5927f',
       '9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b',
       'b852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8',
-    ].join('')
-  )
+    ].join('')}`)
   t.equal(ethUtil.bufferToHex(utils.hashStruct(typedData.primaryType, typedData.message, typedData.types)),
     '0xfdc7b6d35bbd81f7fa78708604f57569a10edff2ca329c8011373f0667821a45')
   t.equal(ethUtil.bufferToHex(utils.hashStruct('EIP712Domain', typedData.domain, typedData.types)),
