@@ -15,7 +15,10 @@ workflows:
             - prep-deps
       - test-14:
           requires:
-            - prep-deps                  
+            - prep-deps
+      - test-browser:
+          requires:
+            - prep-deps
 
 
 jobs:
@@ -48,6 +51,18 @@ jobs:
       - run:
           name: Lint
           command: yarn lint
+
+  test-browser:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Unit tests
+          command: yarn test:browser
+
 
   test-10:
     docker:

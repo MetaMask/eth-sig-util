@@ -12,6 +12,7 @@
     "build": "tsc --project .",
     "lint": "eslint . --ext .ts,.js",
     "test": "npm run build && node test/index.js",
+    "test:browser": "browserify test/index.js >> test/bundle.js && echo ';window.close()' >> test/bundle.js && cat test/bundle.js | smokestack",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -41,8 +42,10 @@
     "@types/node": "^10.17.13",
     "@typescript-eslint/eslint-plugin": "^2.20.0",
     "@typescript-eslint/parser": "^2.20.0",
+    "browserify": "^16.5.1",
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.20.1",
+    "smokestack": "^3.6.0",
     "tape": "^4.9.1",
     "typescript": "3.7.4"
   }
