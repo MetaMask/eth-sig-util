@@ -20,12 +20,12 @@ workflows:
           requires:
             - prep-deps
       - all-tests-pass:
-        requires:
-          - lint
-          - test-10
-          - test-12
-          - test-14
-          - test-browser
+          requires:
+            - lint
+            - test-10
+            - test-12
+            - test-14
+            - test-browser
 
 jobs:
   prep-deps:
