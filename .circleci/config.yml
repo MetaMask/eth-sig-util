@@ -19,7 +19,13 @@ workflows:
       - test-browser:
           requires:
             - prep-deps
-
+      - all-tests-pass:
+        requires:
+          - lint
+          - test-10
+          - test-12
+          - test-14
+          - test-browser
 
 jobs:
   prep-deps:
@@ -40,6 +46,14 @@ jobs:
           paths:
           - node_modules
           - build-artifacts
+
+  all-tests-pass:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - run:
+          name: Unit tests
+          command: echo 'feeling groovy'
 
   lint:
     docker:
