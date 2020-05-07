@@ -1,16 +1,31 @@
 version: 2.1
 
 workflows:
-  lint:
+  test:
     jobs:
       - prep-deps
-      - test-lint:
+      - lint:
           requires:
             - prep-deps
-      - npm-test:
+      - test-10:
           requires:
             - prep-deps
-
+      - test-12:
+          requires:
+            - prep-deps
+      - test-14:
+          requires:
+            - prep-deps
+      - test-browser:
+          requires:
+            - prep-deps
+      - all-tests-pass:
+          requires:
+            - lint
+            - test-10
+            - test-12
+            - test-14
+            - test-browser
 
 jobs:
   prep-deps:
@@ -32,7 +47,15 @@ jobs:
           - node_modules
           - build-artifacts
 
-  test-lint:
+  all-tests-pass:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - run:
+          name: Unit tests
+          command: echo 'feeling groovy'
+
+  lint:
     docker:
       - image: circleci/node:10
     steps:
@@ -43,9 +66,43 @@ jobs:
           name: Lint
           command: yarn lint
 
-  npm-test:
+  test-browser:
+    docker:
+      - image: circleci/node:12-browsers
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Unit tests
+          command: yarn test:browser
+
+
+  test-10:
     docker:
       - image: circleci/node:10
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Unit tests
+          command: yarn test
+
+  test-12:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Unit tests
+          command: yarn test
+
+  test-14:
+    docker:
+      - image: circleci/node:14
     steps:
       - checkout
       - attach_workspace:
