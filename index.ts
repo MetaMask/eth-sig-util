@@ -153,7 +153,7 @@ const TypedDataUtils = {
             value = ethUtil.sha3(this.encodeData(field.type, value, types, useV4));
             encodedValues.push(value);
           } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
-            throw new Error('Arrays currently unimplemented in encodeData');
+            throw new Error('Arrays are unimplemented in encodeData; use V4 extension');
           } else {
             encodedTypes.push(field.type);
             encodedValues.push(value);
