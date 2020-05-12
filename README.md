@@ -69,6 +69,14 @@ Return address of a signer that did `signTypedData`.
 
 Expects the same data that were used for signing. `sig` is a prefixed signature.
 
+### recoverTypedSignature_V4 ({data, sig})
+
+Return address of a signer that did `signTypedData` as per an extension of the published version of [EIP 712](https://github.com/MetaMask/eth-sig-util/pull/54).
+
+This extension adds support for arrays and recursive data types.
+
+Expects the same data that were used for signing. `sig` is a prefixed signature.
+
 ### typedSignatureHash (typedData)
 
 Return hex-encoded hash of typed data params according to [EIP712](https://github.com/ethereum/EIPs/pull/712) schema.
