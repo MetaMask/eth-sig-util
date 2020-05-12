@@ -11,9 +11,9 @@
   "scripts": {
     "build": "tsc --project .",
     "lint": "eslint . --ext .ts,.js",
-    "test": "yarn run build && node test/index.js",
-    "test:browser": "yarn run build && browserify test/index.js > test/bundle.js && echo ';window.close();' >> test/bundle.js && cat test/bundle.js | smokestack",
-    "prepublishOnly": "yarn run build"
+    "test": "yarn build && node test/index.js",
+    "test:browser": "yarn build && browserify test/index.js > test/bundle.js && echo ';window.close();' >> test/bundle.js && cat test/bundle.js | smokestack",
+    "prepublishOnly": "yarn build"
   },
   "repository": {
     "type": "git",
