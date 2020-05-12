@@ -47,6 +47,6 @@
     "eslint-plugin-import": "^2.20.1",
     "smokestack": "^3.6.0",
     "tape": "^4.9.1",
-    "typescript": "3.7.4"
+    "typescript": "^3.8.3"
   }
 }
