@@ -29,6 +29,10 @@
     "url": "https://github.com/MetaMask/eth-sig-util/issues"
   },
   "homepage": "https://github.com/MetaMask/eth-sig-util#readme",
+  "resolutions": {
+    "smokestack/minimist": "^1.2.5",
+    "smokestack/shoe/sockjs/node-uuid": "^1.4.4"
+  },
   "dependencies": {
     "buffer": "^5.2.1",
     "elliptic": "^6.4.0",
