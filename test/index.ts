@@ -573,7 +573,7 @@ test('signedTypeData', (t) => {
     '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
   );
   t.equal(
-    ethUtil.bufferToHex(utils.sign(typedData)),
+    ethUtil.bufferToHex(utils.eip712Hash(typedData)),
     '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2',
   );
   t.equal(
@@ -673,7 +673,7 @@ test('signedTypeData with bytes', (t) => {
     '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
   );
   t.equal(
-    ethUtil.bufferToHex(utils.sign(typedDataWithBytes)),
+    ethUtil.bufferToHex(utils.eip712Hash(typedDataWithBytes)),
     '0xb4aaf457227fec401db772ec22d2095d1235ee5d0833f56f59108c9ffc90fb4b',
   );
   t.equal(
@@ -767,7 +767,7 @@ test('signedTypeData with V3 string', (t) => {
     '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
   );
   t.equal(
-    ethUtil.bufferToHex(utils.sign(typedData)),
+    ethUtil.bufferToHex(utils.eip712Hash(typedData)),
     '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2',
   );
   t.equal(
@@ -924,7 +924,7 @@ test('signedTypeData_v4', (t) => {
     '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
   );
   t.equal(
-    ethUtil.bufferToHex(utils.sign(typedData)),
+    ethUtil.bufferToHex(utils.eip712Hash(typedData)),
     '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2',
   );
 
@@ -1088,7 +1088,7 @@ test('signedTypeData_v4', (t) => {
     '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
   );
   t.equal(
-    ethUtil.bufferToHex(utils.sign(typedData)),
+    ethUtil.bufferToHex(utils.eip712Hash(typedData)),
     '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2',
   );
 
@@ -1229,7 +1229,7 @@ test('signedTypeData_v4 with recursive types', (t) => {
     '0xfacb2c1888f63a780c84c216bd9a81b516fc501a19bae1fc81d82df590bbdc60',
   );
   t.equal(
-    ethUtil.bufferToHex(utils.sign(typedData)),
+    ethUtil.bufferToHex(utils.eip712Hash(typedData)),
     '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c',
   );
 
@@ -1370,7 +1370,7 @@ test('signedTypeMessage V4 with recursive types', (t) => {
     '0xfacb2c1888f63a780c84c216bd9a81b516fc501a19bae1fc81d82df590bbdc60',
   );
   t.equal(
-    ethUtil.bufferToHex(utils.sign(typedData)),
+    ethUtil.bufferToHex(utils.eip712Hash(typedData)),
     '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c',
   );
 

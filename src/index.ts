@@ -292,10 +292,10 @@ const TypedDataUtils = {
   /**
    * Signs a typed message as per EIP-712 and returns its keccak hash
    *
-   * @param {Object} typedData - Types message data to sign
+   * @param {Object} typedData - Types message data to hash as per eip-712
    * @returns {Buffer} - keccak hash of the resulting signed message
    */
-  sign<T extends MessageTypes>(
+  eip712Hash<T extends MessageTypes>(
     typedData: Partial<TypedData | TypedMessage<T>>,
     useV4 = true,
   ): Buffer {
@@ -597,7 +597,7 @@ function signTypedData<T extends MessageTypes>(
   privateKey: Buffer,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
 ): string {
-  const message = TypedDataUtils.sign(msgParams.data, false);
+  const message = TypedDataUtils.eip712Hash(msgParams.data, false);
   const sig = ethUtil.ecsign(message, privateKey);
   return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s));
 }
@@ -606,7 +606,7 @@ function signTypedData_v4<T extends MessageTypes>(
   privateKey: Buffer,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
 ): string {
-  const message = TypedDataUtils.sign(msgParams.data);
+  const message = TypedDataUtils.eip712Hash(msgParams.data);
   const sig = ethUtil.ecsign(message, privateKey);
   return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s));
 }
@@ -614,7 +614,7 @@ function signTypedData_v4<T extends MessageTypes>(
 function recoverTypedSignature<T extends MessageTypes>(
   msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
 ): string {
-  const message = TypedDataUtils.sign(msgParams.data, false);
+  const message = TypedDataUtils.eip712Hash(msgParams.data, false);
   const publicKey = recoverPublicKey(message, msgParams.sig);
   const sender = ethUtil.publicToAddress(publicKey);
   return ethUtil.bufferToHex(sender);
@@ -623,7 +623,7 @@ function recoverTypedSignature<T extends MessageTypes>(
 function recoverTypedSignature_v4<T extends MessageTypes>(
   msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
 ): string {
-  const message = TypedDataUtils.sign(msgParams.data);
+  const message = TypedDataUtils.eip712Hash(msgParams.data);
   const publicKey = recoverPublicKey(message, msgParams.sig);
   const sender = ethUtil.publicToAddress(publicKey);
   return ethUtil.bufferToHex(sender);
