@@ -44,8 +44,8 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-          - node_modules
-          - build-artifacts
+            - node_modules
+            - build-artifacts
 
   all-tests-pass:
     docker:
@@ -76,7 +76,6 @@ jobs:
       - run:
           name: Unit tests
           command: yarn test:browser
-
 
   test-10:
     docker:
