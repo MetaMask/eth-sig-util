@@ -7,4 +7,3 @@ package-lock.json
 
 dist
 test/*.js
-src/*.js
