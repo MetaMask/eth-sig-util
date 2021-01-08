@@ -5,9 +5,13 @@ module.exports = {
     '@metamask/eslint-config/config/nodejs',
     '@metamask/eslint-config/config/typescript',
   ],
+  plugins: [
+    'json',
+  ],
   overrides: [{
     files: [
-      '.eslintrc.js',
+      '*.js',
+      '*.json',
     ],
     parserOptions: {
       sourceType: 'script',
@@ -23,4 +27,9 @@ module.exports = {
     }],
     'no-param-reassign': 'off',
   },
+  ignorePatterns: [
+    '!.eslintrc.js',
+    './test/*.js',
+    'dist',
+  ],
 };

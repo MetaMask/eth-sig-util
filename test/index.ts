@@ -1,6 +1,6 @@
-import * as test from 'tape';
+import test from 'tape';
 import * as ethUtil from 'ethereumjs-util';
-import * as sigUtil from '..';
+import * as sigUtil from '../dist';
 
 test('normalize address lower cases', function (t) {
   t.plan(1);
@@ -265,7 +265,7 @@ signatureTest({
   privateKey: Buffer.from('4545454545454545454545454545454545454545454545454545454545454545', 'hex'),
 });
 
-function signatureTest (opts) {
+function signatureTest(opts) {
   test(opts.testLabel, function (t) {
     t.plan(2);
 
@@ -284,7 +284,7 @@ function signatureTest (opts) {
   });
 }
 
-function typedSignatureHashThrowsTest (opts) {
+function typedSignatureHashThrowsTest(opts) {
   const label = `typedSignatureHash - malformed arguments - ${opts.testLabel}`;
   test(label, function (t) {
     t.plan(1);
@@ -321,7 +321,6 @@ test("Getting bob's encryptionPublicKey", async (t) => {
 
 // encryption test
 test("Alice encrypts message with bob's encryptionPublicKey", async (t) => {
-
 
   t.plan(4);
 
@@ -676,7 +675,6 @@ test('signedTypeData_v4', (t) => {
 
   t.equal(sig, '0x65cbd956f2fae28a601bebc9b906cea0191744bd4c4247bcd27cd08f8eb6b71c78efdf7a31dc9abee78f492292721f362d296cf86b4538e07b51303b67f749061b');
 });
-
 
 test('signedTypeData_v4', (t) => {
   t.plan(15);
