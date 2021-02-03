@@ -1,20 +1,55 @@
-version: 2
+version: 2.1
 
 workflows:
-  version: 2
-  full_test:
+  lint:
     jobs:
-      - npm-test
+      - prep-deps
+      - test-lint:
+          requires:
+            - prep-deps
+      - npm-test:
+          requires:
+            - prep-deps
+
 
 jobs:
-  npm-test:
+  prep-deps:
     docker:
       - image: circleci/node:10
     steps:
       - checkout
       - run:
-          name: npm ci
-          command: npm ci
+          name: Install deps
+          command: |
+            .circleci/scripts/deps-install.sh
       - run:
-          name: npm test
-          command: npm test
+          name: Collect yarn install HAR logs
+          command: |
+            .circleci/scripts/collect-har-artifact.sh
+      - persist_to_workspace:
+          root: .
+          paths:
+          - node_modules
+          - build-artifacts
+
+  test-lint:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Lint
+          command: yarn lint
+
+  npm-test:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Unit tests
+          command: yarn test

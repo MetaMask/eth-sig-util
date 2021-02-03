@@ -4,6 +4,7 @@
   "description": "A few useful functions for signing ethereum data",
   "main": "index.js",
   "scripts": {
+    "lint": "echo",
     "test": "node test/index.js"
   },
   "repository": {
