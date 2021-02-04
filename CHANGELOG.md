@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.5.4] - 2021-02-04
 ### Changed
 - Update `ethereumjs-abi` ([#121](https://github.com/MetaMask/eth-sig-util/pull/121))
 - Remove unused dependencies ([#120](https://github.com/MetaMask/eth-sig-util/pull/120))
@@ -17,5 +18,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]:https://github.com/MetaMask/eth-sig-util/compare/v2.5.3...HEAD
+[Unreleased]:https://github.com/MetaMask/eth-sig-util/compare/v2.5.4...HEAD
+[2.5.4]:https://github.com/MetaMask/eth-sig-util/compare/v2.5.3...v2.5.4
 [2.5.3]:https://github.com/MetaMask/eth-sig-util/compare/v2.5.2...v2.5.3

@@ -1,6 +1,6 @@
 {
   "name": "eth-sig-util",
-  "version": "2.5.2",
+  "version": "2.5.4",
   "description": "A few useful functions for signing ethereum data",
   "main": "index.js",
   "files": [
