@@ -1,10 +1,9 @@
-node_modules
 .DS_Store
+node_modules
 package-lock.json
 
 *.tgz
+*.log
 
-# TypeScript
-/build
-**/*.d.ts
-**/*.js
+dist
+test/*.js

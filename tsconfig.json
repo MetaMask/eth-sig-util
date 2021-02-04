@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "target": "es5"
-  },
-  "include": [
-    "./test/**/*",
-    "./index.ts",
-    "./utils/**/*"
-  ]
+    "esModuleInterop": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "target": "ES2017",
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
+  }
 }

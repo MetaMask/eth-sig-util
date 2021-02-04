@@ -8,7 +8,7 @@ You can find usage examples [here](https://github.com/danfinlay/js-eth-personal-
 
 ## Installation
 
-```
+```shell
 npm install eth-sig-util --save
 ```
 
@@ -79,4 +79,3 @@ Return hex-encoded hash of typed data params according to [EIP712](https://githu
 msgParams should have a `data` key that is hex-encoded data unsigned, and a `sig` key that is hex-encoded and already signed.
 
 Returns a hex-encoded public key.
-
