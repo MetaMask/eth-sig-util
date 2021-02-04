@@ -50,7 +50,7 @@ const TypedDataUtils = {
         if (types[type] !== undefined) {
           return ['bytes32', value === null || value === undefined ?
             '0x0000000000000000000000000000000000000000000000000000000000000000' :
-            ethUtil.sha3(this.encodeData(type, value, types, useV4))]
+            ethUtil.keccak(this.encodeData(type, value, types, useV4))]
         }
 
         if (value === undefined) {
@@ -58,7 +58,7 @@ const TypedDataUtils = {
         }
 
         if (type === 'bytes') {
-          return ['bytes32', ethUtil.sha3(value)]
+          return ['bytes32', ethUtil.keccak(value)]
         }
 
         if (type === 'string') {
@@ -66,13 +66,13 @@ const TypedDataUtils = {
           if (typeof value === 'string') {
             value = Buffer.from(value, 'utf8')
           }
-          return ['bytes32', ethUtil.sha3(value)]
+          return ['bytes32', ethUtil.keccak(value)]
         }
 
         if (type.lastIndexOf(']') === type.length - 1) {
           const parsedType = type.slice(0, type.lastIndexOf('['))
           const typeValuePairs = value.map((item) => encodeField(name, parsedType, item))
-          return ['bytes32', ethUtil.sha3(ethAbi.rawEncode(
+          return ['bytes32', ethUtil.keccak(ethAbi.rawEncode(
             typeValuePairs.map(([_type]) => _type),
             typeValuePairs.map(([, _value]) => _value),
           ))]
@@ -92,7 +92,7 @@ const TypedDataUtils = {
         if (value !== undefined) {
           if (field.type === 'bytes') {
             encodedTypes.push('bytes32')
-            value = ethUtil.sha3(value)
+            value = ethUtil.keccak(value)
             encodedValues.push(value)
           } else if (field.type === 'string') {
             encodedTypes.push('bytes32')
@@ -100,11 +100,11 @@ const TypedDataUtils = {
             if (typeof value === 'string') {
               value = Buffer.from(value, 'utf8')
             }
-            value = ethUtil.sha3(value)
+            value = ethUtil.keccak(value)
             encodedValues.push(value)
           } else if (types[field.type] !== undefined) {
             encodedTypes.push('bytes32')
-            value = ethUtil.sha3(this.encodeData(field.type, value, types, useV4))
+            value = ethUtil.keccak(this.encodeData(field.type, value, types, useV4))
             encodedValues.push(value)
           } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
             throw new Error('Arrays currently unimplemented in encodeData')
@@ -172,7 +172,7 @@ const TypedDataUtils = {
    * @returns {string} - Hash of an object
    */
   hashStruct (primaryType, data, types, useV4 = true) {
-    return ethUtil.sha3(this.encodeData(primaryType, data, types, useV4))
+    return ethUtil.keccak(this.encodeData(primaryType, data, types, useV4))
   },
 
   /**
@@ -183,7 +183,7 @@ const TypedDataUtils = {
    * @returns {string} - Hash of an object
    */
   hashType (primaryType, types) {
-    return ethUtil.sha3(this.encodeType(primaryType, types))
+    return ethUtil.keccak(this.encodeType(primaryType, types))
   },
 
   /**
@@ -204,10 +204,10 @@ const TypedDataUtils = {
   },
 
   /**
-   * Signs a typed message as per EIP-712 and returns its sha3 hash
+   * Signs a typed message as per EIP-712 and returns its keccak hash
    *
    * @param {Object} typedData - Types message data to sign
-   * @returns {string} - sha3 hash of the resulting signed message
+   * @returns {string} - keccak hash of the resulting signed message
    */
   sign (typedData, useV4 = true) {
     const sanitizedData = this.sanitizeData(typedData)
@@ -216,7 +216,7 @@ const TypedDataUtils = {
     if (sanitizedData.primaryType !== 'EIP712Domain') {
       parts.push(this.hashStruct(sanitizedData.primaryType, sanitizedData.message, sanitizedData.types, useV4))
     }
-    return ethUtil.sha3(Buffer.concat(parts))
+    return ethUtil.keccak(Buffer.concat(parts))
   },
 }
 
