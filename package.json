@@ -30,7 +30,7 @@
     "elliptic": "^6.4.0",
     "ethereumjs-abi": "^0.6.8",
     "ethereumjs-util": "^5.1.1",
-    "tweetnacl": "^1.0.0",
+    "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.0"
   },
   "devDependencies": {
