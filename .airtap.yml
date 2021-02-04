@@ -1,0 +1,6 @@
+providers:
+  - airtap-system
+
+browsers:
+  - name: chrome
+  - name: ff

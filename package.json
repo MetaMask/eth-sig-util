@@ -12,7 +12,7 @@
     "build": "tsc --project .",
     "lint": "eslint . --ext .ts,.js",
     "test": "yarn build && node test/index.js",
-    "test:browser": "yarn build && browserify test/index.js > test/bundle.js && echo ';window.close();' >> test/bundle.js && cat test/bundle.js | smokestack",
+    "test:browser": "yarn build && airtap test/index.js",
     "prepublishOnly": "yarn build"
   },
   "repository": {
@@ -29,10 +29,6 @@
     "url": "https://github.com/MetaMask/eth-sig-util/issues"
   },
   "homepage": "https://github.com/MetaMask/eth-sig-util#readme",
-  "resolutions": {
-    "smokestack/minimist": "^1.2.5",
-    "smokestack/shoe/sockjs/node-uuid": "^1.4.4"
-  },
   "dependencies": {
     "buffer": "^5.2.1",
     "elliptic": "^6.4.0",
@@ -46,10 +42,10 @@
     "@types/node": "^10.17.13",
     "@typescript-eslint/eslint-plugin": "^2.20.0",
     "@typescript-eslint/parser": "^2.20.0",
-    "browserify": "^16.5.1",
+    "airtap": "4.0.1",
+    "airtap-system": "^0.0.2",
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.20.1",
-    "smokestack": "^3.6.0",
     "tape": "^4.9.1",
     "typescript": "^3.9.2"
   }
