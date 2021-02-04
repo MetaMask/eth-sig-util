@@ -487,7 +487,7 @@ test('signedTypeData', (t) => {
   };
 
   const utils = sigUtil.TypedDataUtils;
-  const privateKey = ethUtil.sha3('cow');
+  const privateKey = ethUtil.keccak('cow');
   const address = ethUtil.privateToAddress(privateKey);
   const sig = sigUtil.signTypedData(privateKey, { data: typedData });
 
@@ -549,7 +549,7 @@ test('signedTypeData with V3 string', (t) => {
   };
 
   const utils = sigUtil.TypedDataUtils;
-  const privateKey = ethUtil.sha3('cow');
+  const privateKey = ethUtil.keccak('cow');
   const address = ethUtil.privateToAddress(privateKey);
   const sig = sigUtil.signTypedMessage(privateKey, { data: typedData }, 'V3');
 
@@ -667,7 +667,7 @@ test('signedTypeData_v4', (t) => {
   t.equal(ethUtil.bufferToHex(utils.sign(typedData)),
     '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2');
 
-  const privateKey = ethUtil.sha3('cow');
+  const privateKey = ethUtil.keccak('cow');
 
   const address = ethUtil.privateToAddress(privateKey);
   t.equal(ethUtil.bufferToHex(address), '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826');
@@ -776,7 +776,7 @@ test('signedTypeData_v4', (t) => {
   t.equal(ethUtil.bufferToHex(utils.sign(typedData)),
     '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2');
 
-  const privateKey = ethUtil.sha3('cow');
+  const privateKey = ethUtil.keccak('cow');
 
   const address = ethUtil.privateToAddress(privateKey);
   t.equal(ethUtil.bufferToHex(address), '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826');
@@ -869,7 +869,7 @@ test('signedTypeData_v4 with recursive types', (t) => {
   t.equal(ethUtil.bufferToHex(utils.sign(typedData)),
     '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c');
 
-  const privateKey = ethUtil.sha3('dragon');
+  const privateKey = ethUtil.keccak('dragon');
 
   const address = ethUtil.privateToAddress(privateKey);
   t.equal(ethUtil.bufferToHex(address), '0x065a687103c9f6467380bee800ecd70b17f6b72f');
@@ -962,7 +962,7 @@ test('signedTypeMessage V4 with recursive types', (t) => {
   t.equal(ethUtil.bufferToHex(utils.sign(typedData)),
     '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c');
 
-  const privateKey = ethUtil.sha3('dragon');
+  const privateKey = ethUtil.keccak('dragon');
 
   const address = ethUtil.privateToAddress(privateKey);
   t.equal(ethUtil.bufferToHex(address), '0x065a687103c9f6467380bee800ecd70b17f6b72f');
