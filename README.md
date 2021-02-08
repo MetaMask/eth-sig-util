@@ -2,7 +2,7 @@
 
 A small collection of ethereum signing functions.
 
-You can find usage examples [here](https://github.com/danfinlay/js-eth-personal-sign-examples)
+You can find usage examples [here](https://github.com/metamask/test-dapp)
 
 [Available on NPM](https://www.npmjs.com/package/eth-sig-util)
 
