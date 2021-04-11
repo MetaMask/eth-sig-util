@@ -7,9 +7,6 @@ workflows:
       - lint:
           requires:
             - prep-deps
-      - test-10:
-          requires:
-            - prep-deps
       - test-12:
           requires:
             - prep-deps
@@ -22,7 +19,6 @@ workflows:
       - all-tests-pass:
           requires:
             - lint
-            - test-10
             - test-12
             - test-14
             - test-browser
@@ -30,7 +26,7 @@ workflows:
 jobs:
   prep-deps:
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:12
     steps:
       - checkout
       - run:
@@ -49,7 +45,7 @@ jobs:
 
   all-tests-pass:
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:12
     steps:
       - run:
           name: Unit tests
@@ -57,7 +53,7 @@ jobs:
 
   lint:
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:12
     steps:
       - checkout
       - attach_workspace:
@@ -76,17 +72,6 @@ jobs:
       - run:
           name: Unit tests
           command: yarn test:browser
-
-  test-10:
-    docker:
-      - image: circleci/node:10
-    steps:
-      - checkout
-      - attach_workspace:
-          at: .
-      - run:
-          name: Unit tests
-          command: yarn test
 
   test-12:
     docker:
