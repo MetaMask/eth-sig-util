@@ -6,6 +6,9 @@
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": ">=12.0.0"
+  },
   "scripts": {
     "build": "tsc --project ./tsconfig.prod.json && tsc --project ./tsconfig.test.json",
     "lint": "eslint . --ext ts,js,json",
@@ -30,7 +33,7 @@
   "homepage": "https://github.com/MetaMask/eth-sig-util#readme",
   "dependencies": {
     "ethereumjs-abi": "^0.6.8",
-    "ethereumjs-util": "^5.1.1",
+    "ethereumjs-util": "^5.2.1",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.0"
   },
