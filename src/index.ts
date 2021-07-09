@@ -77,7 +77,6 @@ const TYPED_MESSAGE_SCHEMA = {
  * A collection of utility functions used for signing typed data
  */
 const TypedDataUtils = {
-
   /**
    * Encodes an object by encoding and concatenating each of its members
    *
@@ -90,7 +89,7 @@ const TypedDataUtils = {
     primaryType: string,
     data: Record<string, unknown>,
     types: Record<string, MessageTypeProperty[]>,
-    useV4 = true
+    useV4 = true,
   ): Buffer {
     const encodedTypes = ['bytes32'];
     const encodedValues = [this.hashType(primaryType, types)];
@@ -124,14 +123,16 @@ const TypedDataUtils = {
 
         if (type.lastIndexOf(']') === type.length - 1) {
           const parsedType = type.slice(0, type.lastIndexOf('['));
-          const typeValuePairs = value.map((item) => encodeField(name, parsedType, item));
+          const typeValuePairs = value.map((item) =>
+            encodeField(name, parsedType, item),
+          );
           return [
             'bytes32',
             ethUtil.keccak(
               ethAbi.rawEncode(
                 typeValuePairs.map(([t]) => t),
-                typeValuePairs.map(([, v]) => v)
-              )
+                typeValuePairs.map(([, v]) => v),
+              ),
             ),
           ];
         }
@@ -143,7 +144,7 @@ const TypedDataUtils = {
         const [type, value] = encodeField(
           field.name,
           field.type,
-          data[field.name]
+          data[field.name],
         );
         encodedTypes.push(type);
         encodedValues.push(value);
@@ -167,12 +168,12 @@ const TypedDataUtils = {
           } else if (types[field.type] !== undefined) {
             encodedTypes.push('bytes32');
             value = ethUtil.keccak(
-              this.encodeData(field.type, value, types, useV4)
+              this.encodeData(field.type, value, types, useV4),
             );
             encodedValues.push(value);
           } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
             throw new Error(
-              'Arrays are unimplemented in encodeData; use V4 extension'
+              'Arrays are unimplemented in encodeData; use V4 extension',
             );
           } else {
             encodedTypes.push(field.type);
@@ -194,11 +195,11 @@ const TypedDataUtils = {
    */
   encodeType(
     primaryType: string,
-    types: Record<string, MessageTypeProperty[]>
+    types: Record<string, MessageTypeProperty[]>,
   ): string {
     let result = '';
     let deps = this.findTypeDependencies(primaryType, types).filter(
-      (dep) => dep !== primaryType
+      (dep) => dep !== primaryType,
     );
     deps = [primaryType].concat(deps.sort());
     for (const type of deps) {
@@ -224,7 +225,7 @@ const TypedDataUtils = {
   findTypeDependencies(
     primaryType: string,
     types: Record<string, MessageTypeProperty[]>,
-    results: string[] = []
+    results: string[] = [],
   ): string[] {
     [primaryType] = primaryType.match(/^\w*/u);
     if (results.includes(primaryType) || types[primaryType] === undefined) {
@@ -251,7 +252,7 @@ const TypedDataUtils = {
     primaryType: string,
     data: Record<string, unknown>,
     types: Record<string, unknown>,
-    useV4 = true
+    useV4 = true,
   ): Buffer {
     return ethUtil.keccak(this.encodeData(primaryType, data, types, useV4));
   },
@@ -274,7 +275,7 @@ const TypedDataUtils = {
    * @returns {Object} - typed message object with only allowed fields
    */
   sanitizeData<T extends MessageTypes>(
-    data: TypedData | TypedMessage<T>
+    data: TypedData | TypedMessage<T>,
   ): TypedMessage<T> {
     const sanitizedData: Partial<TypedMessage<T>> = {};
     for (const key in TYPED_MESSAGE_SCHEMA.properties) {
@@ -296,7 +297,7 @@ const TypedDataUtils = {
    */
   sign<T extends MessageTypes>(
     typedData: Partial<TypedData | TypedMessage<T>>,
-    useV4 = true
+    useV4 = true,
   ): Buffer {
     const sanitizedData = this.sanitizeData(typedData);
     const parts = [Buffer.from('1901', 'hex')];
@@ -305,8 +306,8 @@ const TypedDataUtils = {
         'EIP712Domain',
         sanitizedData.domain,
         sanitizedData.types,
-        useV4
-      )
+        useV4,
+      ),
     );
     if (sanitizedData.primaryType !== 'EIP712Domain') {
       parts.push(
@@ -314,8 +315,8 @@ const TypedDataUtils = {
           sanitizedData.primaryType,
           sanitizedData.message,
           sanitizedData.types,
-          useV4
-        )
+          useV4,
+        ),
       );
     }
     return ethUtil.keccak(Buffer.concat(parts));
@@ -353,7 +354,7 @@ function normalize(input: number | string): string {
 
 function personalSign<T extends MessageTypes>(
   privateKey: Buffer,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>
+  msgParams: MsgParams<TypedData | TypedMessage<T>>,
 ): string {
   const message = ethUtil.toBuffer(msgParams.data);
   const msgHash = ethUtil.hashPersonalMessage(message);
@@ -363,7 +364,7 @@ function personalSign<T extends MessageTypes>(
 }
 
 function recoverPersonalSignature<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>
+  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
 ): string {
   const publicKey = getPublicKeyFor(msgParams);
   const sender = ethUtil.publicToAddress(publicKey);
@@ -372,7 +373,7 @@ function recoverPersonalSignature<T extends MessageTypes>(
 }
 
 function extractPublicKey<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>
+  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
 ): string {
   const publicKey = getPublicKeyFor(msgParams);
   return `0x${publicKey.toString('hex')}`;
@@ -385,7 +386,7 @@ function externalTypedSignatureHash(typedData: EIP712TypedData[]): string {
 
 function signTypedDataLegacy<T extends MessageTypes>(
   privateKey: Buffer,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>
+  msgParams: MsgParams<TypedData | TypedMessage<T>>,
 ): string {
   const msgHash = typedSignatureHash(msgParams.data);
   const sig = ethUtil.ecsign(msgHash, privateKey);
@@ -393,7 +394,7 @@ function signTypedDataLegacy<T extends MessageTypes>(
 }
 
 function recoverTypedSignatureLegacy<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>
+  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
 ): string {
   const msgHash = typedSignatureHash(msgParams.data);
   const publicKey = recoverPublicKey(msgHash, msgParams.sig);
@@ -404,13 +405,13 @@ function recoverTypedSignatureLegacy<T extends MessageTypes>(
 function encrypt<T extends MessageTypes>(
   receiverPublicKey: string,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
-  version: string
+  version: string,
 ): EthEncryptedData {
   switch (version) {
     case 'x25519-xsalsa20-poly1305': {
       if (typeof msgParams.data !== 'string') {
         throw new Error(
-          'Cannot detect secret message, message params should be of the form {data: "secret message"} '
+          'Cannot detect secret message, message params should be of the form {data: "secret message"} ',
         );
       }
       // generate ephemeral keypair
@@ -432,7 +433,7 @@ function encrypt<T extends MessageTypes>(
         msgParamsUInt8Array,
         nonce,
         pubKeyUInt8Array,
-        ephemeralKeyPair.secretKey
+        ephemeralKeyPair.secretKey,
       );
 
       // handle encrypted data
@@ -454,7 +455,7 @@ function encrypt<T extends MessageTypes>(
 function encryptSafely<T extends MessageTypes>(
   receiverPublicKey: string,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
-  version: string
+  version: string,
 ): EthEncryptedData {
   const DEFAULT_PADDING_LENGTH = 2 ** 11;
   const NACL_EXTRA_BYTES = 16;
@@ -468,7 +469,7 @@ function encryptSafely<T extends MessageTypes>(
     // remove toJSON attack vector
     // TODO, check all possible children
     throw new Error(
-      'Cannot encrypt with toJSON property.  Please remove toJSON property'
+      'Cannot encrypt with toJSON property.  Please remove toJSON property',
     );
   }
 
@@ -481,7 +482,7 @@ function encryptSafely<T extends MessageTypes>(
   // calculate padding
   const dataLength = Buffer.byteLength(
     JSON.stringify(dataWithPadding),
-    'utf-8'
+    'utf-8',
   );
   const modVal = dataLength % DEFAULT_PADDING_LENGTH;
   let padLength = 0;
@@ -497,21 +498,21 @@ function encryptSafely<T extends MessageTypes>(
 
 function decrypt(
   encryptedData: EthEncryptedData,
-  receiverPrivateKey: string
+  receiverPrivateKey: string,
 ): string {
   switch (encryptedData.version) {
     case 'x25519-xsalsa20-poly1305': {
       // string to buffer to UInt8Array
       const recieverPrivateKeyUint8Array = nacl_decodeHex(receiverPrivateKey);
       const recieverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(
-        recieverPrivateKeyUint8Array
+        recieverPrivateKeyUint8Array,
       ).secretKey;
 
       // assemble decryption parameters
       const nonce = naclUtil.decodeBase64(encryptedData.nonce);
       const ciphertext = naclUtil.decodeBase64(encryptedData.ciphertext);
       const ephemPublicKey = naclUtil.decodeBase64(
-        encryptedData.ephemPublicKey
+        encryptedData.ephemPublicKey,
       );
 
       // decrypt
@@ -519,7 +520,7 @@ function decrypt(
         ciphertext,
         nonce,
         ephemPublicKey,
-        recieverEncryptionPrivateKey
+        recieverEncryptionPrivateKey,
       );
 
       // return decrypted msg data
@@ -543,19 +544,18 @@ function decrypt(
 
 function decryptSafely(
   encryptedData: EthEncryptedData,
-  receiverPrivateKey: string
+  receiverPrivateKey: string,
 ): string {
   const dataWithPadding = JSON.parse(
-    decrypt(encryptedData, receiverPrivateKey)
+    decrypt(encryptedData, receiverPrivateKey),
   );
   return dataWithPadding.data;
 }
 
 function getEncryptionPublicKey(privateKey: string): string {
   const privateKeyUint8Array = nacl_decodeHex(privateKey);
-  const encryptionPublicKey = nacl.box.keyPair.fromSecretKey(
-    privateKeyUint8Array
-  ).publicKey;
+  const encryptionPublicKey =
+    nacl.box.keyPair.fromSecretKey(privateKeyUint8Array).publicKey;
   return naclUtil.encodeBase64(encryptionPublicKey);
 }
 
@@ -565,7 +565,7 @@ function getEncryptionPublicKey(privateKey: string): string {
 function signTypedMessage<T extends MessageTypes>(
   privateKey: Buffer,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
-  version: Version = 'V4'
+  version: Version = 'V4',
 ): string {
   switch (version) {
     case 'V1':
@@ -580,7 +580,7 @@ function signTypedMessage<T extends MessageTypes>(
 
 function recoverTypedMessage<T extends MessageTypes>(
   msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
-  version: Version = 'V4'
+  version: Version = 'V4',
 ): string {
   switch (version) {
     case 'V1':
@@ -595,7 +595,7 @@ function recoverTypedMessage<T extends MessageTypes>(
 
 function signTypedData<T extends MessageTypes>(
   privateKey: Buffer,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>
+  msgParams: MsgParams<TypedData | TypedMessage<T>>,
 ): string {
   const message = TypedDataUtils.sign(msgParams.data, false);
   const sig = ethUtil.ecsign(message, privateKey);
@@ -604,7 +604,7 @@ function signTypedData<T extends MessageTypes>(
 
 function signTypedData_v4<T extends MessageTypes>(
   privateKey: Buffer,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>
+  msgParams: MsgParams<TypedData | TypedMessage<T>>,
 ): string {
   const message = TypedDataUtils.sign(msgParams.data);
   const sig = ethUtil.ecsign(message, privateKey);
@@ -612,7 +612,7 @@ function signTypedData_v4<T extends MessageTypes>(
 }
 
 function recoverTypedSignature<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>
+  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
 ): string {
   const message = TypedDataUtils.sign(msgParams.data, false);
   const publicKey = recoverPublicKey(message, msgParams.sig);
@@ -621,7 +621,7 @@ function recoverTypedSignature<T extends MessageTypes>(
 }
 
 function recoverTypedSignature_v4<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>
+  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
 ): string {
   const message = TypedDataUtils.sign(msgParams.data);
   const publicKey = recoverPublicKey(message, msgParams.sig);
@@ -658,7 +658,7 @@ export {
  * @returns Buffer
  */
 function typedSignatureHash<T extends MessageTypes>(
-  typedData: TypedData | TypedMessage<T>
+  typedData: TypedData | TypedMessage<T>,
 ): Buffer {
   const error = new Error('Expect argument to be non-empty array');
   if (
@@ -687,7 +687,7 @@ function typedSignatureHash<T extends MessageTypes>(
     [
       ethAbi.soliditySHA3(new Array(typedData.length).fill('string'), schema),
       ethAbi.soliditySHA3(types, data),
-    ]
+    ],
   );
 }
 
@@ -698,7 +698,7 @@ function recoverPublicKey(hash: Buffer, sig: string): Buffer {
 }
 
 function getPublicKeyFor<T extends MessageTypes>(
-  msgParams: MsgParams<TypedData | TypedMessage<T>>
+  msgParams: MsgParams<TypedData | TypedMessage<T>>,
 ): Buffer {
   const message = ethUtil.toBuffer(msgParams.data);
   const msgHash = ethUtil.hashPersonalMessage(message);
