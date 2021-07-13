@@ -47,7 +47,7 @@ test('personalSign and recover', function (t) {
   const signed = sigUtil.personalSign(privKey, msgParams);
   msgParams.sig = signed;
   const recovered = sigUtil.recoverPersonalSignature(
-    msgParams as sigUtil.SignedMsgParams<string>
+    msgParams as sigUtil.SignedMsgParams<string>,
   );
 
   t.equal(recovered, address);
@@ -67,7 +67,7 @@ test('personalSign and extractPublicKey', function (t) {
   const signed = sigUtil.personalSign(privKey, msgParams);
   msgParams.sig = signed;
   const publicKey = sigUtil.extractPublicKey(
-    msgParams as sigUtil.SignedMsgParams<string>
+    msgParams as sigUtil.SignedMsgParams<string>,
   );
 
   t.equal(publicKey, pubKeyHex);
@@ -98,7 +98,7 @@ test('signTypedDataLegacy and recoverTypedSignatureLegacy - single message', fun
   t.equal(
     signature,
     '0x49e75d475d767de7fcc67f521e0d86590723d872e6111e51c393e8c1e2f21d032dfaf5833af158915f035db6af4f37bf2d5d29781cd81f28a44c5cb4b9d241531b',
-    'Signature matches test value.'
+    'Signature matches test value.',
   );
 
   t.equal(address, recovered);
@@ -125,12 +125,12 @@ test('signTypedDataLegacy as v1 and recoverTypedSignatureLegacy - single message
   const signature = sigUtil.signTypedMessage(privKey, msgParams, 'V1');
   const recovered = sigUtil.recoverTypedMessage(
     { data: msgParams.data, sig: signature },
-    'V1'
+    'V1',
   );
   t.equal(
     signature,
     '0x49e75d475d767de7fcc67f521e0d86590723d872e6111e51c393e8c1e2f21d032dfaf5833af158915f035db6af4f37bf2d5d29781cd81f28a44c5cb4b9d241531b',
-    'Signature matches test value.'
+    'Signature matches test value.',
   );
 
   t.equal(address, recovered);
@@ -181,7 +181,7 @@ test('typedSignatureHash - single value', function (t) {
   const hash = sigUtil.typedSignatureHash(typedData);
   t.equal(
     hash,
-    '0x14b9f24872e28cc49e72dc104d7380d8e0ba84a3fe2e712704bcac66a5702bd5'
+    '0x14b9f24872e28cc49e72dc104d7380d8e0ba84a3fe2e712704bcac66a5702bd5',
   );
 });
 
@@ -202,7 +202,7 @@ test('typedSignatureHash - multiple values', function (t) {
   const hash = sigUtil.typedSignatureHash(typedData);
   t.equal(
     hash,
-    '0xf7ad23226db5c1c00ca0ca1468fd49c8f8bbc1489bc1c382de5adc557a69c229'
+    '0xf7ad23226db5c1c00ca0ca1468fd49c8f8bbc1489bc1c382de5adc557a69c229',
   );
 });
 
@@ -218,7 +218,7 @@ test('typedSignatureHash - bytes', function (t) {
   const hash = sigUtil.typedSignatureHash(typedData);
   t.equal(
     hash,
-    '0x6c69d03412450b174def7d1e48b3bcbbbd8f51df2e76e2c5b3a5d951125be3a9'
+    '0x6c69d03412450b174def7d1e48b3bcbbbd8f51df2e76e2c5b3a5d951125be3a9',
   );
 });
 
@@ -281,7 +281,7 @@ signatureTest({
   addressHex: '0xbe93f9bacbcffc8ee6663f2647917ed7a20a57bb',
   privateKey: Buffer.from(
     '6969696969696969696969696969696969696969696969696969696969696969',
-    'hex'
+    'hex',
   ),
 });
 
@@ -294,7 +294,7 @@ signatureTest({
   addressHex: '0xbe93f9bacbcffc8ee6663f2647917ed7a20a57bb',
   privateKey: Buffer.from(
     '6969696969696969696969696969696969696969696969696969696969696969',
-    'hex'
+    'hex',
   ),
 });
 
@@ -309,7 +309,7 @@ signatureTest({
   addressHex: '0xe0da1edcea030875cd0f199d96eb70f6ab78faf2',
   privateKey: Buffer.from(
     '4545454545454545454545454545454545454545454545454545454545454545',
-    'hex'
+    'hex',
   ),
 });
 
@@ -327,7 +327,7 @@ function signatureTest(opts) {
 
     msgParams.sig = signed;
     const recovered = sigUtil.recoverPersonalSignature(
-      msgParams as sigUtil.SignedMsgParams<string>
+      msgParams as sigUtil.SignedMsgParams<string>,
     );
 
     t.equal(recovered, address);
@@ -377,7 +377,7 @@ test("Alice encrypts message with bob's encryptionPublicKey", async (t) => {
   const result = await sigUtil.encrypt(
     bob.encryptionPublicKey,
     secretMessage,
-    'x25519-xsalsa20-poly1305'
+    'x25519-xsalsa20-poly1305',
   );
 
   console.log('RESULT', result);
@@ -395,7 +395,7 @@ test("Alice encryptsSafely message with bob's encryptionPublicKey", async (t) =>
   const result = await sigUtil.encryptSafely(
     bob.encryptionPublicKey,
     secretMessage,
-    VERSION
+    VERSION,
   );
 
   console.log('RESULT', result);
@@ -414,7 +414,7 @@ test('Bob decryptSafely message that Alice encryptSafely for him', async (t) => 
   const result = await sigUtil.encryptSafely(
     bob.encryptionPublicKey,
     secretMessage,
-    VERSION
+    VERSION,
   );
 
   const plaintext = sigUtil.decryptSafely(result, bob.ethereumPrivateKey);
@@ -540,49 +540,49 @@ test('signedTypeData', (t) => {
 
   t.equal(
     utils.encodeType('Mail', typedData.types),
-    'Mail(Person from,Person to,string contents)Person(string name,address wallet)'
+    'Mail(Person from,Person to,string contents)Person(string name,address wallet)',
   );
   t.equal(
     ethUtil.bufferToHex(utils.hashType('Mail', typedData.types)),
-    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2'
+    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2',
   );
   t.equal(
     ethUtil.bufferToHex(
       utils.encodeData(
         typedData.primaryType,
         typedData.message,
-        typedData.types
-      )
+        typedData.types,
+      ),
     ),
-    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8'
+    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
   );
   t.equal(
     ethUtil.bufferToHex(
       utils.hashStruct(
         typedData.primaryType,
         typedData.message,
-        typedData.types
-      )
+        typedData.types,
+      ),
     ),
-    '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e'
+    '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e',
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types)
+      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types),
     ),
-    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f'
+    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
   );
   t.equal(
     ethUtil.bufferToHex(utils.sign(typedData)),
-    '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2'
+    '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2',
   );
   t.equal(
     ethUtil.bufferToHex(address),
-    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826'
+    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
   );
   t.equal(
     sig,
-    '0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b915621c'
+    '0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b915621c',
   );
 });
 
@@ -625,7 +625,8 @@ test('signedTypeData with bytes', (t) => {
         wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
       },
       contents: 'Hello, Bob!',
-      payload: '0x25192142931f380985072cdd991e37f65cf8253ba7a0e675b54163a1d133b8ca',
+      payload:
+        '0x25192142931f380985072cdd991e37f65cf8253ba7a0e675b54163a1d133b8ca',
     },
   };
   const utils = sigUtil.TypedDataUtils;
@@ -635,53 +636,53 @@ test('signedTypeData with bytes', (t) => {
 
   t.equal(
     utils.encodeType('Mail', typedDataWithBytes.types),
-    'Mail(Person from,Person to,string contents,bytes payload)Person(string name,address wallet)'
+    'Mail(Person from,Person to,string contents,bytes payload)Person(string name,address wallet)',
   );
   t.equal(
     ethUtil.bufferToHex(utils.hashType('Mail', typedDataWithBytes.types)),
-    '0x43999c52db673245777eb64b0330105de064e52179581a340a9856c32372528e'
+    '0x43999c52db673245777eb64b0330105de064e52179581a340a9856c32372528e',
   );
   t.equal(
     ethUtil.bufferToHex(
       utils.encodeData(
         typedDataWithBytes.primaryType,
         typedDataWithBytes.message,
-        typedDataWithBytes.types
-      )
+        typedDataWithBytes.types,
+      ),
     ),
-    '0x43999c52db673245777eb64b0330105de064e52179581a340a9856c32372528efc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8fac776d21ae071a32c362d4c20ba6586779708a56cad3a78d01b37ecb5744298'
+    '0x43999c52db673245777eb64b0330105de064e52179581a340a9856c32372528efc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8fac776d21ae071a32c362d4c20ba6586779708a56cad3a78d01b37ecb5744298',
   );
   t.equal(
     ethUtil.bufferToHex(
       utils.hashStruct(
         typedDataWithBytes.primaryType,
         typedDataWithBytes.message,
-        typedDataWithBytes.types
-      )
+        typedDataWithBytes.types,
+      ),
     ),
-    '0xe004bdc1ca57ba9ad5ea8c81e54dcbdb3bfce2d1d5ad92113f0871fb2a6eb052'
+    '0xe004bdc1ca57ba9ad5ea8c81e54dcbdb3bfce2d1d5ad92113f0871fb2a6eb052',
   );
   t.equal(
     ethUtil.bufferToHex(
       utils.hashStruct(
         'EIP712Domain',
         typedDataWithBytes.domain,
-        typedDataWithBytes.types
-      )
+        typedDataWithBytes.types,
+      ),
     ),
-    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f'
+    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
   );
   t.equal(
     ethUtil.bufferToHex(utils.sign(typedDataWithBytes)),
-    '0xb4aaf457227fec401db772ec22d2095d1235ee5d0833f56f59108c9ffc90fb4b'
+    '0xb4aaf457227fec401db772ec22d2095d1235ee5d0833f56f59108c9ffc90fb4b',
   );
   t.equal(
     ethUtil.bufferToHex(address),
-    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826'
+    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
   );
   t.equal(
     sig,
-    '0xdd17ea877a7da411c85ff94bc54180631d0e86efdcd68876aeb2e051417b68e76be6858d67b20baf7be9c6402d49930bfea2535e9ae150e85838ee265094fd081b'
+    '0xdd17ea877a7da411c85ff94bc54180631d0e86efdcd68876aeb2e051417b68e76be6858d67b20baf7be9c6402d49930bfea2535e9ae150e85838ee265094fd081b',
   );
 });
 
@@ -733,49 +734,49 @@ test('signedTypeData with V3 string', (t) => {
 
   t.equal(
     utils.encodeType('Mail', typedData.types),
-    'Mail(Person from,Person to,string contents)Person(string name,address wallet)'
+    'Mail(Person from,Person to,string contents)Person(string name,address wallet)',
   );
   t.equal(
     ethUtil.bufferToHex(utils.hashType('Mail', typedData.types)),
-    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2'
+    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2',
   );
   t.equal(
     ethUtil.bufferToHex(
       utils.encodeData(
         typedData.primaryType,
         typedData.message,
-        typedData.types
-      )
+        typedData.types,
+      ),
     ),
-    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8'
+    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
   );
   t.equal(
     ethUtil.bufferToHex(
       utils.hashStruct(
         typedData.primaryType,
         typedData.message,
-        typedData.types
-      )
+        typedData.types,
+      ),
     ),
-    '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e'
+    '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e',
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types)
+      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types),
     ),
-    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f'
+    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
   );
   t.equal(
     ethUtil.bufferToHex(utils.sign(typedData)),
-    '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2'
+    '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2',
   );
   t.equal(
     ethUtil.bufferToHex(address),
-    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826'
+    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
   );
   t.equal(
     sig,
-    '0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b915621c'
+    '0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b915621c',
   );
 });
 
@@ -837,94 +838,94 @@ test('signedTypeData_v4', (t) => {
 
   t.equal(
     utils.encodeType('Group', typedData.types),
-    'Group(string name,Person[] members)Person(string name,address[] wallets)'
+    'Group(string name,Person[] members)Person(string name,address[] wallets)',
   );
 
   t.equal(
     utils.encodeType('Person', typedData.types),
-    'Person(string name,address[] wallets)'
+    'Person(string name,address[] wallets)',
   );
   t.equal(
     ethUtil.bufferToHex(utils.hashType('Person', typedData.types)),
-    '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860'
+    '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
   );
 
   t.equal(
     ethUtil.bufferToHex(
-      utils.encodeData('Person', typedData.message.from, typedData.types)
+      utils.encodeData('Person', typedData.message.from, typedData.types),
     ),
     `0x${[
       'fabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
       '8c1d2bd5348394761719da11ec67eedae9502d137e8940fee8ecd6f641ee1648',
       '8a8bfe642b9fc19c25ada5dadfd37487461dc81dd4b0778f262c163ed81b5e2a',
-    ].join('')}`
+    ].join('')}`,
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('Person', typedData.message.from, typedData.types)
+      utils.hashStruct('Person', typedData.message.from, typedData.types),
     ),
-    '0x9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f'
+    '0x9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f',
   );
 
   t.equal(
     ethUtil.bufferToHex(
-      utils.encodeData('Person', typedData.message.to[0], typedData.types)
+      utils.encodeData('Person', typedData.message.to[0], typedData.types),
     ),
     `0x${[
       'fabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
       '28cac318a86c8a0a6a9156c2dba2c8c2363677ba0514ef616592d81557e679b6',
       'd2734f4c86cc3bd9cabf04c3097589d3165d95e4648fc72d943ed161f651ec6d',
-    ].join('')}`
+    ].join('')}`,
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('Person', typedData.message.to[0], typedData.types)
+      utils.hashStruct('Person', typedData.message.to[0], typedData.types),
     ),
-    '0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168'
+    '0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168',
   );
 
   t.equal(
     utils.encodeType('Mail', typedData.types),
-    'Mail(Person from,Person[] to,string contents)Person(string name,address[] wallets)'
+    'Mail(Person from,Person[] to,string contents)Person(string name,address[] wallets)',
   );
   t.equal(
     ethUtil.bufferToHex(utils.hashType('Mail', typedData.types)),
-    '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753'
+    '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
   );
   t.equal(
     ethUtil.bufferToHex(
       utils.encodeData(
         typedData.primaryType,
         typedData.message,
-        typedData.types
-      )
+        typedData.types,
+      ),
     ),
     `0x${[
       '4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
       '9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f',
       'ca322beec85be24e374d18d582a6f2997f75c54e7993ab5bc07404ce176ca7cd',
       'b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
-    ].join('')}`
+    ].join('')}`,
   );
   t.equal(
     ethUtil.bufferToHex(
       utils.hashStruct(
         typedData.primaryType,
         typedData.message,
-        typedData.types
-      )
+        typedData.types,
+      ),
     ),
-    '0xeb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8'
+    '0xeb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8',
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types)
+      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types),
     ),
-    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f'
+    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
   );
   t.equal(
     ethUtil.bufferToHex(utils.sign(typedData)),
-    '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2'
+    '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2',
   );
 
   const privateKey = ethUtil.keccak('cow');
@@ -932,14 +933,14 @@ test('signedTypeData_v4', (t) => {
   const address = ethUtil.privateToAddress(privateKey);
   t.equal(
     ethUtil.bufferToHex(address),
-    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826'
+    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
   );
 
   const sig = sigUtil.signTypedData_v4(privateKey, { data: typedData });
 
   t.equal(
     sig,
-    '0x65cbd956f2fae28a601bebc9b906cea0191744bd4c4247bcd27cd08f8eb6b71c78efdf7a31dc9abee78f492292721f362d296cf86b4538e07b51303b67f749061b'
+    '0x65cbd956f2fae28a601bebc9b906cea0191744bd4c4247bcd27cd08f8eb6b71c78efdf7a31dc9abee78f492292721f362d296cf86b4538e07b51303b67f749061b',
   );
 });
 
@@ -1001,94 +1002,94 @@ test('signedTypeData_v4', (t) => {
 
   t.equal(
     utils.encodeType('Group', typedData.types),
-    'Group(string name,Person[] members)Person(string name,address[] wallets)'
+    'Group(string name,Person[] members)Person(string name,address[] wallets)',
   );
 
   t.equal(
     utils.encodeType('Person', typedData.types),
-    'Person(string name,address[] wallets)'
+    'Person(string name,address[] wallets)',
   );
   t.equal(
     ethUtil.bufferToHex(utils.hashType('Person', typedData.types)),
-    '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860'
+    '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
   );
 
   t.equal(
     ethUtil.bufferToHex(
-      utils.encodeData('Person', typedData.message.from, typedData.types)
+      utils.encodeData('Person', typedData.message.from, typedData.types),
     ),
     `0x${[
       'fabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
       '8c1d2bd5348394761719da11ec67eedae9502d137e8940fee8ecd6f641ee1648',
       '8a8bfe642b9fc19c25ada5dadfd37487461dc81dd4b0778f262c163ed81b5e2a',
-    ].join('')}`
+    ].join('')}`,
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('Person', typedData.message.from, typedData.types)
+      utils.hashStruct('Person', typedData.message.from, typedData.types),
     ),
-    '0x9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f'
+    '0x9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f',
   );
 
   t.equal(
     ethUtil.bufferToHex(
-      utils.encodeData('Person', typedData.message.to[0], typedData.types)
+      utils.encodeData('Person', typedData.message.to[0], typedData.types),
     ),
     `0x${[
       'fabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
       '28cac318a86c8a0a6a9156c2dba2c8c2363677ba0514ef616592d81557e679b6',
       'd2734f4c86cc3bd9cabf04c3097589d3165d95e4648fc72d943ed161f651ec6d',
-    ].join('')}`
+    ].join('')}`,
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('Person', typedData.message.to[0], typedData.types)
+      utils.hashStruct('Person', typedData.message.to[0], typedData.types),
     ),
-    '0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168'
+    '0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168',
   );
 
   t.equal(
     utils.encodeType('Mail', typedData.types),
-    'Mail(Person from,Person[] to,string contents)Person(string name,address[] wallets)'
+    'Mail(Person from,Person[] to,string contents)Person(string name,address[] wallets)',
   );
   t.equal(
     ethUtil.bufferToHex(utils.hashType('Mail', typedData.types)),
-    '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753'
+    '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
   );
   t.equal(
     ethUtil.bufferToHex(
       utils.encodeData(
         typedData.primaryType,
         typedData.message,
-        typedData.types
-      )
+        typedData.types,
+      ),
     ),
     `0x${[
       '4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
       '9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f',
       'ca322beec85be24e374d18d582a6f2997f75c54e7993ab5bc07404ce176ca7cd',
       'b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
-    ].join('')}`
+    ].join('')}`,
   );
   t.equal(
     ethUtil.bufferToHex(
       utils.hashStruct(
         typedData.primaryType,
         typedData.message,
-        typedData.types
-      )
+        typedData.types,
+      ),
     ),
-    '0xeb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8'
+    '0xeb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8',
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types)
+      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types),
     ),
-    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f'
+    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
   );
   t.equal(
     ethUtil.bufferToHex(utils.sign(typedData)),
-    '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2'
+    '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2',
   );
 
   const privateKey = ethUtil.keccak('cow');
@@ -1096,14 +1097,14 @@ test('signedTypeData_v4', (t) => {
   const address = ethUtil.privateToAddress(privateKey);
   t.equal(
     ethUtil.bufferToHex(address),
-    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826'
+    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
   );
 
   const sig = sigUtil.signTypedData_v4(privateKey, { data: typedData });
 
   t.equal(
     sig,
-    '0x65cbd956f2fae28a601bebc9b906cea0191744bd4c4247bcd27cd08f8eb6b71c78efdf7a31dc9abee78f492292721f362d296cf86b4538e07b51303b67f749061b'
+    '0x65cbd956f2fae28a601bebc9b906cea0191744bd4c4247bcd27cd08f8eb6b71c78efdf7a31dc9abee78f492292721f362d296cf86b4538e07b51303b67f749061b',
   );
 });
 
@@ -1152,48 +1153,48 @@ test('signedTypeData_v4 with recursive types', (t) => {
 
   t.equal(
     utils.encodeType('Person', typedData.types),
-    'Person(string name,Person mother,Person father)'
+    'Person(string name,Person mother,Person father)',
   );
 
   t.equal(
     ethUtil.bufferToHex(utils.hashType('Person', typedData.types)),
-    '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116'
+    '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
   );
 
   t.equal(
     ethUtil.bufferToHex(
-      utils.encodeData('Person', typedData.message.mother, typedData.types)
+      utils.encodeData('Person', typedData.message.mother, typedData.types),
     ),
     `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'afe4142a2b3e7b0503b44951e6030e0e2c5000ef83c61857e2e6003e7aef8570',
       '0000000000000000000000000000000000000000000000000000000000000000',
       '88f14be0dd46a8ec608ccbff6d3923a8b4e95cdfc9648f0db6d92a99a264cb36',
-    ].join('')}`
+    ].join('')}`,
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('Person', typedData.message.mother, typedData.types)
+      utils.hashStruct('Person', typedData.message.mother, typedData.types),
     ),
-    '0x9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b'
+    '0x9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b',
   );
 
   t.equal(
     ethUtil.bufferToHex(
-      utils.encodeData('Person', typedData.message.father, typedData.types)
+      utils.encodeData('Person', typedData.message.father, typedData.types),
     ),
     `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'b2a7c7faba769181e578a391a6a6811a3e84080c6a3770a0bf8a856dfa79d333',
       '0000000000000000000000000000000000000000000000000000000000000000',
       '02cc7460f2c9ff107904cff671ec6fee57ba3dd7decf999fe9fe056f3fd4d56e',
-    ].join('')}`
+    ].join('')}`,
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('Person', typedData.message.father, typedData.types)
+      utils.hashStruct('Person', typedData.message.father, typedData.types),
     ),
-    '0xb852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8'
+    '0xb852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8',
   );
 
   t.equal(
@@ -1201,35 +1202,35 @@ test('signedTypeData_v4 with recursive types', (t) => {
       utils.encodeData(
         typedData.primaryType,
         typedData.message,
-        typedData.types
-      )
+        typedData.types,
+      ),
     ),
     `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'e8d55aa98b6b411f04dbcf9b23f29247bb0e335a6bc5368220032fdcb9e5927f',
       '9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b',
       'b852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8',
-    ].join('')}`
+    ].join('')}`,
   );
   t.equal(
     ethUtil.bufferToHex(
       utils.hashStruct(
         typedData.primaryType,
         typedData.message,
-        typedData.types
-      )
+        typedData.types,
+      ),
     ),
-    '0xfdc7b6d35bbd81f7fa78708604f57569a10edff2ca329c8011373f0667821a45'
+    '0xfdc7b6d35bbd81f7fa78708604f57569a10edff2ca329c8011373f0667821a45',
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types)
+      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types),
     ),
-    '0xfacb2c1888f63a780c84c216bd9a81b516fc501a19bae1fc81d82df590bbdc60'
+    '0xfacb2c1888f63a780c84c216bd9a81b516fc501a19bae1fc81d82df590bbdc60',
   );
   t.equal(
     ethUtil.bufferToHex(utils.sign(typedData)),
-    '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c'
+    '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c',
   );
 
   const privateKey = ethUtil.keccak('dragon');
@@ -1237,14 +1238,14 @@ test('signedTypeData_v4 with recursive types', (t) => {
   const address = ethUtil.privateToAddress(privateKey);
   t.equal(
     ethUtil.bufferToHex(address),
-    '0x065a687103c9f6467380bee800ecd70b17f6b72f'
+    '0x065a687103c9f6467380bee800ecd70b17f6b72f',
   );
 
   const sig = sigUtil.signTypedData_v4(privateKey, { data: typedData });
 
   t.equal(
     sig,
-    '0xf2ec61e636ff7bb3ac8bc2a4cc2c8b8f635dd1b2ec8094c963128b358e79c85c5ca6dd637ed7e80f0436fe8fce39c0e5f2082c9517fe677cc2917dcd6c84ba881c'
+    '0xf2ec61e636ff7bb3ac8bc2a4cc2c8b8f635dd1b2ec8094c963128b358e79c85c5ca6dd637ed7e80f0436fe8fce39c0e5f2082c9517fe677cc2917dcd6c84ba881c',
   );
 });
 
@@ -1293,48 +1294,48 @@ test('signedTypeMessage V4 with recursive types', (t) => {
 
   t.equal(
     utils.encodeType('Person', typedData.types),
-    'Person(string name,Person mother,Person father)'
+    'Person(string name,Person mother,Person father)',
   );
 
   t.equal(
     ethUtil.bufferToHex(utils.hashType('Person', typedData.types)),
-    '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116'
+    '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
   );
 
   t.equal(
     ethUtil.bufferToHex(
-      utils.encodeData('Person', typedData.message.mother, typedData.types)
+      utils.encodeData('Person', typedData.message.mother, typedData.types),
     ),
     `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'afe4142a2b3e7b0503b44951e6030e0e2c5000ef83c61857e2e6003e7aef8570',
       '0000000000000000000000000000000000000000000000000000000000000000',
       '88f14be0dd46a8ec608ccbff6d3923a8b4e95cdfc9648f0db6d92a99a264cb36',
-    ].join('')}`
+    ].join('')}`,
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('Person', typedData.message.mother, typedData.types)
+      utils.hashStruct('Person', typedData.message.mother, typedData.types),
     ),
-    '0x9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b'
+    '0x9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b',
   );
 
   t.equal(
     ethUtil.bufferToHex(
-      utils.encodeData('Person', typedData.message.father, typedData.types)
+      utils.encodeData('Person', typedData.message.father, typedData.types),
     ),
     `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'b2a7c7faba769181e578a391a6a6811a3e84080c6a3770a0bf8a856dfa79d333',
       '0000000000000000000000000000000000000000000000000000000000000000',
       '02cc7460f2c9ff107904cff671ec6fee57ba3dd7decf999fe9fe056f3fd4d56e',
-    ].join('')}`
+    ].join('')}`,
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('Person', typedData.message.father, typedData.types)
+      utils.hashStruct('Person', typedData.message.father, typedData.types),
     ),
-    '0xb852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8'
+    '0xb852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8',
   );
 
   t.equal(
@@ -1342,35 +1343,35 @@ test('signedTypeMessage V4 with recursive types', (t) => {
       utils.encodeData(
         typedData.primaryType,
         typedData.message,
-        typedData.types
-      )
+        typedData.types,
+      ),
     ),
     `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'e8d55aa98b6b411f04dbcf9b23f29247bb0e335a6bc5368220032fdcb9e5927f',
       '9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b',
       'b852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8',
-    ].join('')}`
+    ].join('')}`,
   );
   t.equal(
     ethUtil.bufferToHex(
       utils.hashStruct(
         typedData.primaryType,
         typedData.message,
-        typedData.types
-      )
+        typedData.types,
+      ),
     ),
-    '0xfdc7b6d35bbd81f7fa78708604f57569a10edff2ca329c8011373f0667821a45'
+    '0xfdc7b6d35bbd81f7fa78708604f57569a10edff2ca329c8011373f0667821a45',
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types)
+      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types),
     ),
-    '0xfacb2c1888f63a780c84c216bd9a81b516fc501a19bae1fc81d82df590bbdc60'
+    '0xfacb2c1888f63a780c84c216bd9a81b516fc501a19bae1fc81d82df590bbdc60',
   );
   t.equal(
     ethUtil.bufferToHex(utils.sign(typedData)),
-    '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c'
+    '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c',
   );
 
   const privateKey = ethUtil.keccak('dragon');
@@ -1378,13 +1379,13 @@ test('signedTypeMessage V4 with recursive types', (t) => {
   const address = ethUtil.privateToAddress(privateKey);
   t.equal(
     ethUtil.bufferToHex(address),
-    '0x065a687103c9f6467380bee800ecd70b17f6b72f'
+    '0x065a687103c9f6467380bee800ecd70b17f6b72f',
   );
 
   const sig = sigUtil.signTypedMessage(privateKey, { data: typedData }, 'V4');
 
   t.equal(
     sig,
-    '0xf2ec61e636ff7bb3ac8bc2a4cc2c8b8f635dd1b2ec8094c963128b358e79c85c5ca6dd637ed7e80f0436fe8fce39c0e5f2082c9517fe677cc2917dcd6c84ba881c'
+    '0xf2ec61e636ff7bb3ac8bc2a4cc2c8b8f635dd1b2ec8094c963128b358e79c85c5ca6dd637ed7e80f0436fe8fce39c0e5f2082c9517fe677cc2917dcd6c84ba881c',
   );
 });

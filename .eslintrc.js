@@ -1,17 +1,10 @@
 module.exports = {
   root: true,
-  extends: [
-    '@metamask/eslint-config',
-    '@metamask/eslint-config/config/nodejs',
-    '@metamask/eslint-config/config/typescript',
-  ],
-  plugins: ['json'],
+  extends: ['@metamask/eslint-config', '@metamask/eslint-config-nodejs'],
   overrides: [
     {
-      files: ['*.js', '*.json'],
-      parserOptions: {
-        sourceType: 'script',
-      },
+      files: ['*.ts'],
+      extends: ['@metamask/eslint-config-typescript'],
     },
   ],
   rules: {
@@ -27,5 +20,5 @@ module.exports = {
     ],
     'no-param-reassign': 'off',
   },
-  ignorePatterns: ['!.eslintrc.js', './test/*.js', 'dist'],
+  ignorePatterns: ['!.eslintrc.js', 'test/*.js', 'dist'],
 };
