@@ -21,6 +21,7 @@
     "dist"
   ],
   "scripts": {
+    "setup": "yarn install && yarn allow-scripts",
     "build": "tsc --project ./tsconfig.prod.json && tsc --project ./tsconfig.test.json",
     "lint:eslint": "eslint . --cache --ext js,ts",
     "lint:json": "prettier '**/*.json' --ignore-path .gitignore",
@@ -40,6 +41,7 @@
     "tweetnacl-util": "^0.15.0"
   },
   "devDependencies": {
+    "@lavamoat/allow-scripts": "^1.0.6",
     "@metamask/eslint-config": "^7.0.1",
     "@metamask/eslint-config-nodejs": "^7.0.0",
     "@metamask/eslint-config-typescript": "^7.0.1",
@@ -60,5 +62,15 @@
   },
   "engines": {
     "node": ">=12.0.0"
+  },
+  "lavamoat": {
+    "allowScripts": {
+      "@lavamoat/preinstall-always-fail": false,
+      "core-js": false,
+      "registry-js": false,
+      "win-version-info": false,
+      "keccak": true,
+      "secp256k1": true
+    }
   }
 }

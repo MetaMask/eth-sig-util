@@ -5,4 +5,5 @@ set -e
 set -u
 set -o pipefail
 
-yarn --frozen-lockfile --ignore-scripts --har
+yarn --frozen-lockfile --har
+yarn allow-scripts
