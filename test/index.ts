@@ -805,10 +805,7 @@ test('signedTypeData_v4', (t) => {
       ],
     },
     domain: {
-      name: 'Ether Mail',
-      version: '1',
-      chainId: 1,
-      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+
     },
     primaryType: 'Mail' as const,
     message: {
@@ -834,12 +831,6 @@ test('signedTypeData_v4', (t) => {
   };
 
   const utils = sigUtil.TypedDataUtils;
-
-  t.equal(
-    utils.encodeType('Group', typedData.types),
-    'Group(string name,Person[] members)Person(string name,address[] wallets)'
-  );
-
   t.equal(
     utils.encodeType('Person', typedData.types),
     'Person(string name,address[] wallets)'
@@ -934,9 +925,6 @@ test('signedTypeData_v4', (t) => {
     ethUtil.bufferToHex(address),
     '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826'
   );
-
-  const sig = sigUtil.signTypedData_v4(privateKey, { data: typedData });
-
   t.equal(
     sig,
     '0x65cbd956f2fae28a601bebc9b906cea0191744bd4c4247bcd27cd08f8eb6b71c78efdf7a31dc9abee78f492292721f362d296cf86b4538e07b51303b67f749061b'
