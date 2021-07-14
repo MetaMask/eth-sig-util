@@ -74,256 +74,273 @@ const TYPED_MESSAGE_SCHEMA = {
 };
 
 /**
- * A collection of utility functions used for signing typed data
+ * Encodes an object by encoding and concatenating each of its members
+ *
+ * @param {string} primaryType - Root type
+ * @param {Object} data - Object to encode
+ * @param {Object} types - Type definitions
+ * @param {Version} version - The EIP-712 version the encoding should comply with
+ * @returns {Buffer} - Encoded representation of an object
  */
-const TypedDataUtils = {
-  /**
-   * Encodes an object by encoding and concatenating each of its members
-   *
-   * @param {string} primaryType - Root type
-   * @param {Object} data - Object to encode
-   * @param {Object} types - Type definitions
-   * @param {Version} version - The EIP-712 version the encoding should comply with
-   * @returns {Buffer} - Encoded representation of an object
-   */
-  encodeData(
-    primaryType: string,
-    data: Record<string, unknown>,
-    types: Record<string, MessageTypeProperty[]>,
-    version: Version,
-  ): Buffer {
-    const encodedTypes = ['bytes32'];
-    const encodedValues = [this.hashType(primaryType, types)];
+function encodeData(
+  primaryType: string,
+  data: Record<string, unknown>,
+  types: Record<string, MessageTypeProperty[]>,
+  version: Version,
+): Buffer {
+  const encodedTypes = ['bytes32'];
+  const encodedValues: unknown[] = [hashType(primaryType, types)];
 
-    if (version === 'V4') {
-      const encodeField = (name, type, value) => {
-        if (types[type] !== undefined) {
-          return [
-            'bytes32',
-            value == null // eslint-disable-line no-eq-null
-              ? '0x0000000000000000000000000000000000000000000000000000000000000000'
-              : ethUtil.keccak(this.encodeData(type, value, types, version)),
-          ];
+  if (version === 'V4') {
+    const encodeField = (name, type, value) => {
+      if (types[type] !== undefined) {
+        return [
+          'bytes32',
+          value == null // eslint-disable-line no-eq-null
+            ? '0x0000000000000000000000000000000000000000000000000000000000000000'
+            : ethUtil.keccak(encodeData(type, value, types, version)),
+        ];
+      }
+
+      if (value === undefined) {
+        throw new Error(`missing value for field ${name} of type ${type}`);
+      }
+
+      if (type === 'bytes') {
+        return ['bytes32', ethUtil.keccak(value)];
+      }
+
+      if (type === 'string') {
+        // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
+        if (typeof value === 'string') {
+          value = Buffer.from(value, 'utf8');
         }
+        return ['bytes32', ethUtil.keccak(value)];
+      }
 
-        if (value === undefined) {
-          throw new Error(`missing value for field ${name} of type ${type}`);
-        }
+      if (type.lastIndexOf(']') === type.length - 1) {
+        const parsedType = type.slice(0, type.lastIndexOf('['));
+        const typeValuePairs = value.map((item) =>
+          encodeField(name, parsedType, item),
+        );
+        return [
+          'bytes32',
+          ethUtil.keccak(
+            ethAbi.rawEncode(
+              typeValuePairs.map(([t]) => t),
+              typeValuePairs.map(([, v]) => v),
+            ),
+          ),
+        ];
+      }
 
-        if (type === 'bytes') {
-          return ['bytes32', ethUtil.keccak(value)];
-        }
+      return [type, value];
+    };
 
-        if (type === 'string') {
+    for (const field of types[primaryType]) {
+      const [type, value] = encodeField(
+        field.name,
+        field.type,
+        data[field.name],
+      );
+      encodedTypes.push(type);
+      encodedValues.push(value);
+    }
+  } else {
+    for (const field of types[primaryType]) {
+      let value = data[field.name];
+      if (value !== undefined) {
+        if (field.type === 'bytes') {
+          encodedTypes.push('bytes32');
+          value = ethUtil.keccak(value);
+          encodedValues.push(value);
+        } else if (field.type === 'string') {
+          encodedTypes.push('bytes32');
           // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
           if (typeof value === 'string') {
             value = Buffer.from(value, 'utf8');
           }
-          return ['bytes32', ethUtil.keccak(value)];
-        }
-
-        if (type.lastIndexOf(']') === type.length - 1) {
-          const parsedType = type.slice(0, type.lastIndexOf('['));
-          const typeValuePairs = value.map((item) =>
-            encodeField(name, parsedType, item),
-          );
-          return [
-            'bytes32',
-            ethUtil.keccak(
-              ethAbi.rawEncode(
-                typeValuePairs.map(([t]) => t),
-                typeValuePairs.map(([, v]) => v),
-              ),
+          value = ethUtil.keccak(value);
+          encodedValues.push(value);
+        } else if (types[field.type] !== undefined) {
+          encodedTypes.push('bytes32');
+          value = ethUtil.keccak(
+            encodeData(
+              field.type,
+              // TODO: Add validation to ensure this is a string-indexed
+              // object, so that this type cast can be removed
+              value as Record<string, unknown>,
+              types,
+              version,
             ),
-          ];
-        }
-
-        return [type, value];
-      };
-
-      for (const field of types[primaryType]) {
-        const [type, value] = encodeField(
-          field.name,
-          field.type,
-          data[field.name],
-        );
-        encodedTypes.push(type);
-        encodedValues.push(value);
-      }
-    } else {
-      for (const field of types[primaryType]) {
-        let value = data[field.name];
-        if (value !== undefined) {
-          if (field.type === 'bytes') {
-            encodedTypes.push('bytes32');
-            value = ethUtil.keccak(value);
-            encodedValues.push(value);
-          } else if (field.type === 'string') {
-            encodedTypes.push('bytes32');
-            // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
-            if (typeof value === 'string') {
-              value = Buffer.from(value, 'utf8');
-            }
-            value = ethUtil.keccak(value);
-            encodedValues.push(value);
-          } else if (types[field.type] !== undefined) {
-            encodedTypes.push('bytes32');
-            value = ethUtil.keccak(
-              this.encodeData(field.type, value, types, version),
-            );
-            encodedValues.push(value);
-          } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
-            throw new Error(
-              'Arrays are unimplemented in encodeData; use V4 extension',
-            );
-          } else {
-            encodedTypes.push(field.type);
-            encodedValues.push(value);
-          }
+          );
+          encodedValues.push(value);
+        } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
+          throw new Error(
+            'Arrays are unimplemented in encodeData; use V4 extension',
+          );
+        } else {
+          encodedTypes.push(field.type);
+          encodedValues.push(value);
         }
       }
     }
+  }
 
-    return ethAbi.rawEncode(encodedTypes, encodedValues);
-  },
+  return ethAbi.rawEncode(encodedTypes, encodedValues);
+}
 
-  /**
-   * Encodes the type of an object by encoding a comma delimited list of its members
-   *
-   * @param {string} primaryType - Root type to encode
-   * @param {Object} types - Type definitions
-   * @returns {string} - Encoded representation of the type of an object
-   */
-  encodeType(
-    primaryType: string,
-    types: Record<string, MessageTypeProperty[]>,
-  ): string {
-    let result = '';
-    let deps = this.findTypeDependencies(primaryType, types).filter(
-      (dep) => dep !== primaryType,
-    );
-    deps = [primaryType].concat(deps.sort());
-    for (const type of deps) {
-      const children = types[type];
-      if (!children) {
-        throw new Error(`No type definition specified: ${type}`);
-      }
-      result += `${type}(${types[type]
-        .map(({ name, type: t }) => `${t} ${name}`)
-        .join(',')})`;
+/**
+ * Encodes the type of an object by encoding a comma delimited list of its members
+ *
+ * @param {string} primaryType - Root type to encode
+ * @param {Object} types - Type definitions
+ * @returns {string} - Encoded representation of the type of an object
+ */
+function encodeType(
+  primaryType: string,
+  types: Record<string, MessageTypeProperty[]>,
+): string {
+  let result = '';
+  let deps = findTypeDependencies(primaryType, types).filter(
+    (dep) => dep !== primaryType,
+  );
+  deps = [primaryType].concat(deps.sort());
+  for (const type of deps) {
+    const children = types[type];
+    if (!children) {
+      throw new Error(`No type definition specified: ${type}`);
     }
-    return result;
-  },
+    result += `${type}(${types[type]
+      .map(({ name, type: t }) => `${t} ${name}`)
+      .join(',')})`;
+  }
+  return result;
+}
 
-  /**
-   * Finds all types within a type definition object
-   *
-   * @param {string} primaryType - Root type
-   * @param {Object} types - Type definitions
-   * @param {Array} results - current set of accumulated types
-   * @returns {Array} - Set of all types found in the type definition
-   */
-  findTypeDependencies(
-    primaryType: string,
-    types: Record<string, MessageTypeProperty[]>,
-    results: string[] = [],
-  ): string[] {
-    [primaryType] = primaryType.match(/^\w*/u);
-    if (results.includes(primaryType) || types[primaryType] === undefined) {
-      return results;
-    }
-    results.push(primaryType);
-    for (const field of types[primaryType]) {
-      for (const dep of this.findTypeDependencies(field.type, types, results)) {
-        !results.includes(dep) && results.push(dep);
-      }
-    }
+/**
+ * Finds all types within a type definition object
+ *
+ * @param {string} primaryType - Root type
+ * @param {Object} types - Type definitions
+ * @param {Array} results - current set of accumulated types
+ * @returns {Array} - Set of all types found in the type definition
+ */
+function findTypeDependencies(
+  primaryType: string,
+  types: Record<string, MessageTypeProperty[]>,
+  results: string[] = [],
+): string[] {
+  [primaryType] = primaryType.match(/^\w*/u);
+  if (results.includes(primaryType) || types[primaryType] === undefined) {
     return results;
-  },
-
-  /**
-   * Hashes an object
-   *
-   * @param {string} primaryType - Root type
-   * @param {Object} data - Object to hash
-   * @param {Object} types - Type definitions
-   * @param {Version} version - The EIP-712 version the hash should comply with
-   * @returns {Buffer} - Hash of an object
-   */
-  hashStruct(
-    primaryType: string,
-    data: Record<string, unknown>,
-    types: Record<string, unknown>,
-    version: Version,
-  ): Buffer {
-    return ethUtil.keccak(this.encodeData(primaryType, data, types, version));
-  },
-
-  /**
-   * Hashes the type of an object
-   *
-   * @param {string} primaryType - Root type to hash
-   * @param {Object} types - Type definitions
-   * @returns {Buffer} - Hash of an object
-   */
-  hashType(primaryType: string, types: Record<string, unknown>): Buffer {
-    return ethUtil.keccak(this.encodeType(primaryType, types));
-  },
-
-  /**
-   * Removes properties from a message object that are not defined per EIP-712
-   *
-   * @param {Object} data - typed message object
-   * @returns {Object} - typed message object with only allowed fields
-   */
-  sanitizeData<T extends MessageTypes>(
-    data: TypedData | TypedMessage<T>,
-  ): TypedMessage<T> {
-    const sanitizedData: Partial<TypedMessage<T>> = {};
-    for (const key in TYPED_MESSAGE_SCHEMA.properties) {
-      if (data[key]) {
-        sanitizedData[key] = data[key];
-      }
+  }
+  results.push(primaryType);
+  for (const field of types[primaryType]) {
+    for (const dep of findTypeDependencies(field.type, types, results)) {
+      !results.includes(dep) && results.push(dep);
     }
-    if ('types' in sanitizedData) {
-      sanitizedData.types = { EIP712Domain: [], ...sanitizedData.types };
-    }
-    return sanitizedData as Required<TypedMessage<T>>;
-  },
+  }
+  return results;
+}
 
-  /**
-   * Signs a typed message as per EIP-712 and returns its keccak hash
-   *
-   * @param {Object} typedData - Types message data to hash as per eip-712
-   * @param {Version} version - The EIP-712 version the hash should comply with
-   * @returns {Buffer} - keccak hash of the resulting signed message
-   */
-  eip712Hash<T extends MessageTypes>(
-    typedData: Partial<TypedData | TypedMessage<T>>,
-    version: Version,
-  ): Buffer {
-    const sanitizedData = this.sanitizeData(typedData);
-    const parts = [Buffer.from('1901', 'hex')];
+/**
+ * Hashes an object
+ *
+ * @param {string} primaryType - Root type
+ * @param {Object} data - Object to hash
+ * @param {Object} types - Type definitions
+ * @returns {Buffer} - Hash of an object
+ */
+function hashStruct(
+  primaryType: string,
+  data: Record<string, unknown>,
+  types: Record<string, MessageTypeProperty[]>,
+  version: Version,
+): Buffer {
+  return ethUtil.keccak(encodeData(primaryType, data, types, version));
+}
+
+/**
+ * Hashes the type of an object
+ *
+ * @param {string} primaryType - Root type to hash
+ * @param {Object} types - Type definitions
+ * @returns {Buffer} - Hash of an object
+ */
+function hashType(
+  primaryType: string,
+  types: Record<string, MessageTypeProperty[]>,
+): Buffer {
+  return ethUtil.keccak(encodeType(primaryType, types));
+}
+
+/**
+ * Removes properties from a message object that are not defined per EIP-712
+ *
+ * @param {Object} data - typed message object
+ * @returns {Object} - typed message object with only allowed fields
+ */
+function sanitizeData<T extends MessageTypes>(
+  data: TypedData | TypedMessage<T>,
+): TypedMessage<T> {
+  const sanitizedData: Partial<TypedMessage<T>> = {};
+  for (const key in TYPED_MESSAGE_SCHEMA.properties) {
+    if (data[key]) {
+      sanitizedData[key] = data[key];
+    }
+  }
+  if ('types' in sanitizedData) {
+    sanitizedData.types = { EIP712Domain: [], ...sanitizedData.types };
+  }
+  return sanitizedData as Required<TypedMessage<T>>;
+}
+
+/**
+ * Signs a typed message as per EIP-712 and returns its keccak hash
+ *
+ * @param {Object} typedData - Types message data to hash as per eip-712
+ * @returns {Buffer} - keccak hash of the resulting signed message
+ */
+function eip712Hash<T extends MessageTypes>(
+  typedData: TypedData | TypedMessage<T>,
+  version: Version,
+): Buffer {
+  const sanitizedData = sanitizeData(typedData);
+  const parts = [Buffer.from('1901', 'hex')];
+  parts.push(
+    hashStruct(
+      'EIP712Domain',
+      sanitizedData.domain,
+      sanitizedData.types,
+      version,
+    ),
+  );
+  if (sanitizedData.primaryType !== 'EIP712Domain') {
     parts.push(
-      this.hashStruct(
-        'EIP712Domain',
-        sanitizedData.domain,
+      hashStruct(
+        // TODO: Validate that this is a string, so this type cast can be removed.
+        sanitizedData.primaryType as string,
+        sanitizedData.message,
         sanitizedData.types,
         version,
       ),
     );
-    if (sanitizedData.primaryType !== 'EIP712Domain') {
-      parts.push(
-        this.hashStruct(
-          sanitizedData.primaryType,
-          sanitizedData.message,
-          sanitizedData.types,
-          version,
-        ),
-      );
-    }
-    return ethUtil.keccak(Buffer.concat(parts));
-  },
+  }
+  return ethUtil.keccak(Buffer.concat(parts));
+}
+
+/**
+ * A collection of utility functions used for signing typed data
+ */
+const TypedDataUtils = {
+  encodeData,
+  encodeType,
+  findTypeDependencies,
+  hashStruct,
+  hashType,
+  sanitizeData,
+  eip712Hash,
 };
 
 function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
