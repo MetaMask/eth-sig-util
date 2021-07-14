@@ -83,25 +83,26 @@ const TypedDataUtils = {
    * @param {string} primaryType - Root type
    * @param {Object} data - Object to encode
    * @param {Object} types - Type definitions
+   * @param {Version} version - The EIP-712 version the encoding should comply with
    * @returns {Buffer} - Encoded representation of an object
    */
   encodeData(
     primaryType: string,
     data: Record<string, unknown>,
     types: Record<string, MessageTypeProperty[]>,
-    useV4 = true,
+    version: Version,
   ): Buffer {
     const encodedTypes = ['bytes32'];
     const encodedValues = [this.hashType(primaryType, types)];
 
-    if (useV4) {
+    if (version === 'V4') {
       const encodeField = (name, type, value) => {
         if (types[type] !== undefined) {
           return [
             'bytes32',
             value == null // eslint-disable-line no-eq-null
               ? '0x0000000000000000000000000000000000000000000000000000000000000000'
-              : ethUtil.keccak(this.encodeData(type, value, types, useV4)),
+              : ethUtil.keccak(this.encodeData(type, value, types, version)),
           ];
         }
 
@@ -168,7 +169,7 @@ const TypedDataUtils = {
           } else if (types[field.type] !== undefined) {
             encodedTypes.push('bytes32');
             value = ethUtil.keccak(
-              this.encodeData(field.type, value, types, useV4),
+              this.encodeData(field.type, value, types, version),
             );
             encodedValues.push(value);
           } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
@@ -246,15 +247,16 @@ const TypedDataUtils = {
    * @param {string} primaryType - Root type
    * @param {Object} data - Object to hash
    * @param {Object} types - Type definitions
+   * @param {Version} version - The EIP-712 version the hash should comply with
    * @returns {Buffer} - Hash of an object
    */
   hashStruct(
     primaryType: string,
     data: Record<string, unknown>,
     types: Record<string, unknown>,
-    useV4 = true,
+    version: Version,
   ): Buffer {
-    return ethUtil.keccak(this.encodeData(primaryType, data, types, useV4));
+    return ethUtil.keccak(this.encodeData(primaryType, data, types, version));
   },
 
   /**
@@ -293,11 +295,12 @@ const TypedDataUtils = {
    * Signs a typed message as per EIP-712 and returns its keccak hash
    *
    * @param {Object} typedData - Types message data to hash as per eip-712
+   * @param {Version} version - The EIP-712 version the hash should comply with
    * @returns {Buffer} - keccak hash of the resulting signed message
    */
   eip712Hash<T extends MessageTypes>(
     typedData: Partial<TypedData | TypedMessage<T>>,
-    useV4 = true,
+    version: Version,
   ): Buffer {
     const sanitizedData = this.sanitizeData(typedData);
     const parts = [Buffer.from('1901', 'hex')];
@@ -306,7 +309,7 @@ const TypedDataUtils = {
         'EIP712Domain',
         sanitizedData.domain,
         sanitizedData.types,
-        useV4,
+        version,
       ),
     );
     if (sanitizedData.primaryType !== 'EIP712Domain') {
@@ -315,7 +318,7 @@ const TypedDataUtils = {
           sanitizedData.primaryType,
           sanitizedData.message,
           sanitizedData.types,
-          useV4,
+          version,
         ),
       );
     }
@@ -382,24 +385,6 @@ function extractPublicKey<T extends MessageTypes>(
 function externalTypedSignatureHash(typedData: EIP712TypedData[]): string {
   const hashBuffer = typedSignatureHash(typedData);
   return ethUtil.bufferToHex(hashBuffer);
-}
-
-function signTypedDataLegacy<T extends MessageTypes>(
-  privateKey: Buffer,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>,
-): string {
-  const msgHash = typedSignatureHash(msgParams.data);
-  const sig = ethUtil.ecsign(msgHash, privateKey);
-  return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s));
-}
-
-function recoverTypedSignatureLegacy<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
-): string {
-  const msgHash = typedSignatureHash(msgParams.data);
-  const publicKey = recoverPublicKey(msgHash, msgParams.sig);
-  const sender = ethUtil.publicToAddress(publicKey);
-  return ethUtil.bufferToHex(sender);
 }
 
 function encrypt<T extends MessageTypes>(
@@ -560,71 +545,56 @@ function getEncryptionPublicKey(privateKey: string): string {
 }
 
 /**
- * A generic entry point for all typed data methods to be passed, includes a version parameter.
+ * Sign typed data according to EIP-712. The signing differs based upon the `version`.
+ *
+ * V1 is based upon [an early version of EIP-712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca)
+ * that lacked some later security improvements, and should generally be
+ * neglected in favor of later versions.
+ *
+ * V3 is based on EIP-712, except that arrays and recursive data structures
+ * are not supported.
+ *
+ * V4 is based on EIP-712, and includes full support of arrays and recursive
+ * data structures.
+ *
+ * @param privateKey - The private key to sign with.
+ * @param msgParams - Signing parameters.
+ * @param msgParams.data - The typed data to sign.
+ * @param version - The signing version to use.
+ * @returns The signature
  */
-function signTypedMessage<T extends MessageTypes>(
-  privateKey: Buffer,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>,
-  version: Version = 'V4',
-): string {
-  switch (version) {
-    case 'V1':
-      return signTypedDataLegacy(privateKey, msgParams);
-    case 'V3':
-      return signTypedData(privateKey, msgParams);
-    case 'V4':
-    default:
-      return signTypedData_v4(privateKey, msgParams);
-  }
-}
-
-function recoverTypedMessage<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
-  version: Version = 'V4',
-): string {
-  switch (version) {
-    case 'V1':
-      return recoverTypedSignatureLegacy(msgParams);
-    case 'V3':
-      return recoverTypedSignature(msgParams);
-    case 'V4':
-    default:
-      return recoverTypedSignature_v4(msgParams);
-  }
-}
-
 function signTypedData<T extends MessageTypes>(
   privateKey: Buffer,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
+  version: Version,
 ): string {
-  const message = TypedDataUtils.eip712Hash(msgParams.data, false);
-  const sig = ethUtil.ecsign(message, privateKey);
+  const messageHash =
+    version === 'V1'
+      ? typedSignatureHash(msgParams.data)
+      : TypedDataUtils.eip712Hash(msgParams.data, version);
+  const sig = ethUtil.ecsign(messageHash, privateKey);
   return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s));
 }
 
-function signTypedData_v4<T extends MessageTypes>(
-  privateKey: Buffer,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>,
-): string {
-  const message = TypedDataUtils.eip712Hash(msgParams.data);
-  const sig = ethUtil.ecsign(message, privateKey);
-  return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s));
-}
-
+/**
+ * Recover the address of the account that created the given EIP-712
+ * signature. The version provided must match the version used to
+ * create the signature.
+ *
+ * @param msgParams - Signing parameters.
+ * @param msgParams.data - The data that was signed.
+ * @param version - The signing version to use.
+ * @returns The address of the signer.
+ */
 function recoverTypedSignature<T extends MessageTypes>(
   msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
+  version: Version,
 ): string {
-  const message = TypedDataUtils.eip712Hash(msgParams.data, false);
-  const publicKey = recoverPublicKey(message, msgParams.sig);
-  const sender = ethUtil.publicToAddress(publicKey);
-  return ethUtil.bufferToHex(sender);
-}
-
-function recoverTypedSignature_v4<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
-): string {
-  const message = TypedDataUtils.eip712Hash(msgParams.data);
-  const publicKey = recoverPublicKey(message, msgParams.sig);
+  const messageHash =
+    version === 'V1'
+      ? typedSignatureHash(msgParams.data)
+      : TypedDataUtils.eip712Hash(msgParams.data, version);
+  const publicKey = recoverPublicKey(messageHash, msgParams.sig);
   const sender = ethUtil.publicToAddress(publicKey);
   return ethUtil.bufferToHex(sender);
 }
@@ -638,19 +608,13 @@ export {
   recoverPersonalSignature,
   extractPublicKey,
   externalTypedSignatureHash as typedSignatureHash,
-  signTypedDataLegacy,
-  recoverTypedSignatureLegacy,
   encrypt,
   encryptSafely,
   decrypt,
   decryptSafely,
   getEncryptionPublicKey,
-  signTypedMessage,
-  recoverTypedMessage,
   signTypedData,
-  signTypedData_v4,
   recoverTypedSignature,
-  recoverTypedSignature_v4,
 };
 
 /**
