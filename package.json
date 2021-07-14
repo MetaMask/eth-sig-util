@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/MetaMask/eth-sig-util.git"
+    "url": "https://github.com/MetaMask/eth-sig-util.git"
   },
   "license": "ISC",
   "author": "Dan Finlay",
@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "^1.0.6",
+    "@metamask/auto-changelog": "^2.4.0",
     "@metamask/eslint-config": "^7.0.1",
     "@metamask/eslint-config-nodejs": "^7.0.0",
     "@metamask/eslint-config-typescript": "^7.0.1",
