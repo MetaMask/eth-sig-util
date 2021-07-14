@@ -38,7 +38,7 @@
     "ethereumjs-abi": "^0.6.8",
     "ethereumjs-util": "^5.2.1",
     "tweetnacl": "^1.0.3",
-    "tweetnacl-util": "^0.15.0"
+    "tweetnacl-util": "^0.15.1"
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "^1.0.6",
