@@ -552,6 +552,7 @@ test('signedTypeData', (t) => {
         typedData.primaryType,
         typedData.message,
         typedData.types,
+        false,
       ),
     ),
     '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
@@ -562,18 +563,24 @@ test('signedTypeData', (t) => {
         typedData.primaryType,
         typedData.message,
         typedData.types,
+        false,
       ),
     ),
     '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e',
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types),
+      utils.hashStruct(
+        'EIP712Domain',
+        typedData.domain,
+        typedData.types,
+        false,
+      ),
     ),
     '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
   );
   t.equal(
-    ethUtil.bufferToHex(utils.eip712Hash(typedData)),
+    ethUtil.bufferToHex(utils.eip712Hash(typedData, false)),
     '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2',
   );
   t.equal(
@@ -648,6 +655,7 @@ test('signedTypeData with bytes', (t) => {
         typedDataWithBytes.primaryType,
         typedDataWithBytes.message,
         typedDataWithBytes.types,
+        false,
       ),
     ),
     '0x43999c52db673245777eb64b0330105de064e52179581a340a9856c32372528efc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8fac776d21ae071a32c362d4c20ba6586779708a56cad3a78d01b37ecb5744298',
@@ -658,6 +666,7 @@ test('signedTypeData with bytes', (t) => {
         typedDataWithBytes.primaryType,
         typedDataWithBytes.message,
         typedDataWithBytes.types,
+        false,
       ),
     ),
     '0xe004bdc1ca57ba9ad5ea8c81e54dcbdb3bfce2d1d5ad92113f0871fb2a6eb052',
@@ -668,12 +677,13 @@ test('signedTypeData with bytes', (t) => {
         'EIP712Domain',
         typedDataWithBytes.domain,
         typedDataWithBytes.types,
+        false,
       ),
     ),
     '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
   );
   t.equal(
-    ethUtil.bufferToHex(utils.eip712Hash(typedDataWithBytes)),
+    ethUtil.bufferToHex(utils.eip712Hash(typedDataWithBytes, false)),
     '0xb4aaf457227fec401db772ec22d2095d1235ee5d0833f56f59108c9ffc90fb4b',
   );
   t.equal(
@@ -746,6 +756,7 @@ test('signedTypeData with V3 string', (t) => {
         typedData.primaryType,
         typedData.message,
         typedData.types,
+        false,
       ),
     ),
     '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
@@ -756,18 +767,24 @@ test('signedTypeData with V3 string', (t) => {
         typedData.primaryType,
         typedData.message,
         typedData.types,
+        false,
       ),
     ),
     '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e',
   );
   t.equal(
     ethUtil.bufferToHex(
-      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types),
+      utils.hashStruct(
+        'EIP712Domain',
+        typedData.domain,
+        typedData.types,
+        false,
+      ),
     ),
     '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
   );
   t.equal(
-    ethUtil.bufferToHex(utils.eip712Hash(typedData)),
+    ethUtil.bufferToHex(utils.eip712Hash(typedData, false)),
     '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2',
   );
   t.equal(
