@@ -22,13 +22,12 @@
   ],
   "scripts": {
     "setup": "yarn install && yarn allow-scripts",
-    "build": "tsc --project ./tsconfig.prod.json && tsc --project ./tsconfig.test.json",
+    "build": "tsc --project ./tsconfig.json && tsc --project ./tsconfig.test.json",
     "lint:eslint": "eslint . --cache --ext js,ts",
     "lint:json": "prettier '**/*.json' --ignore-path .gitignore",
     "lint": "yarn lint:eslint && yarn lint:json --check",
     "lint:fix": "yarn lint:eslint --fix && yarn lint:json --write",
     "test": "yarn build && node test/index.js",
-    "test:browser": "yarn build && airtap test/index.js",
     "prepublishOnly": "yarn build"
   },
   "resolutions": {
@@ -49,8 +48,6 @@
     "@types/node": "^14.14.25",
     "@typescript-eslint/eslint-plugin": "^4.28.2",
     "@typescript-eslint/parser": "^4.28.2",
-    "airtap": "4.0.1",
-    "airtap-system": "^0.0.2",
     "eslint": "^7.30.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.23.4",
@@ -67,9 +64,6 @@
   "lavamoat": {
     "allowScripts": {
       "@lavamoat/preinstall-always-fail": false,
-      "core-js": false,
-      "registry-js": false,
-      "win-version-info": false,
       "keccak": true,
       "secp256k1": true
     }
