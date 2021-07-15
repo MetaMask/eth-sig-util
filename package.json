@@ -22,7 +22,7 @@
   ],
   "scripts": {
     "setup": "yarn install && yarn allow-scripts",
-    "build": "tsc --project ./tsconfig.prod.json && tsc --project ./tsconfig.test.json",
+    "build": "tsc --project ./tsconfig.json && tsc --project ./tsconfig.test.json",
     "lint:eslint": "eslint . --cache --ext js,ts",
     "lint:json": "prettier '**/*.json' --ignore-path .gitignore",
     "lint": "yarn lint:eslint && yarn lint:json --check",
