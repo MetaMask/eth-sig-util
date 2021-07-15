@@ -36,37 +36,39 @@ msgParams should have a `data` key that is hex-encoded data unsigned, and a `sig
 
 Returns a hex-encoded sender address.
 
-### signTypedData (privateKeyBuffer, msgParams)
+### signTypedDataLegacy (privateKeyBuffer, msgParams)
 
 Signs typed data as per [an early draft of EIP 712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca).
 
 Data should be under `data` key of `msgParams`. The method returns prefixed signature.
 
-### signTypedData_v3 (privateKeyBuffer, msgParams)
+### signTypedData (privateKeyBuffer, msgParams)
 
-Signs typed data as per the published version of [EIP 712](https://github.com/ethereum/EIPs/pull/712).
+Signs typed data as per [EIP 712](https://github.com/ethereum/EIPs/pull/712), except that arrays and recursive data structures are not supported.
 
 Data should be under `data` key of `msgParams`. The method returns prefixed signature.
 
 ### signTypedData_v4 (privateKeyBuffer, msgParams)
 
-Signs typed data as per an extension of the published version of [EIP 712](https://github.com/MetaMask/eth-sig-util/pull/54).
-
-This extension adds support for arrays and recursive data types.
+Signs typed data as per [EIP 712](https://github.com/MetaMask/eth-sig-util/pull/54), including support for arrays and recursive data types.
 
 Data should be under `data` key of `msgParams`. The method returns prefixed signature.
 
-### recoverTypedSignature ({data, sig})
+### recoverTypedSignatureLegacy ({data, sig})
 
-Return address of a signer that did `signTypedData`.
+Recover the address of the account used to sign the provided signature. The signature should be of the same type produced by `signTypedDataLegacy`.
 
 Expects the same data that were used for signing. `sig` is a prefixed signature.
 
-### recoverTypedSignature_V4 ({data, sig})
+### recoverTypedSignature ({data, sig})
 
-Return address of a signer that did `signTypedData` as per an extension of the published version of [EIP 712](https://github.com/MetaMask/eth-sig-util/pull/54).
+Recover the address of the account used to sign the provided signature. The signature should be of the same type produced by `signTypedData`.
 
-This extension adds support for arrays and recursive data types.
+Expects the same data that were used for signing. `sig` is a prefixed signature.
+
+### recoverTypedSignature_v4 ({data, sig})
+
+Recover the address of the account used to sign the provided signature. The signature should be of the same type produced by `signTypedData_v4`.
 
 Expects the same data that were used for signing. `sig` is a prefixed signature.
 
