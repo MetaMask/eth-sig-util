@@ -2,7 +2,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "declaration": false,
+    "inlineSources": false,
+    "rootDir": "",
+    "outDir": "",
     "sourceMap": false
   },
-  "files": ["./test/index.ts"]
+  "include": ["./test/index.ts"]
 }
