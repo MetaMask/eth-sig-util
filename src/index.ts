@@ -92,7 +92,11 @@ function encodeData(
   const encodedValues: unknown[] = [hashType(primaryType, types)];
 
   if (version === 'V4') {
-    const encodeField = (name, type, value) => {
+    const encodeField = (
+      name: string,
+      type: string,
+      value: any,
+    ): [string, string] => {
       if (types[type] !== undefined) {
         return [
           'bytes32',

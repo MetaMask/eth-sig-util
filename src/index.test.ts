@@ -1,6 +1,308 @@
 import * as ethUtil from 'ethereumjs-util';
 import * as sigUtil from '.';
 
+const encodeDataExamples = {
+  // dynamic types supported by EIP-712:
+  bytes: [10, '10', '0x10', Buffer.from('10', 'utf8')],
+  string: ['Hello!', '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB', '😁', 10],
+  // atomic types supported by EIP-712:
+  address: [
+    '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+    '0x0',
+    10,
+    'bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+    Number.MAX_SAFE_INTEGER,
+  ],
+  bool: [true, false, 'true', 'false', 0, 1, -1, Number.MAX_SAFE_INTEGER],
+  bytes1: [
+    '0x10',
+    10,
+    0,
+    1,
+    -1,
+    Number.MAX_SAFE_INTEGER,
+    Buffer.from('10', 'utf8'),
+  ],
+  bytes32: [
+    '0x10',
+    10,
+    0,
+    1,
+    -1,
+    Number.MAX_SAFE_INTEGER,
+    Buffer.from('10', 'utf8'),
+  ],
+  int8: [0, '0', '0x0', 255, -255],
+  int256: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER],
+  uint8: [0, '0', '0x0', 255],
+  uint256: [0, '0', '0x0', Number.MAX_SAFE_INTEGER],
+  // atomic types not supported by EIP-712:
+  int: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER], // interpreted as `int256` by `ethereumjs-abi`
+  uint: [0, '0', '0x0', Number.MAX_SAFE_INTEGER], // interpreted as `uint256` by `ethereumjs-abi`
+  // `fixed` and `ufixed` types omitted because their encoding in
+  // `ethereumjs-abi` is very broken at the moment.
+  // `function` type omitted because it is not supported by `ethereumjs-abi`.
+};
+
+const encodeDataErrorExamples = {
+  address: [
+    {
+      input: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB0',
+      errorMessage: 'Supplied uint exceeds width: 160 vs 164',
+    },
+  ],
+  int8: [{ input: '256', errorMessage: 'Supplied int exceeds width: 8 vs 9' }],
+  uint: [{ input: -1, errorMessage: 'Supplied uint is negative' }],
+  uint8: [{ input: -1, errorMessage: 'Supplied uint is negative' }],
+  uint256: [{ input: -1, errorMessage: 'Supplied uint is negative' }],
+  bytes1: [
+    { input: 'a', errorMessage: 'Cannot convert string to buffer' },
+    { input: 'test', errorMessage: 'Cannot convert string to buffer' },
+  ],
+  bytes32: [
+    { input: 'a', errorMessage: 'Cannot convert string to buffer' },
+    { input: 'test', errorMessage: 'Cannot convert string to buffer' },
+  ],
+};
+
+describe('TypedDataUtils.encodeData', function () {
+  describe('V3', function () {
+    it('should encode data with custom type', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+      };
+      expect(
+        sigUtil.TypedDataUtils.encodeData(
+          primaryType,
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toBe(
+        'a0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
+      );
+    });
+
+    // Union of all types from both sets of examples
+    const allExampleTypes = [
+      ...new Set(
+        Object.keys(encodeDataExamples).concat(
+          Object.keys(encodeDataErrorExamples),
+        ),
+      ),
+    ];
+
+    // Reassigned to silence "no-look-func" ESLint rule
+    // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
+    // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
+    const _expect = expect;
+    const _it = it;
+
+    for (const type of allExampleTypes) {
+      describe(`type "${type}"`, function () {
+        // Test all examples that do not crash
+        const inputs = encodeDataExamples[type] || [];
+        for (const input of inputs) {
+          const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+          _it(`should encode "${input}" (type "${inputType}")`, function () {
+            const types = {
+              Message: [{ name: 'data', type }],
+            };
+            const message = { data: input };
+            _expect(
+              sigUtil.TypedDataUtils.encodeData(
+                'Message',
+                message,
+                types,
+                'V3',
+              ).toString('hex'),
+            ).toMatchSnapshot();
+          });
+        }
+
+        // Test all examples that crash
+        const errorInputs = encodeDataErrorExamples[type] || [];
+        for (const { input, errorMessage } of errorInputs) {
+          const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+          _it(
+            `should fail to encode "${input}" (type "${inputType}")`,
+            function () {
+              const types = {
+                Message: [{ name: 'data', type }],
+              };
+              const message = { data: input };
+              _expect(() =>
+                sigUtil.TypedDataUtils.encodeData(
+                  'Message',
+                  message,
+                  types,
+                  'V3',
+                ).toString('hex'),
+              ).toThrow(errorMessage);
+            },
+          );
+        }
+      });
+    }
+
+    it('should throw an error when trying to encode an array', function () {
+      const types = {
+        Message: [{ name: 'data', type: 'string[]' }],
+      };
+      const message = { data: ['1', '2', '3'] };
+      expect(() =>
+        sigUtil.TypedDataUtils.encodeData(
+          'Message',
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toThrow('Arrays are unimplemented in encodeData; use V4 extension');
+    });
+
+    it('should throw an error when trying to encode a recursive data type', function () {
+      // TODO
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+      };
+      expect(
+        sigUtil.TypedDataUtils.encodeData(
+          primaryType,
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toBe(
+        'a0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
+      );
+    });
+
+    it('should throw an error when trying to encode an unrecognized type', function () {
+      const types = {};
+      const message = { data: 'test' };
+      _expect(() =>
+        sigUtil.TypedDataUtils.encodeData(
+          'Message',
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toThrow('No type definition specified: Message');
+    });
+  });
+
+  describe('V4', function () {
+    it('should encode data', function () {
+      const primaryType = 'Mail';
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallets', type: 'address[]' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person[]' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const message = {
+        from: {
+          name: 'Cow',
+          wallets: [
+            '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+            '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF',
+          ],
+        },
+        to: [
+          {
+            name: 'Bob',
+            wallets: [
+              '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+              '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
+              '0xB0B0b0b0b0b0B000000000000000000000000000',
+            ],
+          },
+        ],
+        contents: 'Hello, Bob!',
+      };
+      expect(
+        sigUtil.TypedDataUtils.encodeData(
+          primaryType,
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toBe(
+        '4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e7539b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67fca322beec85be24e374d18d582a6f2997f75c54e7993ab5bc07404ce176ca7cdb5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
+      );
+    });
+  });
+});
+
+// describe('TypedDataUtils.encodeType', function() {
+
+// });
+
+// describe('TypedDataUtils.findTypeDependencies', function() {
+
+// });
+
+// describe('TypedDataUtils.hashStruct', function() {
+
+// });
+
+// describe('TypedDataUtils.hashType', function() {
+
+// });
+
+// describe('TypedDataUtils.sanitizeData', function() {
+
+// });
+
+// describe('TypedDataUtils.eip712Hash', function() {
+
+// });
+
 it('normalize address lower cases', function () {
   const initial = '0xA06599BD35921CfB5B71B4BE3869740385b0B306';
   const result = sigUtil.normalize(initial);
