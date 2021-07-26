@@ -38,39 +38,21 @@ msgParams should have a `data` key that is hex-encoded data unsigned, and a `sig
 
 Returns a hex-encoded sender address.
 
-### signTypedDataLegacy (privateKeyBuffer, msgParams)
+### signTypedData (privateKeyBuffer, msgParams, version)
 
-Signs typed data as per [an early draft of EIP 712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca).
-
-Data should be under `data` key of `msgParams`. The method returns prefixed signature.
-
-### signTypedData (privateKeyBuffer, msgParams)
-
-Signs typed data as per [EIP 712](https://github.com/ethereum/EIPs/pull/712), except that arrays and recursive data structures are not supported.
+Sign typed data according to EIP-712. The signing differs based upon the `version`, which is explained in the table below.
 
 Data should be under `data` key of `msgParams`. The method returns prefixed signature.
 
-### signTypedData_v4 (privateKeyBuffer, msgParams)
+| Version | Description                                                  |
+| ------- | ------------------------------------------------------------ |
+| `V1`    | This is based on [an early version of EIP-712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca) that lacked some later security improvements, and should generally be neglected in favor of `V3`. |
+| `V3`    | Based on [EIP 712](https://eips.ethereum.org/EIPS/eip-712), except that arrays and recursive data structures are not supported |
+| `V4`    | Based on [EIP 712](https://eips.ethereum.org/EIPS/eip-712), including support for arrays and recursive data types. |
 
-Signs typed data as per [EIP 712](https://github.com/MetaMask/eth-sig-util/pull/54), including support for arrays and recursive data types.
+### recoverTypedSignature ({data, sig}, version)
 
-Data should be under `data` key of `msgParams`. The method returns prefixed signature.
-
-### recoverTypedSignatureLegacy ({data, sig})
-
-Recover the address of the account used to sign the provided signature. The signature should be of the same type produced by `signTypedDataLegacy`.
-
-Expects the same data that were used for signing. `sig` is a prefixed signature.
-
-### recoverTypedSignature ({data, sig})
-
-Recover the address of the account used to sign the provided signature. The signature should be of the same type produced by `signTypedData`.
-
-Expects the same data that were used for signing. `sig` is a prefixed signature.
-
-### recoverTypedSignature_v4 ({data, sig})
-
-Recover the address of the account used to sign the provided signature. The signature should be of the same type produced by `signTypedData_v4`.
+Recover the address of the account used to sign the provided signature. The `version` parameter must match the version the signature was created with.
 
 Expects the same data that were used for signing. `sig` is a prefixed signature.
 
