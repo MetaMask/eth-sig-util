@@ -1,43 +1,33 @@
-import test from 'tape';
 import * as ethUtil from 'ethereumjs-util';
-import * as sigUtil from '../dist';
+import * as sigUtil from '.';
 
-test('normalize address lower cases', function (t) {
-  t.plan(1);
+it('normalize address lower cases', function () {
   const initial = '0xA06599BD35921CfB5B71B4BE3869740385b0B306';
   const result = sigUtil.normalize(initial);
-  t.equal(result, initial.toLowerCase());
+  expect(result).toBe(initial.toLowerCase());
 });
 
-test('normalize address adds hex prefix', function (t) {
-  t.plan(1);
+it('normalize address adds hex prefix', function () {
   const initial = 'A06599BD35921CfB5B71B4BE3869740385b0B306';
   const result = sigUtil.normalize(initial);
-  t.equal(result, `0x${initial.toLowerCase()}`);
+  expect(result).toBe(`0x${initial.toLowerCase()}`);
 });
 
-test('normalize an integer converts to byte-pair hex', function (t) {
-  t.plan(1);
+it('normalize an integer converts to byte-pair hex', function () {
   const initial = 1;
   const result = sigUtil.normalize(initial);
-  t.equal(result, '0x01');
+  expect(result).toBe('0x01');
 });
 
-test('normalize an unsupported type throws', function (t) {
-  t.plan(1);
+it('normalize an unsupported type throws', function () {
   const initial = {};
-  try {
-    sigUtil.normalize(initial as any);
-    t.ok(false, 'did not throw');
-  } catch (e) {
-    t.ok(e, 'should throw');
-  }
+  expect(() => sigUtil.normalize(initial as any)).toThrow(
+    'eth-sig-util.normalize() requires hex string or integer input. received object:',
+  );
 });
 
-test('personalSign and recover', function (t) {
-  t.plan(1);
+it('personalSign and recover', function () {
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b';
-  console.log(`for address ${address}`);
   const privKeyHex =
     '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0';
   const privKey = Buffer.from(privKeyHex, 'hex');
@@ -50,11 +40,10 @@ test('personalSign and recover', function (t) {
     msgParams as sigUtil.SignedMsgParams<string>,
   );
 
-  t.equal(recovered, address);
+  expect(recovered).toBe(address);
 });
 
-test('personalSign and extractPublicKey', function (t) {
-  t.plan(1);
+it('personalSign and extractPublicKey', function () {
   const privKeyHex =
     '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0';
   const pubKeyHex =
@@ -70,10 +59,10 @@ test('personalSign and extractPublicKey', function (t) {
     msgParams as sigUtil.SignedMsgParams<string>,
   );
 
-  t.equal(publicKey, pubKeyHex);
+  expect(publicKey).toBe(pubKeyHex);
 });
 
-test('signTypedData and recoverTypedSignature V1 - single message', function (t) {
+it('signTypedData and recoverTypedSignature V1 - single message', function () {
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b';
   const privKeyHex =
     '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0';
@@ -98,18 +87,14 @@ test('signTypedData and recoverTypedSignature V1 - single message', function (t)
     },
     'V1',
   );
-  t.equal(
-    signature,
+  expect(signature).toBe(
     '0x49e75d475d767de7fcc67f521e0d86590723d872e6111e51c393e8c1e2f21d032dfaf5833af158915f035db6af4f37bf2d5d29781cd81f28a44c5cb4b9d241531b',
-    'Signature matches test value.',
   );
 
-  t.equal(address, recovered);
-  t.end();
+  expect(address).toBe(recovered);
 });
 
-test('signTypedData and recoverTypedSignature V1 - multiple messages', function (t) {
-  t.plan(1);
+it('signTypedData and recoverTypedSignature V1 - multiple messages', function () {
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b';
   const privKeyHex =
     '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0';
@@ -140,11 +125,10 @@ test('signTypedData and recoverTypedSignature V1 - multiple messages', function 
     'V1',
   );
 
-  t.equal(address, recovered);
+  expect(address).toBe(recovered);
 });
 
-test('typedSignatureHash - single value', function (t) {
-  t.plan(1);
+it('typedSignatureHash - single value', function () {
   const typedData = [
     {
       type: 'string',
@@ -153,14 +137,12 @@ test('typedSignatureHash - single value', function (t) {
     },
   ];
   const hash = sigUtil.typedSignatureHash(typedData);
-  t.equal(
-    hash,
+  expect(hash).toBe(
     '0x14b9f24872e28cc49e72dc104d7380d8e0ba84a3fe2e712704bcac66a5702bd5',
   );
 });
 
-test('typedSignatureHash - multiple values', function (t) {
-  t.plan(1);
+it('typedSignatureHash - multiple values', function () {
   const typedData = [
     {
       type: 'string',
@@ -174,14 +156,12 @@ test('typedSignatureHash - multiple values', function (t) {
     },
   ];
   const hash = sigUtil.typedSignatureHash(typedData);
-  t.equal(
-    hash,
+  expect(hash).toBe(
     '0xf7ad23226db5c1c00ca0ca1468fd49c8f8bbc1489bc1c382de5adc557a69c229',
   );
 });
 
-test('typedSignatureHash - bytes', function (t) {
-  t.plan(1);
+it('typedSignatureHash - bytes', function () {
   const typedData = [
     {
       type: 'bytes',
@@ -190,29 +170,30 @@ test('typedSignatureHash - bytes', function (t) {
     },
   ];
   const hash = sigUtil.typedSignatureHash(typedData);
-  t.equal(
-    hash,
+  expect(hash).toBe(
     '0x6c69d03412450b174def7d1e48b3bcbbbd8f51df2e76e2c5b3a5d951125be3a9',
   );
 });
 
 typedSignatureHashThrowsTest({
-  testLabel: 'empty array',
   argument: [],
+  errorMessage: 'Expect argument to be non-empty array',
+  testLabel: 'empty array',
 });
 
 typedSignatureHashThrowsTest({
-  testLabel: 'not array',
   argument: 42,
+  errorMessage: 'Expect argument to be non-empty array',
+  testLabel: 'not array',
 });
 
 typedSignatureHashThrowsTest({
-  testLabel: 'null',
   argument: null,
+  errorMessage: "Cannot use 'in' operator to search for 'length' in null",
+  testLabel: 'null',
 });
 
 typedSignatureHashThrowsTest({
-  testLabel: 'wrong type',
   argument: [
     {
       type: 'jocker',
@@ -220,26 +201,30 @@ typedSignatureHashThrowsTest({
       value: 'Hi, Alice!',
     },
   ],
+  errorMessage: 'Unsupported or invalid type: jocker',
+  testLabel: 'wrong type',
 });
 
 typedSignatureHashThrowsTest({
-  testLabel: 'no type',
   argument: [
     {
       name: 'message',
       value: 'Hi, Alice!',
     },
   ],
+  errorMessage: "Cannot read property 'startsWith' of undefined",
+  testLabel: 'no type',
 });
 
 typedSignatureHashThrowsTest({
-  testLabel: 'no name',
   argument: [
     {
       type: 'string',
       value: 'Hi, Alice!',
     },
   ],
+  errorMessage: 'Expect argument to be non-empty array',
+  testLabel: 'no name',
 });
 
 // personal_sign was declared without an explicit set of test data
@@ -288,36 +273,30 @@ signatureTest({
 });
 
 function signatureTest(opts) {
-  test(opts.testLabel, function (t) {
-    t.plan(2);
-
+  it(opts.testLabel, function () {
     const address = opts.addressHex;
     const privKey = opts.privateKey;
     const { message } = opts;
     const msgParams: sigUtil.MsgParams<string> = { data: message };
 
     const signed = sigUtil.personalSign(privKey, msgParams);
-    t.equal(signed, opts.signature);
+    expect(signed).toBe(opts.signature);
 
     msgParams.sig = signed;
     const recovered = sigUtil.recoverPersonalSignature(
       msgParams as sigUtil.SignedMsgParams<string>,
     );
 
-    t.equal(recovered, address);
+    expect(recovered).toBe(address);
   });
 }
 
-function typedSignatureHashThrowsTest(opts) {
-  const label = `typedSignatureHash - malformed arguments - ${opts.testLabel}`;
-  test(label, function (t) {
-    t.plan(1);
-
-    const { argument } = opts;
-
-    t.throws(() => {
+function typedSignatureHashThrowsTest({ argument, errorMessage, testLabel }) {
+  const label = `typedSignatureHash - malformed arguments - ${testLabel}`;
+  it(label, function () {
+    expect(() => {
       sigUtil.typedSignatureHash(argument);
-    });
+    }).toThrow(errorMessage);
   });
 }
 
@@ -337,34 +316,27 @@ const encryptedData = {
   ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
 };
 
-test("Getting bob's encryptionPublicKey", async (t) => {
-  t.plan(1);
-
+it("Getting bob's encryptionPublicKey", async function () {
   const result = await sigUtil.getEncryptionPublicKey(bob.ethereumPrivateKey);
-  t.equal(result, bob.encryptionPublicKey);
+  expect(result).toBe(bob.encryptionPublicKey);
 });
 
 // encryption test
-test("Alice encrypts message with bob's encryptionPublicKey", async (t) => {
-  t.plan(4);
-
+it("Alice encrypts message with bob's encryptionPublicKey", async function () {
   const result = await sigUtil.encrypt(
     bob.encryptionPublicKey,
     secretMessage,
     'x25519-xsalsa20-poly1305',
   );
 
-  console.log('RESULT', result);
-
-  t.ok(result.version);
-  t.ok(result.nonce);
-  t.ok(result.ephemPublicKey);
-  t.ok(result.ciphertext);
+  expect(result.ciphertext).toHaveLength(56);
+  expect(result.ephemPublicKey).toHaveLength(44);
+  expect(result.nonce).toHaveLength(32);
+  expect(result.version).toBe('x25519-xsalsa20-poly1305');
 });
 
 // safe encryption test
-test("Alice encryptsSafely message with bob's encryptionPublicKey", async (t) => {
-  t.plan(5);
+it("Alice encryptsSafely message with bob's encryptionPublicKey", async function () {
   const VERSION = 'x25519-xsalsa20-poly1305';
   const result = await sigUtil.encryptSafely(
     bob.encryptionPublicKey,
@@ -372,18 +344,14 @@ test("Alice encryptsSafely message with bob's encryptionPublicKey", async (t) =>
     VERSION,
   );
 
-  console.log('RESULT', result);
-
-  t.equals(result.version, VERSION);
-  t.ok(result.nonce);
-  t.ok(result.ephemPublicKey);
-  t.ok(result.ciphertext);
-  t.ok(result.ciphertext.length > 1048);
+  expect(result.ciphertext).toHaveLength(2732);
+  expect(result.ephemPublicKey).toHaveLength(44);
+  expect(result.nonce).toHaveLength(32);
+  expect(result.version).toBe('x25519-xsalsa20-poly1305');
 });
 
 // safe decryption test
-test('Bob decryptSafely message that Alice encryptSafely for him', async (t) => {
-  t.plan(1);
+it('Bob decryptSafely message that Alice encryptSafely for him', async function () {
   const VERSION = 'x25519-xsalsa20-poly1305';
   const result = await sigUtil.encryptSafely(
     bob.encryptionPublicKey,
@@ -392,20 +360,16 @@ test('Bob decryptSafely message that Alice encryptSafely for him', async (t) => 
   );
 
   const plaintext = sigUtil.decryptSafely(result, bob.ethereumPrivateKey);
-  t.equal(plaintext, secretMessage.data);
+  expect(plaintext).toBe(secretMessage.data);
 });
 
 // decryption test
-test('Bob decrypts message that Alice sent to him', (t) => {
-  t.plan(1);
-
+it('Bob decrypts message that Alice sent to him', function () {
   const result = sigUtil.decrypt(encryptedData, bob.ethereumPrivateKey);
-  t.equal(result, secretMessage.data);
+  expect(result).toBe(secretMessage.data);
 });
 
-test('Decryption failed because version is wrong or missing', (t) => {
-  t.plan(1);
-
+it('Decryption failed because version is wrong or missing', function () {
   const badVersionData = {
     version: 'x256k1-aes256cbc',
     nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
@@ -413,14 +377,12 @@ test('Decryption failed because version is wrong or missing', (t) => {
     ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
   };
 
-  t.throws(function () {
-    sigUtil.decrypt(badVersionData, bob.ethereumPrivateKey);
-  }, 'Encryption type/version not supported.');
+  expect(() => sigUtil.decrypt(badVersionData, bob.ethereumPrivateKey)).toThrow(
+    'Encryption type/version not supported.',
+  );
 });
 
-test('Decryption failed because nonce is wrong or missing', (t) => {
-  t.plan(1);
-
+it('Decryption failed because nonce is wrong or missing', function () {
   // encrypted data
   const badNonceData = {
     version: 'x25519-xsalsa20-poly1305',
@@ -429,14 +391,12 @@ test('Decryption failed because nonce is wrong or missing', (t) => {
     ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
   };
 
-  t.throws(function () {
-    sigUtil.decrypt(badNonceData, bob.ethereumPrivateKey);
-  }, 'Decryption failed.');
+  expect(() => sigUtil.decrypt(badNonceData, bob.ethereumPrivateKey)).toThrow(
+    'bad nonce size',
+  );
 });
 
-test('Decryption failed because ephemPublicKey is wrong or missing', (t) => {
-  t.plan(1);
-
+it('Decryption failed because ephemPublicKey is wrong or missing', function () {
   // encrypted data
   const badEphemData = {
     version: 'x25519-xsalsa20-poly1305',
@@ -445,14 +405,12 @@ test('Decryption failed because ephemPublicKey is wrong or missing', (t) => {
     ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
   };
 
-  t.throws(function () {
-    sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey);
-  }, 'Decryption failed.');
+  expect(() => sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)).toThrow(
+    'Decryption failed.',
+  );
 });
 
-test('Decryption failed because cyphertext is wrong or missing', (t) => {
-  t.plan(1);
-
+it('Decryption failed because cyphertext is wrong or missing', function () {
   // encrypted data
   const badEphemData = {
     version: 'x25519-xsalsa20-poly1305',
@@ -461,14 +419,12 @@ test('Decryption failed because cyphertext is wrong or missing', (t) => {
     ciphertext: 'ffffff/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
   };
 
-  t.throws(function () {
-    sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey);
-  }, 'Decryption failed.');
+  expect(() => sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)).toThrow(
+    'Decryption failed.',
+  );
 });
 
-test('signedTypeData', (t) => {
-  t.plan(8);
-
+it('signedTypeData', function () {
   const typedData = {
     types: {
       EIP712Domain: [
@@ -512,15 +468,13 @@ test('signedTypeData', (t) => {
   const address = ethUtil.privateToAddress(privateKey);
   const sig = sigUtil.signTypedData(privateKey, { data: typedData }, 'V3');
 
-  t.equal(
-    utils.encodeType('Mail', typedData.types),
+  expect(utils.encodeType('Mail', typedData.types)).toBe(
     'Mail(Person from,Person to,string contents)Person(string name,address wallet)',
   );
-  t.equal(
-    ethUtil.bufferToHex(utils.hashType('Mail', typedData.types)),
+  expect(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types))).toBe(
     '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2',
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData(
         typedData.primaryType,
@@ -529,9 +483,10 @@ test('signedTypeData', (t) => {
         'V3',
       ),
     ),
+  ).toBe(
     '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct(
         typedData.primaryType,
@@ -540,31 +495,24 @@ test('signedTypeData', (t) => {
         'V3',
       ),
     ),
-    '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e',
-  );
-  t.equal(
+  ).toBe('0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e');
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct('EIP712Domain', typedData.domain, typedData.types, 'V3'),
     ),
-    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
-  );
-  t.equal(
-    ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V3')),
+  ).toBe('0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f');
+  expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V3'))).toBe(
     '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2',
   );
-  t.equal(
-    ethUtil.bufferToHex(address),
+  expect(ethUtil.bufferToHex(address)).toBe(
     '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
   );
-  t.equal(
-    sig,
+  expect(sig).toBe(
     '0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b915621c',
   );
 });
 
-test('signedTypeData with bytes', (t) => {
-  t.plan(8);
-
+it('signedTypeData with bytes', function () {
   const typedDataWithBytes = {
     types: {
       EIP712Domain: [
@@ -614,15 +562,13 @@ test('signedTypeData with bytes', (t) => {
     'V3',
   );
 
-  t.equal(
-    utils.encodeType('Mail', typedDataWithBytes.types),
+  expect(utils.encodeType('Mail', typedDataWithBytes.types)).toBe(
     'Mail(Person from,Person to,string contents,bytes payload)Person(string name,address wallet)',
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(utils.hashType('Mail', typedDataWithBytes.types)),
-    '0x43999c52db673245777eb64b0330105de064e52179581a340a9856c32372528e',
-  );
-  t.equal(
+  ).toBe('0x43999c52db673245777eb64b0330105de064e52179581a340a9856c32372528e');
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData(
         typedDataWithBytes.primaryType,
@@ -631,9 +577,10 @@ test('signedTypeData with bytes', (t) => {
         'V3',
       ),
     ),
+  ).toBe(
     '0x43999c52db673245777eb64b0330105de064e52179581a340a9856c32372528efc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8fac776d21ae071a32c362d4c20ba6586779708a56cad3a78d01b37ecb5744298',
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct(
         typedDataWithBytes.primaryType,
@@ -642,9 +589,8 @@ test('signedTypeData with bytes', (t) => {
         'V3',
       ),
     ),
-    '0xe004bdc1ca57ba9ad5ea8c81e54dcbdb3bfce2d1d5ad92113f0871fb2a6eb052',
-  );
-  t.equal(
+  ).toBe('0xe004bdc1ca57ba9ad5ea8c81e54dcbdb3bfce2d1d5ad92113f0871fb2a6eb052');
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct(
         'EIP712Domain',
@@ -653,25 +599,19 @@ test('signedTypeData with bytes', (t) => {
         'V3',
       ),
     ),
-    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
-  );
-  t.equal(
-    ethUtil.bufferToHex(utils.eip712Hash(typedDataWithBytes, 'V3')),
+  ).toBe('0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f');
+  expect(ethUtil.bufferToHex(utils.eip712Hash(typedDataWithBytes, 'V3'))).toBe(
     '0xb4aaf457227fec401db772ec22d2095d1235ee5d0833f56f59108c9ffc90fb4b',
   );
-  t.equal(
-    ethUtil.bufferToHex(address),
+  expect(ethUtil.bufferToHex(address)).toBe(
     '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
   );
-  t.equal(
-    sig,
+  expect(sig).toBe(
     '0xdd17ea877a7da411c85ff94bc54180631d0e86efdcd68876aeb2e051417b68e76be6858d67b20baf7be9c6402d49930bfea2535e9ae150e85838ee265094fd081b',
   );
 });
 
-test('signedTypeData_v4', (t) => {
-  t.plan(15);
-
+it('signedTypeData_v4', function () {
   const typedData = {
     types: {
       EIP712Domain: [
@@ -725,38 +665,35 @@ test('signedTypeData_v4', (t) => {
 
   const utils = sigUtil.TypedDataUtils;
 
-  t.equal(
-    utils.encodeType('Group', typedData.types),
+  expect(utils.encodeType('Group', typedData.types)).toBe(
     'Group(string name,Person[] members)Person(string name,address[] wallets)',
   );
 
-  t.equal(
-    utils.encodeType('Person', typedData.types),
+  expect(utils.encodeType('Person', typedData.types)).toBe(
     'Person(string name,address[] wallets)',
   );
-  t.equal(
-    ethUtil.bufferToHex(utils.hashType('Person', typedData.types)),
+  expect(ethUtil.bufferToHex(utils.hashType('Person', typedData.types))).toBe(
     '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
   );
 
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData('Person', typedData.message.from, typedData.types, 'V4'),
     ),
+  ).toBe(
     `0x${[
       'fabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
       '8c1d2bd5348394761719da11ec67eedae9502d137e8940fee8ecd6f641ee1648',
       '8a8bfe642b9fc19c25ada5dadfd37487461dc81dd4b0778f262c163ed81b5e2a',
     ].join('')}`,
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct('Person', typedData.message.from, typedData.types, 'V4'),
     ),
-    '0x9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f',
-  );
+  ).toBe('0x9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f');
 
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData(
         'Person',
@@ -765,13 +702,14 @@ test('signedTypeData_v4', (t) => {
         'V4',
       ),
     ),
+  ).toBe(
     `0x${[
       'fabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
       '28cac318a86c8a0a6a9156c2dba2c8c2363677ba0514ef616592d81557e679b6',
       'd2734f4c86cc3bd9cabf04c3097589d3165d95e4648fc72d943ed161f651ec6d',
     ].join('')}`,
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct(
         'Person',
@@ -780,18 +718,15 @@ test('signedTypeData_v4', (t) => {
         'V4',
       ),
     ),
-    '0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168',
-  );
+  ).toBe('0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168');
 
-  t.equal(
-    utils.encodeType('Mail', typedData.types),
+  expect(utils.encodeType('Mail', typedData.types)).toBe(
     'Mail(Person from,Person[] to,string contents)Person(string name,address[] wallets)',
   );
-  t.equal(
-    ethUtil.bufferToHex(utils.hashType('Mail', typedData.types)),
+  expect(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types))).toBe(
     '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData(
         typedData.primaryType,
@@ -800,6 +735,7 @@ test('signedTypeData_v4', (t) => {
         'V4',
       ),
     ),
+  ).toBe(
     `0x${[
       '4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
       '9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f',
@@ -807,7 +743,7 @@ test('signedTypeData_v4', (t) => {
       'b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
     ].join('')}`,
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct(
         typedData.primaryType,
@@ -816,38 +752,31 @@ test('signedTypeData_v4', (t) => {
         'V4',
       ),
     ),
-    '0xeb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8',
-  );
-  t.equal(
+  ).toBe('0xeb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8');
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct('EIP712Domain', typedData.domain, typedData.types, 'V4'),
     ),
-    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
-  );
-  t.equal(
-    ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4')),
+  ).toBe('0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f');
+  expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
     '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2',
   );
 
   const privateKey = ethUtil.keccak('cow');
 
   const address = ethUtil.privateToAddress(privateKey);
-  t.equal(
-    ethUtil.bufferToHex(address),
+  expect(ethUtil.bufferToHex(address)).toBe(
     '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
   );
 
   const sig = sigUtil.signTypedData(privateKey, { data: typedData }, 'V4');
 
-  t.equal(
-    sig,
+  expect(sig).toBe(
     '0x65cbd956f2fae28a601bebc9b906cea0191744bd4c4247bcd27cd08f8eb6b71c78efdf7a31dc9abee78f492292721f362d296cf86b4538e07b51303b67f749061b',
   );
 });
 
-test('signedTypeData_v4', (t) => {
-  t.plan(15);
-
+it('signedTypeData_v4', function () {
   const typedData = {
     types: {
       EIP712Domain: [
@@ -901,38 +830,35 @@ test('signedTypeData_v4', (t) => {
 
   const utils = sigUtil.TypedDataUtils;
 
-  t.equal(
-    utils.encodeType('Group', typedData.types),
+  expect(utils.encodeType('Group', typedData.types)).toBe(
     'Group(string name,Person[] members)Person(string name,address[] wallets)',
   );
 
-  t.equal(
-    utils.encodeType('Person', typedData.types),
+  expect(utils.encodeType('Person', typedData.types)).toBe(
     'Person(string name,address[] wallets)',
   );
-  t.equal(
-    ethUtil.bufferToHex(utils.hashType('Person', typedData.types)),
+  expect(ethUtil.bufferToHex(utils.hashType('Person', typedData.types))).toBe(
     '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
   );
 
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData('Person', typedData.message.from, typedData.types, 'V4'),
     ),
+  ).toBe(
     `0x${[
       'fabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
       '8c1d2bd5348394761719da11ec67eedae9502d137e8940fee8ecd6f641ee1648',
       '8a8bfe642b9fc19c25ada5dadfd37487461dc81dd4b0778f262c163ed81b5e2a',
     ].join('')}`,
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct('Person', typedData.message.from, typedData.types, 'V4'),
     ),
-    '0x9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f',
-  );
+  ).toBe('0x9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f');
 
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData(
         'Person',
@@ -941,13 +867,14 @@ test('signedTypeData_v4', (t) => {
         'V4',
       ),
     ),
+  ).toBe(
     `0x${[
       'fabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
       '28cac318a86c8a0a6a9156c2dba2c8c2363677ba0514ef616592d81557e679b6',
       'd2734f4c86cc3bd9cabf04c3097589d3165d95e4648fc72d943ed161f651ec6d',
     ].join('')}`,
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct(
         'Person',
@@ -956,18 +883,15 @@ test('signedTypeData_v4', (t) => {
         'V4',
       ),
     ),
-    '0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168',
-  );
+  ).toBe('0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168');
 
-  t.equal(
-    utils.encodeType('Mail', typedData.types),
+  expect(utils.encodeType('Mail', typedData.types)).toBe(
     'Mail(Person from,Person[] to,string contents)Person(string name,address[] wallets)',
   );
-  t.equal(
-    ethUtil.bufferToHex(utils.hashType('Mail', typedData.types)),
+  expect(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types))).toBe(
     '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData(
         typedData.primaryType,
@@ -976,6 +900,7 @@ test('signedTypeData_v4', (t) => {
         'V4',
       ),
     ),
+  ).toBe(
     `0x${[
       '4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
       '9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f',
@@ -983,7 +908,7 @@ test('signedTypeData_v4', (t) => {
       'b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8',
     ].join('')}`,
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct(
         typedData.primaryType,
@@ -992,38 +917,31 @@ test('signedTypeData_v4', (t) => {
         'V4',
       ),
     ),
-    '0xeb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8',
-  );
-  t.equal(
+  ).toBe('0xeb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8');
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct('EIP712Domain', typedData.domain, typedData.types, 'V4'),
     ),
-    '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
-  );
-  t.equal(
-    ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4')),
+  ).toBe('0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f');
+  expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
     '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2',
   );
 
   const privateKey = ethUtil.keccak('cow');
 
   const address = ethUtil.privateToAddress(privateKey);
-  t.equal(
-    ethUtil.bufferToHex(address),
+  expect(ethUtil.bufferToHex(address)).toBe(
     '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
   );
 
   const sig = sigUtil.signTypedData(privateKey, { data: typedData }, 'V4');
 
-  t.equal(
-    sig,
+  expect(sig).toBe(
     '0x65cbd956f2fae28a601bebc9b906cea0191744bd4c4247bcd27cd08f8eb6b71c78efdf7a31dc9abee78f492292721f362d296cf86b4538e07b51303b67f749061b',
   );
 });
 
-test('signedTypeData_v4 with recursive types', (t) => {
-  t.plan(12);
-
+it('signedTypeData_v4 with recursive types', function () {
   const typedData = {
     types: {
       EIP712Domain: [
@@ -1064,17 +982,15 @@ test('signedTypeData_v4 with recursive types', (t) => {
 
   const utils = sigUtil.TypedDataUtils;
 
-  t.equal(
-    utils.encodeType('Person', typedData.types),
+  expect(utils.encodeType('Person', typedData.types)).toBe(
     'Person(string name,Person mother,Person father)',
   );
 
-  t.equal(
-    ethUtil.bufferToHex(utils.hashType('Person', typedData.types)),
+  expect(ethUtil.bufferToHex(utils.hashType('Person', typedData.types))).toBe(
     '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
   );
 
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData(
         'Person',
@@ -1083,6 +999,7 @@ test('signedTypeData_v4 with recursive types', (t) => {
         'V4',
       ),
     ),
+  ).toBe(
     `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'afe4142a2b3e7b0503b44951e6030e0e2c5000ef83c61857e2e6003e7aef8570',
@@ -1090,7 +1007,7 @@ test('signedTypeData_v4 with recursive types', (t) => {
       '88f14be0dd46a8ec608ccbff6d3923a8b4e95cdfc9648f0db6d92a99a264cb36',
     ].join('')}`,
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct(
         'Person',
@@ -1099,10 +1016,9 @@ test('signedTypeData_v4 with recursive types', (t) => {
         'V4',
       ),
     ),
-    '0x9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b',
-  );
+  ).toBe('0x9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b');
 
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData(
         'Person',
@@ -1111,6 +1027,7 @@ test('signedTypeData_v4 with recursive types', (t) => {
         'V4',
       ),
     ),
+  ).toBe(
     `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'b2a7c7faba769181e578a391a6a6811a3e84080c6a3770a0bf8a856dfa79d333',
@@ -1118,7 +1035,7 @@ test('signedTypeData_v4 with recursive types', (t) => {
       '02cc7460f2c9ff107904cff671ec6fee57ba3dd7decf999fe9fe056f3fd4d56e',
     ].join('')}`,
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct(
         'Person',
@@ -1127,10 +1044,9 @@ test('signedTypeData_v4 with recursive types', (t) => {
         'V4',
       ),
     ),
-    '0xb852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8',
-  );
+  ).toBe('0xb852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8');
 
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData(
         typedData.primaryType,
@@ -1139,6 +1055,7 @@ test('signedTypeData_v4 with recursive types', (t) => {
         'V4',
       ),
     ),
+  ).toBe(
     `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'e8d55aa98b6b411f04dbcf9b23f29247bb0e335a6bc5368220032fdcb9e5927f',
@@ -1146,7 +1063,7 @@ test('signedTypeData_v4 with recursive types', (t) => {
       'b852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8',
     ].join('')}`,
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct(
         typedData.primaryType,
@@ -1155,38 +1072,31 @@ test('signedTypeData_v4 with recursive types', (t) => {
         'V4',
       ),
     ),
-    '0xfdc7b6d35bbd81f7fa78708604f57569a10edff2ca329c8011373f0667821a45',
-  );
-  t.equal(
+  ).toBe('0xfdc7b6d35bbd81f7fa78708604f57569a10edff2ca329c8011373f0667821a45');
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct('EIP712Domain', typedData.domain, typedData.types, 'V4'),
     ),
-    '0xfacb2c1888f63a780c84c216bd9a81b516fc501a19bae1fc81d82df590bbdc60',
-  );
-  t.equal(
-    ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4')),
+  ).toBe('0xfacb2c1888f63a780c84c216bd9a81b516fc501a19bae1fc81d82df590bbdc60');
+  expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
     '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c',
   );
 
   const privateKey = ethUtil.keccak('dragon');
 
   const address = ethUtil.privateToAddress(privateKey);
-  t.equal(
-    ethUtil.bufferToHex(address),
+  expect(ethUtil.bufferToHex(address)).toBe(
     '0x065a687103c9f6467380bee800ecd70b17f6b72f',
   );
 
   const sig = sigUtil.signTypedData(privateKey, { data: typedData }, 'V4');
 
-  t.equal(
-    sig,
+  expect(sig).toBe(
     '0xf2ec61e636ff7bb3ac8bc2a4cc2c8b8f635dd1b2ec8094c963128b358e79c85c5ca6dd637ed7e80f0436fe8fce39c0e5f2082c9517fe677cc2917dcd6c84ba881c',
   );
 });
 
-test('signedTypeMessage V4 with recursive types', (t) => {
-  t.plan(12);
-
+it('signedTypeMessage V4 with recursive types', function () {
   const typedData = {
     types: {
       EIP712Domain: [
@@ -1227,17 +1137,15 @@ test('signedTypeMessage V4 with recursive types', (t) => {
 
   const utils = sigUtil.TypedDataUtils;
 
-  t.equal(
-    utils.encodeType('Person', typedData.types),
+  expect(utils.encodeType('Person', typedData.types)).toBe(
     'Person(string name,Person mother,Person father)',
   );
 
-  t.equal(
-    ethUtil.bufferToHex(utils.hashType('Person', typedData.types)),
+  expect(ethUtil.bufferToHex(utils.hashType('Person', typedData.types))).toBe(
     '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
   );
 
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData(
         'Person',
@@ -1246,6 +1154,7 @@ test('signedTypeMessage V4 with recursive types', (t) => {
         'V4',
       ),
     ),
+  ).toBe(
     `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'afe4142a2b3e7b0503b44951e6030e0e2c5000ef83c61857e2e6003e7aef8570',
@@ -1253,7 +1162,7 @@ test('signedTypeMessage V4 with recursive types', (t) => {
       '88f14be0dd46a8ec608ccbff6d3923a8b4e95cdfc9648f0db6d92a99a264cb36',
     ].join('')}`,
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct(
         'Person',
@@ -1262,10 +1171,9 @@ test('signedTypeMessage V4 with recursive types', (t) => {
         'V4',
       ),
     ),
-    '0x9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b',
-  );
+  ).toBe('0x9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b');
 
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData(
         'Person',
@@ -1274,6 +1182,7 @@ test('signedTypeMessage V4 with recursive types', (t) => {
         'V4',
       ),
     ),
+  ).toBe(
     `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'b2a7c7faba769181e578a391a6a6811a3e84080c6a3770a0bf8a856dfa79d333',
@@ -1281,7 +1190,7 @@ test('signedTypeMessage V4 with recursive types', (t) => {
       '02cc7460f2c9ff107904cff671ec6fee57ba3dd7decf999fe9fe056f3fd4d56e',
     ].join('')}`,
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct(
         'Person',
@@ -1290,10 +1199,9 @@ test('signedTypeMessage V4 with recursive types', (t) => {
         'V4',
       ),
     ),
-    '0xb852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8',
-  );
+  ).toBe('0xb852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8');
 
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.encodeData(
         typedData.primaryType,
@@ -1302,6 +1210,7 @@ test('signedTypeMessage V4 with recursive types', (t) => {
         'V4',
       ),
     ),
+  ).toBe(
     `0x${[
       '7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
       'e8d55aa98b6b411f04dbcf9b23f29247bb0e335a6bc5368220032fdcb9e5927f',
@@ -1309,7 +1218,7 @@ test('signedTypeMessage V4 with recursive types', (t) => {
       'b852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8',
     ].join('')}`,
   );
-  t.equal(
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct(
         typedData.primaryType,
@@ -1318,31 +1227,26 @@ test('signedTypeMessage V4 with recursive types', (t) => {
         'V4',
       ),
     ),
-    '0xfdc7b6d35bbd81f7fa78708604f57569a10edff2ca329c8011373f0667821a45',
-  );
-  t.equal(
+  ).toBe('0xfdc7b6d35bbd81f7fa78708604f57569a10edff2ca329c8011373f0667821a45');
+  expect(
     ethUtil.bufferToHex(
       utils.hashStruct('EIP712Domain', typedData.domain, typedData.types, 'V4'),
     ),
-    '0xfacb2c1888f63a780c84c216bd9a81b516fc501a19bae1fc81d82df590bbdc60',
-  );
-  t.equal(
-    ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4')),
+  ).toBe('0xfacb2c1888f63a780c84c216bd9a81b516fc501a19bae1fc81d82df590bbdc60');
+  expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
     '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c',
   );
 
   const privateKey = ethUtil.keccak('dragon');
 
   const address = ethUtil.privateToAddress(privateKey);
-  t.equal(
-    ethUtil.bufferToHex(address),
+  expect(ethUtil.bufferToHex(address)).toBe(
     '0x065a687103c9f6467380bee800ecd70b17f6b72f',
   );
 
   const sig = sigUtil.signTypedData(privateKey, { data: typedData }, 'V4');
 
-  t.equal(
-    sig,
+  expect(sig).toBe(
     '0xf2ec61e636ff7bb3ac8bc2a4cc2c8b8f635dd1b2ec8094c963128b358e79c85c5ca6dd637ed7e80f0436fe8fce39c0e5f2082c9517fe677cc2917dcd6c84ba881c',
   );
 });
