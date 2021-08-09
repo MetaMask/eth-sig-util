@@ -1581,6 +1581,82 @@ describe('TypedDataUtils.findTypeDependencies', () => {
   });
 });
 
+describe('TypedDataUtils.sanitizeData', function () {
+  it('should return correctly formatted data unchanged', function () {
+    const typedMessage = {
+      domain: {},
+      message: {},
+      primaryType: 'Person' as const,
+      types: {
+        EIP712Domain: [{ name: 'name', type: 'string' }],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+      },
+    };
+
+    const sanitizedTypedMessage =
+      sigUtil.TypedDataUtils.sanitizeData(typedMessage);
+
+    expect(sanitizedTypedMessage).toStrictEqual(typedMessage);
+  });
+
+  it("should add `EIP712Domain` to `types` if it's missing", function () {
+    const typedMessage = {
+      domain: {},
+      message: {},
+      primaryType: 'Person' as const,
+      types: {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+      },
+    };
+
+    const sanitizedTypedMessage = sigUtil.TypedDataUtils.sanitizeData(
+      typedMessage as any,
+    );
+
+    expect(sanitizedTypedMessage).toStrictEqual({
+      ...typedMessage,
+      types: { ...typedMessage.types, EIP712Domain: [] },
+    });
+  });
+
+  it('should sanitize empty object', function () {
+    const typedMessage = {};
+
+    const sanitizedTypedMessage = sigUtil.TypedDataUtils.sanitizeData(
+      typedMessage as any,
+    );
+
+    expect(sanitizedTypedMessage).toStrictEqual({});
+  });
+
+  it('should omit unrecognized properties', function () {
+    const expectedMessage = {
+      domain: {},
+      message: {},
+      primaryType: 'Person' as const,
+      types: {
+        EIP712Domain: [{ name: 'name', type: 'string' }],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+      },
+    };
+    const typedMessage = { ...expectedMessage, extraStuff: 'Extra stuff' };
+
+    const sanitizedTypedMessage =
+      sigUtil.TypedDataUtils.sanitizeData(typedMessage);
+
+    expect(sanitizedTypedMessage).toStrictEqual(expectedMessage);
+  });
+});
+
 it('normalize address lower cases', function () {
   const initial = '0xA06599BD35921CfB5B71B4BE3869740385b0B306';
   const result = sigUtil.normalize(initial);
