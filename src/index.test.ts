@@ -609,9 +609,6 @@ describe('TypedDataUtils.encodeData', function () {
     });
   });
 
-  // This test suite should include all expected V4 behavior except the example
-  // data encoding, whcih is covered in the "V3/V4 encoding similarities" test
-  // suite
   describe('V4', function () {
     describe('example data', function () {
       // Reassigned to silence "no-loop-func" ESLint rule
