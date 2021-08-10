@@ -3060,6 +3060,488 @@ describe('TypedDataUtils.sanitizeData', function () {
   });
 });
 
+describe('TypedDataUtils.eip712Hash', function () {
+  describe('V3', function () {
+    it('should hash a minimal valid typed message', function () {
+      const hash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {},
+          message: {},
+        },
+        'V3',
+      );
+
+      expect(hash.toString('hex')).toMatchSnapshot();
+    });
+
+    it('minimal typed message hash should be identical to minimal valid typed message hash', function () {
+      const minimalHash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {},
+          primaryType: 'EIP712Domain',
+        } as any,
+        'V3',
+      );
+      const minimalValidHash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {},
+          message: {},
+        },
+        'V3',
+      );
+
+      expect(minimalHash.toString('hex')).toBe(
+        minimalValidHash.toString('hex'),
+      );
+    });
+
+    it('should ignore extra top-level properties', function () {
+      const minimalValidHash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {},
+          message: {},
+        },
+        'V3',
+      );
+      const extraPropertiesHash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {},
+          message: {},
+          extra: 'stuff',
+          moreExtra: 1,
+        } as any,
+        'V3',
+      );
+
+      expect(minimalValidHash.toString('hex')).toBe(
+        extraPropertiesHash.toString('hex'),
+      );
+    });
+
+    it('should hash a typed message with a domain separator that uses all fields.', function () {
+      const hash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [
+              {
+                name: 'name',
+                type: 'string',
+              },
+              {
+                name: 'version',
+                type: 'string',
+              },
+              {
+                name: 'chainId',
+                type: 'uint256',
+              },
+              {
+                name: 'verifyingContract',
+                type: 'address',
+              },
+            ],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {
+            name: 'example.metamask.io',
+            version: '1',
+            chainId: 1,
+            verifyingContract: '0x0000000000000000000000000000000000000000',
+          },
+          message: {},
+        },
+        'V3',
+      );
+
+      expect(hash.toString('hex')).toMatchSnapshot();
+    });
+
+    it('should hash a typed message with extra domain seperator fields', function () {
+      const hash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [
+              {
+                name: 'name',
+                type: 'string',
+              },
+              {
+                name: 'version',
+                type: 'string',
+              },
+              {
+                name: 'chainId',
+                type: 'uint256',
+              },
+              {
+                name: 'verifyingContract',
+                type: 'address',
+              },
+              {
+                name: 'extraField',
+                type: 'string',
+              },
+            ],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {
+            name: 'example.metamask.io',
+            version: '1',
+            chainId: 1,
+            verifyingContract: '0x0000000000000000000000000000000000000000',
+            extraField: 'stuff',
+          },
+          message: {},
+        } as any,
+        'V3',
+      );
+
+      expect(hash.toString('hex')).toMatchSnapshot();
+    });
+
+    it('should hash a typed message with only custom domain seperator fields', function () {
+      const hash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [
+              {
+                name: 'customName',
+                type: 'string',
+              },
+              {
+                name: 'customVersion',
+                type: 'string',
+              },
+              {
+                name: 'customChainId',
+                type: 'uint256',
+              },
+              {
+                name: 'customVerifyingContract',
+                type: 'address',
+              },
+              {
+                name: 'extraField',
+                type: 'string',
+              },
+            ],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {
+            customName: 'example.metamask.io',
+            customVersion: '1',
+            customChainId: 1,
+            customVerifyingContract:
+              '0x0000000000000000000000000000000000000000',
+            extraField: 'stuff',
+          },
+          message: {},
+        } as any,
+        'V3',
+      );
+
+      expect(hash.toString('hex')).toMatchSnapshot();
+    });
+
+    it('should hash a typed message with data', function () {
+      const hash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [
+              {
+                name: 'name',
+                type: 'string',
+              },
+              {
+                name: 'version',
+                type: 'string',
+              },
+              {
+                name: 'chainId',
+                type: 'uint256',
+              },
+              {
+                name: 'verifyingContract',
+                type: 'address',
+              },
+            ],
+            Message: [{ name: 'data', type: 'string' }],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {
+            name: 'example.metamask.io',
+            version: '1',
+            chainId: 1,
+            verifyingContract: '0x0000000000000000000000000000000000000000',
+          },
+          message: {
+            data: 'Hello!',
+          },
+        },
+        'V3',
+      );
+
+      expect(hash.toString('hex')).toMatchSnapshot();
+    });
+  });
+
+  describe('V4', function () {
+    it('should hash a minimal valid typed message', function () {
+      const hash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {},
+          message: {},
+        },
+        'V4',
+      );
+
+      expect(hash.toString('hex')).toMatchSnapshot();
+    });
+
+    it('minimal typed message hash should be identical to minimal valid typed message hash', function () {
+      const minimalHash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {},
+          primaryType: 'EIP712Domain',
+        } as any,
+        'V4',
+      );
+      const minimalValidHash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {},
+          message: {},
+        },
+        'V4',
+      );
+
+      expect(minimalHash.toString('hex')).toBe(
+        minimalValidHash.toString('hex'),
+      );
+    });
+
+    it('should ignore extra top-level properties', function () {
+      const minimalValidHash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {},
+          message: {},
+        },
+        'V4',
+      );
+      const extraPropertiesHash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {},
+          message: {},
+          extra: 'stuff',
+          moreExtra: 1,
+        } as any,
+        'V4',
+      );
+
+      expect(minimalValidHash.toString('hex')).toBe(
+        extraPropertiesHash.toString('hex'),
+      );
+    });
+
+    it('should hash a typed message with a domain separator that uses all fields.', function () {
+      const hash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [
+              {
+                name: 'name',
+                type: 'string',
+              },
+              {
+                name: 'version',
+                type: 'string',
+              },
+              {
+                name: 'chainId',
+                type: 'uint256',
+              },
+              {
+                name: 'verifyingContract',
+                type: 'address',
+              },
+            ],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {
+            name: 'example.metamask.io',
+            version: '1',
+            chainId: 1,
+            verifyingContract: '0x0000000000000000000000000000000000000000',
+          },
+          message: {},
+        },
+        'V4',
+      );
+
+      expect(hash.toString('hex')).toMatchSnapshot();
+    });
+
+    it('should hash a typed message with extra domain seperator fields', function () {
+      const hash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [
+              {
+                name: 'name',
+                type: 'string',
+              },
+              {
+                name: 'version',
+                type: 'string',
+              },
+              {
+                name: 'chainId',
+                type: 'uint256',
+              },
+              {
+                name: 'verifyingContract',
+                type: 'address',
+              },
+              {
+                name: 'extraField',
+                type: 'string',
+              },
+            ],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {
+            name: 'example.metamask.io',
+            version: '1',
+            chainId: 1,
+            verifyingContract: '0x0000000000000000000000000000000000000000',
+            extraField: 'stuff',
+          },
+          message: {},
+        } as any,
+        'V4',
+      );
+
+      expect(hash.toString('hex')).toMatchSnapshot();
+    });
+
+    it('should hash a typed message with only custom domain seperator fields', function () {
+      const hash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [
+              {
+                name: 'customName',
+                type: 'string',
+              },
+              {
+                name: 'customVersion',
+                type: 'string',
+              },
+              {
+                name: 'customChainId',
+                type: 'uint256',
+              },
+              {
+                name: 'customVerifyingContract',
+                type: 'address',
+              },
+              {
+                name: 'extraField',
+                type: 'string',
+              },
+            ],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {
+            customName: 'example.metamask.io',
+            customVersion: '1',
+            customChainId: 1,
+            customVerifyingContract:
+              '0x0000000000000000000000000000000000000000',
+            extraField: 'stuff',
+          },
+          message: {},
+        } as any,
+        'V4',
+      );
+
+      expect(hash.toString('hex')).toMatchSnapshot();
+    });
+
+    it('should hash a typed message with data', function () {
+      const hash = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [
+              {
+                name: 'name',
+                type: 'string',
+              },
+              {
+                name: 'version',
+                type: 'string',
+              },
+              {
+                name: 'chainId',
+                type: 'uint256',
+              },
+              {
+                name: 'verifyingContract',
+                type: 'address',
+              },
+            ],
+            Message: [{ name: 'data', type: 'string' }],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {
+            name: 'example.metamask.io',
+            version: '1',
+            chainId: 1,
+            verifyingContract: '0x0000000000000000000000000000000000000000',
+          },
+          message: {
+            data: 'Hello!',
+          },
+        },
+        'V4',
+      );
+
+      expect(hash.toString('hex')).toMatchSnapshot();
+    });
+  });
+});
+
 describe('concatSig', function () {
   it('should concatenate an extended ECDSA signature', function () {
     expect(
@@ -3619,14 +4101,10 @@ it('signedTypeData', function () {
     },
   };
 
-  const utils = sigUtil.TypedDataUtils;
   const privateKey = ethUtil.keccak('cow');
   const address = ethUtil.privateToAddress(privateKey);
   const sig = sigUtil.signTypedData(privateKey, { data: typedData }, 'V3');
 
-  expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V3'))).toBe(
-    '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2',
-  );
   expect(ethUtil.bufferToHex(address)).toBe(
     '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
   );
@@ -3676,7 +4154,6 @@ it('signedTypeData with bytes', function () {
         '0x25192142931f380985072cdd991e37f65cf8253ba7a0e675b54163a1d133b8ca',
     },
   };
-  const utils = sigUtil.TypedDataUtils;
   const privateKey = ethUtil.sha3('cow');
   const address = ethUtil.privateToAddress(privateKey);
   const sig = sigUtil.signTypedData(
@@ -3685,9 +4162,6 @@ it('signedTypeData with bytes', function () {
     'V3',
   );
 
-  expect(ethUtil.bufferToHex(utils.eip712Hash(typedDataWithBytes, 'V3'))).toBe(
-    '0xb4aaf457227fec401db772ec22d2095d1235ee5d0833f56f59108c9ffc90fb4b',
-  );
   expect(ethUtil.bufferToHex(address)).toBe(
     '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
   );
@@ -3748,12 +4222,6 @@ it('signedTypeData_v4', function () {
     },
   };
 
-  const utils = sigUtil.TypedDataUtils;
-
-  expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
-    '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2',
-  );
-
   const privateKey = ethUtil.keccak('cow');
 
   const address = ethUtil.privateToAddress(privateKey);
@@ -3820,12 +4288,6 @@ it('signedTypeData_v4', function () {
     },
   };
 
-  const utils = sigUtil.TypedDataUtils;
-
-  expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
-    '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2',
-  );
-
   const privateKey = ethUtil.keccak('cow');
 
   const address = ethUtil.privateToAddress(privateKey);
@@ -3879,12 +4341,6 @@ it('signedTypeData_v4 with recursive types', function () {
     },
   };
 
-  const utils = sigUtil.TypedDataUtils;
-
-  expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
-    '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c',
-  );
-
   const privateKey = ethUtil.keccak('dragon');
 
   const address = ethUtil.privateToAddress(privateKey);
@@ -3937,12 +4393,6 @@ it('signedTypeMessage V4 with recursive types', function () {
       },
     },
   };
-
-  const utils = sigUtil.TypedDataUtils;
-
-  expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
-    '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c',
-  );
 
   const privateKey = ethUtil.keccak('dragon');
 
