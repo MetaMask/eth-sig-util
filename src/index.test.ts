@@ -532,6 +532,7 @@ describe('TypedDataUtils.encodeData', function () {
           name: 'Cow',
           wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
         },
+        to: undefined,
         contents: 'Hello, Bob!',
       };
 
@@ -1040,6 +1041,7 @@ describe('TypedDataUtils.encodeData', function () {
           name: 'Cow',
           wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
         },
+        to: undefined,
         contents: 'Hello, Bob!',
       };
 
