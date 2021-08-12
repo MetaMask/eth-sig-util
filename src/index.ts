@@ -47,6 +47,7 @@ export interface TypedMessage<T extends MessageTypes> {
     version?: string;
     chainId?: number;
     verifyingContract?: string;
+    salt?: ArrayBuffer;
   };
   message: Record<string, unknown>;
 }
