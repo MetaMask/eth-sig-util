@@ -1712,29 +1712,38 @@ describe('concatSig', function () {
   });
 });
 
-it('normalize address lower cases', function () {
-  const initial = '0xA06599BD35921CfB5B71B4BE3869740385b0B306';
-  const result = sigUtil.normalize(initial);
-  expect(result).toBe(initial.toLowerCase());
-});
+describe('normalize', function () {
+  it('should normalize an address to lower case', function () {
+    const initial = '0xA06599BD35921CfB5B71B4BE3869740385b0B306';
+    const result = sigUtil.normalize(initial);
+    expect(result).toBe(initial.toLowerCase());
+  });
 
-it('normalize address adds hex prefix', function () {
-  const initial = 'A06599BD35921CfB5B71B4BE3869740385b0B306';
-  const result = sigUtil.normalize(initial);
-  expect(result).toBe(`0x${initial.toLowerCase()}`);
-});
+  it('should normalize address without a 0x prefix', function () {
+    const initial = 'A06599BD35921CfB5B71B4BE3869740385b0B306';
+    const result = sigUtil.normalize(initial);
+    expect(result).toBe(`0x${initial.toLowerCase()}`);
+  });
 
-it('normalize an integer converts to byte-pair hex', function () {
-  const initial = 1;
-  const result = sigUtil.normalize(initial);
-  expect(result).toBe('0x01');
-});
+  it('should normalize an integer to a byte-pair hex string', function () {
+    const initial = 1;
+    const result = sigUtil.normalize(initial);
+    expect(result).toBe('0x01');
+  });
 
-it('normalize an unsupported type throws', function () {
-  const initial = {};
-  expect(() => sigUtil.normalize(initial as any)).toThrow(
-    'eth-sig-util.normalize() requires hex string or integer input. received object:',
-  );
+  // TODO: Add validation to disallow negative integers.
+  it('should normalize a negative integer to 0x', function () {
+    const initial = -1;
+    const result = sigUtil.normalize(initial);
+    expect(result).toBe('0x');
+  });
+
+  it('should throw if given an object', function () {
+    const initial = {};
+    expect(() => sigUtil.normalize(initial as any)).toThrow(
+      'eth-sig-util.normalize() requires hex string or integer input. received object:',
+    );
+  });
 });
 
 it('personalSign and recover', function () {

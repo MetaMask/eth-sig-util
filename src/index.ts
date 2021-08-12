@@ -366,6 +366,11 @@ export function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
   return ethUtil.addHexPrefix(rStr.concat(sStr, vStr)).toString('hex');
 }
 
+/**
+ * Normalize the input to a 0x-prefixed hex string.
+ *
+ * @param input - The value to normalize
+ */
 export function normalize(input: number | string): string {
   if (!input) {
     return undefined;
