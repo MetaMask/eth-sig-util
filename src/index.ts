@@ -686,7 +686,7 @@ function getPublicKeyFor<T extends MessageTypes>(
   return recoverPublicKey(msgHash, msgParams.sig);
 }
 
-function padWithZeroes(number: string, length: number): string {
+export function padWithZeroes(number: string, length: number): string {
   let myString = `${number}`;
   while (myString.length < length) {
     myString = `0${myString}`;

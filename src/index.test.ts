@@ -1450,6 +1450,18 @@ it('normalize an unsupported type throws', function () {
   );
 });
 
+describe('padWithZeroes', function () {
+  it('pads a string shorter than the target length with zeroes', function () {
+    const input = 'abc';
+    expect(sigUtil.padWithZeroes(input, 4)).toStrictEqual(`0${input}`);
+  });
+
+  it('returns a string longer than or equal to the target length without modifying it', function () {
+    const input = 'abc';
+    expect(sigUtil.padWithZeroes(input, 3)).toStrictEqual(input);
+  });
+});
+
 it('personalSign and recover', function () {
   const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b';
   const privKeyHex =
