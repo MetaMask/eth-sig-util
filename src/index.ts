@@ -202,20 +202,21 @@ function encodeType(
   types: Record<string, MessageTypeProperty[]>,
 ): string {
   let result = '';
-  const deps = [primaryType].concat(
-    Array.from(findTypeDependencies(primaryType, types))
-      .filter((dep) => dep !== primaryType)
-      .sort(),
-  );
+  const unsortedDeps = findTypeDependencies(primaryType, types);
+  unsortedDeps.delete(primaryType);
+
+  const deps = [primaryType, ...Array.from(unsortedDeps).sort()];
   for (const type of deps) {
     const children = types[type];
     if (!children) {
       throw new Error(`No type definition specified: ${type}`);
     }
+
     result += `${type}(${types[type]
       .map(({ name, type: t }) => `${t} ${name}`)
       .join(',')})`;
   }
+
   return result;
 }
 
