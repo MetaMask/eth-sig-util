@@ -1480,7 +1480,7 @@ describe('TypedDataUtils.encodeType', () => {
     );
   });
 
-  it('should encode unrecognized types', () => {
+  it('should encode unrecognized non-primary types', () => {
     const types = {
       Mail: [
         { name: 'from', type: 'Person' },
