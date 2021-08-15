@@ -1519,7 +1519,7 @@ describe('TypedDataUtils.findTypeDependencies', () => {
 
     expect(
       sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
-    ).toStrictEqual(['Person']);
+    ).toStrictEqual(new Set(['Person']));
   });
 
   it('should return type dependencies of an array type', function () {
@@ -1530,7 +1530,7 @@ describe('TypedDataUtils.findTypeDependencies', () => {
 
     expect(
       sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
-    ).toStrictEqual(['Person']);
+    ).toStrictEqual(new Set(['Person']));
   });
 
   it('should return type dependencies of a complex type', function () {
@@ -1549,7 +1549,7 @@ describe('TypedDataUtils.findTypeDependencies', () => {
 
     expect(
       sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
-    ).toStrictEqual(['Mail', 'Person']);
+    ).toStrictEqual(new Set(['Mail', 'Person']));
   });
 
   it('should return type dependencies of a recursive type', function () {
@@ -1569,15 +1569,15 @@ describe('TypedDataUtils.findTypeDependencies', () => {
 
     expect(
       sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
-    ).toStrictEqual(['Mail', 'Person']);
+    ).toStrictEqual(new Set(['Mail', 'Person']));
   });
 
-  it('should return empty array if primary type is missing', function () {
+  it('should return empty set if primary type is missing', function () {
     const primaryType = 'Person';
 
     expect(
       sigUtil.TypedDataUtils.findTypeDependencies(primaryType, {}),
-    ).toStrictEqual([]);
+    ).toStrictEqual(new Set());
   });
 });
 

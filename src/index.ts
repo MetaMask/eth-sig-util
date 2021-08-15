@@ -202,10 +202,11 @@ function encodeType(
   types: Record<string, MessageTypeProperty[]>,
 ): string {
   let result = '';
-  let deps = findTypeDependencies(primaryType, types).filter(
-    (dep) => dep !== primaryType,
+  const deps = [primaryType].concat(
+    Array.from(findTypeDependencies(primaryType, types))
+      .filter((dep) => dep !== primaryType)
+      .sort(),
   );
-  deps = [primaryType].concat(deps.sort());
   for (const type of deps) {
     const children = types[type];
     if (!children) {
@@ -229,17 +230,17 @@ function encodeType(
 function findTypeDependencies(
   primaryType: string,
   types: Record<string, MessageTypeProperty[]>,
-  results: string[] = [],
-): string[] {
+  results: Set<string> = new Set(),
+): Set<string> {
   [primaryType] = primaryType.match(/^\w*/u);
-  if (results.includes(primaryType) || types[primaryType] === undefined) {
+  if (results.has(primaryType) || types[primaryType] === undefined) {
     return results;
   }
-  results.push(primaryType);
+
+  results.add(primaryType);
+
   for (const field of types[primaryType]) {
-    for (const dep of findTypeDependencies(field.type, types, results)) {
-      !results.includes(dep) && results.push(dep);
-    }
+    findTypeDependencies(field.type, types, results);
   }
   return results;
 }
