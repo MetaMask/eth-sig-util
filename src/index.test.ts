@@ -1460,6 +1460,15 @@ describe('padWithZeroes', function () {
     const input = 'abc';
     expect(sigUtil.padWithZeroes(input, 3)).toStrictEqual(input);
   });
+
+  it('throws an error if passed an invalid hex string', function () {
+    const inputs = ['0xabc', 'xyz', '-'];
+    for (const input of inputs) {
+      expect(() => sigUtil.padWithZeroes(input, 3)).toThrow(
+        new Error(`Expected an unprefixed hex string. Received: ${input}`),
+      );
+    }
+  });
 });
 
 it('personalSign and recover', function () {
