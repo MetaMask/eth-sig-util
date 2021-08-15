@@ -1453,7 +1453,12 @@ it('normalize an unsupported type throws', function () {
 describe('padWithZeroes', function () {
   it('pads a string shorter than the target length with zeroes', function () {
     const input = 'abc';
-    expect(sigUtil.padWithZeroes(input, 4)).toStrictEqual(`0${input}`);
+    expect(sigUtil.padWithZeroes(input, 5)).toStrictEqual(`00${input}`);
+  });
+
+  it('pads an empty string', function () {
+    const input = '';
+    expect(sigUtil.padWithZeroes(input, 4)).toStrictEqual(`0000`);
   });
 
   it('returns a string longer than or equal to the target length without modifying it', function () {

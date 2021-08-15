@@ -700,7 +700,7 @@ function getPublicKeyFor<T extends MessageTypes>(
  * if it was already greater than or equal to to the target length.
  */
 export function padWithZeroes(hexString: string, targetLength: number): string {
-  if (!/^[a-f0-9]+$/iu.test(hexString)) {
+  if (hexString !== '' && !/^[a-f0-9]+$/iu.test(hexString)) {
     throw new Error(
       `Expected an unprefixed hex string. Received: ${hexString}`,
     );
@@ -709,7 +709,7 @@ export function padWithZeroes(hexString: string, targetLength: number): string {
   if (hexString.length < targetLength) {
     return `${new Array(targetLength - hexString.length)
       .fill(0)
-      .join()}${hexString}`;
+      .join('')}${hexString}`;
   }
   return hexString;
 }
