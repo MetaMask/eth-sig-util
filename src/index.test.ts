@@ -119,6 +119,9 @@ describe('TypedDataUtils.encodeData', function () {
   // | Unrecognized primary type                            | N  | N  |                     |
   // | Unrecognized non-primary type                        | N  | N  |                     |
   // | Extra type specified that isn't used by primary type | Y  | Y  | Y                   |
+  //
+  // Note that these tests should mirror the `TypedDataUtils.hashStruct` tests. The `hashStruct`
+  // function just calls `encodeData` and hashes the result.
 
   describe('V3', function () {
     describe('example data', function () {
@@ -1425,6 +1428,1314 @@ describe('TypedDataUtils.encodeData', function () {
   });
 });
 
+describe('TypedDataUtils.hashStruct', function () {
+  // These tests mirror the `TypedDataUtils.encodeData` tests. The same inputs are expected.
+  // See the `encodeData` test comments for more information about these test cases.
+  describe('V3', function () {
+    describe('example data', function () {
+      // Reassigned to silence "no-loop-func" ESLint rule
+      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
+      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
+      const _expect = expect;
+      const _it = it;
+
+      for (const type of allExampleTypes) {
+        describe(`type "${type}"`, function () {
+          // Test all examples that do not crash
+          const inputs = encodeDataExamples[type] || [];
+          for (const input of inputs) {
+            const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+            _it(`should hash "${input}" (type "${inputType}")`, function () {
+              const types = {
+                Message: [{ name: 'data', type }],
+              };
+              const message = { data: input };
+
+              _expect(
+                sigUtil.TypedDataUtils.hashStruct(
+                  'Message',
+                  message,
+                  types,
+                  'V3',
+                ).toString('hex'),
+              ).toMatchSnapshot();
+            });
+          }
+
+          // Test all examples that crash
+          const errorInputs = encodeDataErrorExamples[type] || [];
+          for (const { input, errorMessage } of errorInputs) {
+            const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+            _it(
+              `should fail to hash "${input}" (type "${inputType}")`,
+              function () {
+                const types = {
+                  Message: [{ name: 'data', type }],
+                };
+                const message = { data: input };
+
+                _expect(() =>
+                  sigUtil.TypedDataUtils.hashStruct(
+                    'Message',
+                    message,
+                    types,
+                    'V3',
+                  ).toString('hex'),
+                ).toThrow(errorMessage);
+              },
+            );
+          }
+
+          _it(
+            `should fail to hash array of all ${type} example data`,
+            function () {
+              const types = {
+                Message: [{ name: 'data', type: `${type}[]` }],
+              };
+              const message = { data: inputs };
+              _expect(() =>
+                sigUtil.TypedDataUtils.hashStruct(
+                  'Message',
+                  message,
+                  types,
+                  'V3',
+                ).toString('hex'),
+              ).toThrow(
+                'Arrays are unimplemented in encodeData; use V4 extension',
+              );
+            },
+          );
+        });
+      }
+    });
+
+    it('should hash data with custom type', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+
+    it('should hash data with a recursive data type', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+          { name: 'replyTo', type: 'Mail' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+        replyTo: {
+          to: {
+            name: 'Cow',
+            wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+          },
+          from: {
+            name: 'Bob',
+            wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+          },
+          contents: 'Hello!',
+        },
+      };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+
+    it('should throw an error when trying to hash a custom type array', function () {
+      const types = {
+        Message: [{ name: 'data', type: 'string[]' }],
+      };
+      const message = { data: ['1', '2', '3'] };
+
+      expect(() =>
+        sigUtil.TypedDataUtils.hashStruct(
+          'Message',
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toThrow('Arrays are unimplemented in encodeData; use V4 extension');
+    });
+
+    it('should ignore extra unspecified message properties', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      const originalSignature = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        message,
+        types,
+        'V3',
+      ).toString('hex');
+      const messageWithExtraProperties = { ...message, foo: 'bar' };
+      const signatureWithExtraProperties = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        messageWithExtraProperties,
+        types,
+        'V3',
+      ).toString('hex');
+
+      expect(originalSignature).toBe(signatureWithExtraProperties);
+    });
+
+    it('should throw an error when an atomic property is set to null', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+          { name: 'length', type: 'int32' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello!',
+        length: null,
+      };
+
+      expect(() =>
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toThrow(`Cannot read property 'toArray' of null`);
+    });
+
+    it('should hash data with an atomic property set to undefined', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+          { name: 'length', type: 'int32' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello!',
+        length: undefined,
+      };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+
+    it('should hash data with a dynamic property set to null', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: null,
+      };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+
+    it('should hash data with a dynamic property set to undefined', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: undefined,
+      };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+
+    it('should throw an error when a custom type property is set to null', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        to: null,
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      expect(() =>
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toThrow(`Cannot read property 'name' of null`);
+    });
+
+    it('should hash data with a custom type property set to undefined', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: undefined,
+        contents: 'Hello, Bob!',
+      };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+
+    it('should throw an error when trying to hash a function', function () {
+      const types = {
+        Message: [{ name: 'data', type: 'function' }],
+      };
+      const message = { data: 'test' };
+
+      expect(() =>
+        sigUtil.TypedDataUtils.hashStruct(
+          'Message',
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toThrow('Unsupported or invalid type: function');
+    });
+
+    it('should throw an error when trying to hash with a missing primary type definition', function () {
+      const types = {};
+      const message = { data: 'test' };
+
+      expect(() =>
+        sigUtil.TypedDataUtils.hashStruct(
+          'Message',
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toThrow('No type definition specified: Message');
+    });
+
+    it('should throw an error when trying to hash an unrecognized type', function () {
+      const types = {
+        Message: [{ name: 'data', type: 'foo' }],
+      };
+      const message = { data: 'test' };
+
+      expect(() =>
+        sigUtil.TypedDataUtils.hashStruct(
+          'Message',
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toThrow('Unsupported or invalid type: foo');
+    });
+
+    it('should hash data when given extraneous types', function () {
+      const types = {
+        Message: [{ name: 'data', type: 'string' }],
+        Extra: [{ name: 'data', type: 'string' }],
+      };
+      const message = { data: 'Hello!' };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          'Message',
+          message,
+          types,
+          'V3',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe('V4', function () {
+    describe('example data', function () {
+      // Reassigned to silence "no-loop-func" ESLint rule
+      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
+      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
+      const _expect = expect;
+      const _it = it;
+
+      for (const type of allExampleTypes) {
+        describe(`type "${type}"`, function () {
+          // Test all examples that do not crash
+          const inputs = encodeDataExamples[type] || [];
+          for (const input of inputs) {
+            const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+            _it(`should hash "${input}" (type "${inputType}")`, function () {
+              const types = {
+                Message: [{ name: 'data', type }],
+              };
+              const message = { data: input };
+
+              _expect(
+                sigUtil.TypedDataUtils.hashStruct(
+                  'Message',
+                  message,
+                  types,
+                  'V4',
+                ).toString('hex'),
+              ).toMatchSnapshot();
+            });
+          }
+
+          // Test all examples that crash
+          const errorInputs = encodeDataErrorExamples[type] || [];
+          for (const { input, errorMessage } of errorInputs) {
+            const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+            _it(
+              `should fail to hash "${input}" (type "${inputType}")`,
+              function () {
+                const types = {
+                  Message: [{ name: 'data', type }],
+                };
+                const message = { data: input };
+
+                _expect(() =>
+                  sigUtil.TypedDataUtils.hashStruct(
+                    'Message',
+                    message,
+                    types,
+                    'V4',
+                  ).toString('hex'),
+                ).toThrow(errorMessage);
+              },
+            );
+          }
+
+          _it(`should hash array of all ${type} example data`, function () {
+            const types = {
+              Message: [{ name: 'data', type: `${type}[]` }],
+            };
+            const message = { data: inputs };
+            _expect(
+              sigUtil.TypedDataUtils.hashStruct(
+                'Message',
+                message,
+                types,
+                'V4',
+              ).toString('hex'),
+            ).toMatchSnapshot();
+          });
+        });
+      }
+    });
+
+    it('should hash data with custom type', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+
+    it('should hash data with a recursive data type', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+          { name: 'replyTo', type: 'Mail' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+        replyTo: {
+          to: {
+            name: 'Cow',
+            wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+          },
+          from: {
+            name: 'Bob',
+            wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+          },
+          contents: 'Hello!',
+        },
+      };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+
+    it('should hash data with a custom data type array', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address[]' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person[]' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: [
+            '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+            '0xDD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+          ],
+        },
+        to: [
+          {
+            name: 'Bob',
+            wallet: ['0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB'],
+          },
+        ],
+        contents: 'Hello, Bob!',
+      };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+
+    it('should ignore extra unspecified message properties', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      const originalSignature = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        message,
+        types,
+        'V4',
+      ).toString('hex');
+      const messageWithExtraProperties = { ...message, foo: 'bar' };
+      const signatureWithExtraProperties = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        messageWithExtraProperties,
+        types,
+        'V4',
+      ).toString('hex');
+
+      expect(originalSignature).toBe(signatureWithExtraProperties);
+    });
+
+    it('should throw an error when an atomic property is set to null', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+          { name: 'length', type: 'int32' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello!',
+        length: null,
+      };
+
+      expect(() =>
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toThrow(`Cannot read property 'toArray' of null`);
+    });
+
+    it('should throw an error when an atomic property is set to undefined', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+          { name: 'length', type: 'int32' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello!',
+        length: undefined,
+      };
+
+      expect(() =>
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toThrow('missing value for field length of type int32');
+    });
+
+    it('should hash data with a dynamic property set to null', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: null,
+      };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+
+    it('should throw an error when a dynamic property is set to undefined', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: undefined,
+      };
+
+      expect(() =>
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toThrow('missing value for field contents of type string');
+    });
+
+    it('should hash data with a custom type property set to null', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        to: null,
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+
+    it('should hash data with a custom type property set to undefined', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: undefined,
+        contents: 'Hello, Bob!',
+      };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          primaryType,
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+
+    it('should throw an error when trying to hash a function', function () {
+      const types = {
+        Message: [{ name: 'data', type: 'function' }],
+      };
+      const message = { data: 'test' };
+
+      expect(() =>
+        sigUtil.TypedDataUtils.hashStruct(
+          'Message',
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toThrow('Unsupported or invalid type: function');
+    });
+
+    it('should throw an error when trying to hash with a missing primary type definition', function () {
+      const types = {};
+      const message = { data: 'test' };
+
+      expect(() =>
+        sigUtil.TypedDataUtils.hashStruct(
+          'Message',
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toThrow('No type definition specified: Message');
+    });
+
+    it('should throw an error when trying to hash an unrecognized type', function () {
+      const types = {
+        Message: [{ name: 'data', type: 'foo' }],
+      };
+      const message = { data: 'test' };
+
+      expect(() =>
+        sigUtil.TypedDataUtils.hashStruct(
+          'Message',
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toThrow('Unsupported or invalid type: foo');
+    });
+
+    it('should hash data when given extraneous types', function () {
+      const types = {
+        Message: [{ name: 'data', type: 'string' }],
+        Extra: [{ name: 'data', type: 'string' }],
+      };
+      const message = { data: 'Hello!' };
+
+      expect(
+        sigUtil.TypedDataUtils.hashStruct(
+          'Message',
+          message,
+          types,
+          'V4',
+        ).toString('hex'),
+      ).toMatchSnapshot();
+    });
+  });
+
+  // This test suite covers all cases where data should be encoded identically
+  // on V3 and V4
+  describe('V3/V4 identical encodings', function () {
+    describe('example data', function () {
+      // Reassigned to silence "no-loop-func" ESLint rule
+      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
+      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
+      const _expect = expect;
+      const _it = it;
+
+      for (const type of allExampleTypes) {
+        describe(`type "${type}"`, function () {
+          // Test all examples that do not crash
+          const inputs = encodeDataExamples[type] || [];
+          for (const input of inputs) {
+            const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+            _it(`should hash "${input}" (type "${inputType}")`, function () {
+              const types = {
+                Message: [{ name: 'data', type }],
+              };
+              const message = { data: input };
+
+              const v3Signature = sigUtil.TypedDataUtils.hashStruct(
+                'Message',
+                message,
+                types,
+                'V3',
+              ).toString('hex');
+              const v4Signature = sigUtil.TypedDataUtils.hashStruct(
+                'Message',
+                message,
+                types,
+                'V4',
+              ).toString('hex');
+
+              _expect(v3Signature).toBe(v4Signature);
+            });
+          }
+        });
+      }
+    });
+
+    it('should hash data with custom type', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      const v3Signature = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        message,
+        types,
+        'V3',
+      ).toString('hex');
+      const v4Signature = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        message,
+        types,
+        'V4',
+      ).toString('hex');
+
+      expect(v3Signature).toBe(v4Signature);
+    });
+
+    it('should ignore extra unspecified message properties', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      const originalV3Signature = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        message,
+        types,
+        'V3',
+      ).toString('hex');
+      const originalV4Signature = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        message,
+        types,
+        'V4',
+      ).toString('hex');
+      const messageWithExtraProperties = { ...message, foo: 'bar' };
+      const v3signatureWithExtraProperties = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        messageWithExtraProperties,
+        types,
+        'V3',
+      ).toString('hex');
+      const v4signatureWithExtraProperties = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        messageWithExtraProperties,
+        types,
+        'V4',
+      ).toString('hex');
+
+      expect(originalV3Signature).toBe(originalV4Signature);
+      expect(v3signatureWithExtraProperties).toBe(
+        v4signatureWithExtraProperties,
+      );
+    });
+
+    it('should hash data with a dynamic property set to null', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: null,
+      };
+
+      const v3Signature = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        message,
+        types,
+        'V3',
+      ).toString('hex');
+      const v4Signature = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        message,
+        types,
+        'V4',
+      ).toString('hex');
+
+      expect(v3Signature).toBe(v4Signature);
+    });
+
+    it('should hash data when given extraneous types', function () {
+      const types = {
+        Message: [{ name: 'data', type: 'string' }],
+        Extra: [{ name: 'data', type: 'string' }],
+      };
+      const message = { data: 'Hello!' };
+
+      const v3Signature = sigUtil.TypedDataUtils.hashStruct(
+        'Message',
+        message,
+        types,
+        'V3',
+      ).toString('hex');
+      const v4Signature = sigUtil.TypedDataUtils.hashStruct(
+        'Message',
+        message,
+        types,
+        'V4',
+      ).toString('hex');
+
+      expect(v3Signature).toBe(v4Signature);
+    });
+  });
+
+  // This test suite covers all cases where data should be encoded differently
+  // on V3 and V4
+  describe('V3/V4 encoding differences', () => {
+    // Recursive data structures are encoded differently because V4 encodes
+    // missing custom typed properties as 0 byte32 rather than omitting it,
+    // and all recursive data structures must include a missing custom typed
+    // property (the recursive one), or they'd be infinitely large or cyclic.
+    // And cyclic data structures are not supported.
+    it('should hash data with recursive data differently', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+          { name: 'replyTo', type: 'Mail' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+        replyTo: {
+          to: {
+            name: 'Cow',
+            wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+          },
+          from: {
+            name: 'Bob',
+            wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+          },
+          contents: 'Hello!',
+        },
+      };
+
+      const v3Signature = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        message,
+        types,
+        'V3',
+      ).toString('hex');
+      const v4Signature = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        message,
+        types,
+        'V4',
+      ).toString('hex');
+
+      expect(v3Signature).not.toBe(v4Signature);
+    });
+
+    // Missing custom type properties are omitted in V3, but encoded as 0 (bytes32) in V4
+    it('should hash missing custom type properties differently', function () {
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      const v3Signature = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        message,
+        types,
+        'V3',
+      ).toString('hex');
+      const v4Signature = sigUtil.TypedDataUtils.hashStruct(
+        primaryType,
+        message,
+        types,
+        'V4',
+      ).toString('hex');
+
+      expect(v3Signature).not.toBe(v4Signature);
+    });
+  });
+});
+
 describe('TypedDataUtils.encodeType', () => {
   it('should encode simple type', () => {
     const types = {
@@ -1519,7 +2830,7 @@ describe('TypedDataUtils.findTypeDependencies', () => {
 
     expect(
       sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
-    ).toStrictEqual(['Person']);
+    ).toStrictEqual(new Set(['Person']));
   });
 
   it('should return type dependencies of an array type', function () {
@@ -1530,7 +2841,7 @@ describe('TypedDataUtils.findTypeDependencies', () => {
 
     expect(
       sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
-    ).toStrictEqual(['Person']);
+    ).toStrictEqual(new Set(['Person']));
   });
 
   it('should return type dependencies of a complex type', function () {
@@ -1549,7 +2860,7 @@ describe('TypedDataUtils.findTypeDependencies', () => {
 
     expect(
       sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
-    ).toStrictEqual(['Mail', 'Person']);
+    ).toStrictEqual(new Set(['Mail', 'Person']));
   });
 
   it('should return type dependencies of a recursive type', function () {
@@ -1569,15 +2880,15 @@ describe('TypedDataUtils.findTypeDependencies', () => {
 
     expect(
       sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
-    ).toStrictEqual(['Mail', 'Person']);
+    ).toStrictEqual(new Set(['Mail', 'Person']));
   });
 
-  it('should return empty array if primary type is missing', function () {
+  it('should return empty set if primary type is missing', function () {
     const primaryType = 'Person';
 
     expect(
       sigUtil.TypedDataUtils.findTypeDependencies(primaryType, {}),
-    ).toStrictEqual([]);
+    ).toStrictEqual(new Set());
   });
 });
 
@@ -2224,21 +3535,6 @@ it('signedTypeData', function () {
   expect(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types))).toBe(
     '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2',
   );
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct(
-        typedData.primaryType,
-        typedData.message,
-        typedData.types,
-        'V3',
-      ),
-    ),
-  ).toBe('0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e');
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types, 'V3'),
-    ),
-  ).toBe('0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f');
   expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V3'))).toBe(
     '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2',
   );
@@ -2303,26 +3599,6 @@ it('signedTypeData with bytes', function () {
   expect(
     ethUtil.bufferToHex(utils.hashType('Mail', typedDataWithBytes.types)),
   ).toBe('0x43999c52db673245777eb64b0330105de064e52179581a340a9856c32372528e');
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct(
-        typedDataWithBytes.primaryType,
-        typedDataWithBytes.message,
-        typedDataWithBytes.types,
-        'V3',
-      ),
-    ),
-  ).toBe('0xe004bdc1ca57ba9ad5ea8c81e54dcbdb3bfce2d1d5ad92113f0871fb2a6eb052');
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct(
-        'EIP712Domain',
-        typedDataWithBytes.domain,
-        typedDataWithBytes.types,
-        'V3',
-      ),
-    ),
-  ).toBe('0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f');
   expect(ethUtil.bufferToHex(utils.eip712Hash(typedDataWithBytes, 'V3'))).toBe(
     '0xb4aaf457227fec401db772ec22d2095d1235ee5d0833f56f59108c9ffc90fb4b',
   );
@@ -2392,41 +3668,9 @@ it('signedTypeData_v4', function () {
     '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
   );
 
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct('Person', typedData.message.from, typedData.types, 'V4'),
-    ),
-  ).toBe('0x9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f');
-
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct(
-        'Person',
-        typedData.message.to[0],
-        typedData.types,
-        'V4',
-      ),
-    ),
-  ).toBe('0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168');
-
   expect(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types))).toBe(
     '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
   );
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct(
-        typedData.primaryType,
-        typedData.message,
-        typedData.types,
-        'V4',
-      ),
-    ),
-  ).toBe('0xeb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8');
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types, 'V4'),
-    ),
-  ).toBe('0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f');
   expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
     '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2',
   );
@@ -2503,41 +3747,9 @@ it('signedTypeData_v4', function () {
     '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
   );
 
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct('Person', typedData.message.from, typedData.types, 'V4'),
-    ),
-  ).toBe('0x9b4846dd48b866f0ac54d61b9b21a9e746f921cefa4ee94c4c0a1c49c774f67f');
-
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct(
-        'Person',
-        typedData.message.to[0],
-        typedData.types,
-        'V4',
-      ),
-    ),
-  ).toBe('0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168');
-
   expect(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types))).toBe(
     '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
   );
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct(
-        typedData.primaryType,
-        typedData.message,
-        typedData.types,
-        'V4',
-      ),
-    ),
-  ).toBe('0xeb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8');
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types, 'V4'),
-    ),
-  ).toBe('0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f');
   expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
     '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2',
   );
@@ -2601,43 +3813,6 @@ it('signedTypeData_v4 with recursive types', function () {
     '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
   );
 
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct(
-        'Person',
-        typedData.message.mother,
-        typedData.types,
-        'V4',
-      ),
-    ),
-  ).toBe('0x9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b');
-
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct(
-        'Person',
-        typedData.message.father,
-        typedData.types,
-        'V4',
-      ),
-    ),
-  ).toBe('0xb852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8');
-
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct(
-        typedData.primaryType,
-        typedData.message,
-        typedData.types,
-        'V4',
-      ),
-    ),
-  ).toBe('0xfdc7b6d35bbd81f7fa78708604f57569a10edff2ca329c8011373f0667821a45');
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types, 'V4'),
-    ),
-  ).toBe('0xfacb2c1888f63a780c84c216bd9a81b516fc501a19bae1fc81d82df590bbdc60');
   expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
     '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c',
   );
@@ -2701,43 +3876,6 @@ it('signedTypeMessage V4 with recursive types', function () {
     '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
   );
 
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct(
-        'Person',
-        typedData.message.mother,
-        typedData.types,
-        'V4',
-      ),
-    ),
-  ).toBe('0x9ebcfbf94f349de50bcb1e3aa4f1eb38824457c99914fefda27dcf9f99f6178b');
-
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct(
-        'Person',
-        typedData.message.father,
-        typedData.types,
-        'V4',
-      ),
-    ),
-  ).toBe('0xb852e5abfeff916a30cb940c4e24c43cfb5aeb0fa8318bdb10dd2ed15c8c70d8');
-
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct(
-        typedData.primaryType,
-        typedData.message,
-        typedData.types,
-        'V4',
-      ),
-    ),
-  ).toBe('0xfdc7b6d35bbd81f7fa78708604f57569a10edff2ca329c8011373f0667821a45');
-  expect(
-    ethUtil.bufferToHex(
-      utils.hashStruct('EIP712Domain', typedData.domain, typedData.types, 'V4'),
-    ),
-  ).toBe('0xfacb2c1888f63a780c84c216bd9a81b516fc501a19bae1fc81d82df590bbdc60');
   expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
     '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c',
   );

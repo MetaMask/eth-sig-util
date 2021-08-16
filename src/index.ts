@@ -3,6 +3,8 @@ import * as ethAbi from 'ethereumjs-abi';
 import * as nacl from 'tweetnacl';
 import * as naclUtil from 'tweetnacl-util';
 
+import { padWithZeroes } from './utils';
+
 export type TypedData = string | EIP712TypedData | EIP712TypedData[];
 
 interface EIP712TypedData {
@@ -202,19 +204,21 @@ function encodeType(
   types: Record<string, MessageTypeProperty[]>,
 ): string {
   let result = '';
-  let deps = findTypeDependencies(primaryType, types).filter(
-    (dep) => dep !== primaryType,
-  );
-  deps = [primaryType].concat(deps.sort());
+  const unsortedDeps = findTypeDependencies(primaryType, types);
+  unsortedDeps.delete(primaryType);
+
+  const deps = [primaryType, ...Array.from(unsortedDeps).sort()];
   for (const type of deps) {
     const children = types[type];
     if (!children) {
       throw new Error(`No type definition specified: ${type}`);
     }
+
     result += `${type}(${types[type]
       .map(({ name, type: t }) => `${t} ${name}`)
       .join(',')})`;
   }
+
   return result;
 }
 
@@ -229,17 +233,17 @@ function encodeType(
 function findTypeDependencies(
   primaryType: string,
   types: Record<string, MessageTypeProperty[]>,
-  results: string[] = [],
-): string[] {
+  results: Set<string> = new Set(),
+): Set<string> {
   [primaryType] = primaryType.match(/^\w*/u);
-  if (results.includes(primaryType) || types[primaryType] === undefined) {
+  if (results.has(primaryType) || types[primaryType] === undefined) {
     return results;
   }
-  results.push(primaryType);
+
+  results.add(primaryType);
+
   for (const field of types[primaryType]) {
-    for (const dep of findTypeDependencies(field.type, types, results)) {
-      !results.includes(dep) && results.push(dep);
-    }
+    findTypeDependencies(field.type, types, results);
   }
   return results;
 }
@@ -685,14 +689,6 @@ function getPublicKeyFor<T extends MessageTypes>(
   const message = ethUtil.toBuffer(msgParams.data);
   const msgHash = ethUtil.hashPersonalMessage(message);
   return recoverPublicKey(msgHash, msgParams.sig);
-}
-
-function padWithZeroes(number: string, length: number): string {
-  let myString = `${number}`;
-  while (myString.length < length) {
-    myString = `0${myString}`;
-  }
-  return myString;
 }
 
 // converts hex strings to the Uint8Array format used by nacl
