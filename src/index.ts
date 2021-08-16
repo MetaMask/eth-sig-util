@@ -3,6 +3,8 @@ import * as ethAbi from 'ethereumjs-abi';
 import * as nacl from 'tweetnacl';
 import * as naclUtil from 'tweetnacl-util';
 
+import { padWithZeroes } from './utils';
+
 export type TypedData = string | EIP712TypedData | EIP712TypedData[];
 
 interface EIP712TypedData {
@@ -681,14 +683,6 @@ function getPublicKeyFor<T extends MessageTypes>(
   const message = ethUtil.toBuffer(msgParams.data);
   const msgHash = ethUtil.hashPersonalMessage(message);
   return recoverPublicKey(msgHash, msgParams.sig);
-}
-
-function padWithZeroes(number: string, length: number): string {
-  let myString = `${number}`;
-  while (myString.length < length) {
-    myString = `0${myString}`;
-  }
-  return myString;
 }
 
 // converts hex strings to the Uint8Array format used by nacl
