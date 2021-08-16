@@ -3064,6 +3064,9 @@ describe('TypedDataUtils.eip712Hash', function () {
   describe('V3', function () {
     it('should hash a minimal valid typed message', function () {
       const hash = sigUtil.TypedDataUtils.eip712Hash(
+        // This represents the most basic "typed message" that is valid according to our types.
+        // It's not a very useful message (it's totally empty), but it's complete according to the
+        // spec.
         {
           types: {
             EIP712Domain: [],
@@ -3080,6 +3083,8 @@ describe('TypedDataUtils.eip712Hash', function () {
 
     it('minimal typed message hash should be identical to minimal valid typed message hash', function () {
       const minimalHash = sigUtil.TypedDataUtils.eip712Hash(
+        // This tests that when the mandatory fields `domain`, `message`, and `types.EIP712Domain`
+        // are omitted, the result is the same as if they were included but empty.
         {
           types: {},
           primaryType: 'EIP712Domain',
