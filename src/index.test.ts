@@ -1425,6 +1425,91 @@ describe('TypedDataUtils.encodeData', function () {
   });
 });
 
+describe('TypedDataUtils.encodeType', () => {
+  it('should encode simple type', () => {
+    const types = {
+      Person: [{ name: 'name', type: 'string' }],
+    };
+    const primaryType = 'Person';
+
+    expect(
+      sigUtil.TypedDataUtils.encodeType(primaryType, types),
+    ).toMatchInlineSnapshot(`"Person(string name)"`);
+  });
+
+  it('should encode complex type', () => {
+    const types = {
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallet', type: 'address' },
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person[]' },
+        { name: 'contents', type: 'string' },
+      ],
+    };
+    const primaryType = 'Mail';
+
+    expect(
+      sigUtil.TypedDataUtils.encodeType(primaryType, types),
+    ).toMatchInlineSnapshot(
+      `"Mail(Person from,Person[] to,string contents)Person(string name,address wallet)"`,
+    );
+  });
+
+  it('should encode recursive type', () => {
+    const types = {
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallet', type: 'address' },
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person' },
+        { name: 'contents', type: 'string' },
+        { name: 'replyTo', type: 'Mail' },
+      ],
+    };
+    const primaryType = 'Mail';
+
+    expect(
+      sigUtil.TypedDataUtils.encodeType(primaryType, types),
+    ).toMatchInlineSnapshot(
+      `"Mail(Person from,Person to,string contents,Mail replyTo)Person(string name,address wallet)"`,
+    );
+  });
+
+  it('should encode unrecognized non-primary types', () => {
+    const types = {
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person' },
+        { name: 'contents', type: 'string' },
+      ],
+    };
+    const primaryType = 'Mail';
+
+    expect(
+      sigUtil.TypedDataUtils.encodeType(primaryType, types),
+    ).toMatchInlineSnapshot(`"Mail(Person from,Person to,string contents)"`);
+  });
+
+  it('should throw if primary type is missing', () => {
+    const types = {
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallet', type: 'address' },
+      ],
+    };
+    const primaryType = 'Mail';
+
+    expect(() => sigUtil.TypedDataUtils.encodeType(primaryType, types)).toThrow(
+      'No type definition specified: Mail',
+    );
+  });
+});
+
 it('normalize address lower cases', function () {
   const initial = '0xA06599BD35921CfB5B71B4BE3869740385b0B306';
   const result = sigUtil.normalize(initial);
@@ -1892,9 +1977,6 @@ it('signedTypeData', function () {
   const address = ethUtil.privateToAddress(privateKey);
   const sig = sigUtil.signTypedData(privateKey, { data: typedData }, 'V3');
 
-  expect(utils.encodeType('Mail', typedData.types)).toBe(
-    'Mail(Person from,Person to,string contents)Person(string name,address wallet)',
-  );
   expect(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types))).toBe(
     '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2',
   );
@@ -1974,9 +2056,6 @@ it('signedTypeData with bytes', function () {
     'V3',
   );
 
-  expect(utils.encodeType('Mail', typedDataWithBytes.types)).toBe(
-    'Mail(Person from,Person to,string contents,bytes payload)Person(string name,address wallet)',
-  );
   expect(
     ethUtil.bufferToHex(utils.hashType('Mail', typedDataWithBytes.types)),
   ).toBe('0x43999c52db673245777eb64b0330105de064e52179581a340a9856c32372528e');
@@ -2065,13 +2144,6 @@ it('signedTypeData_v4', function () {
 
   const utils = sigUtil.TypedDataUtils;
 
-  expect(utils.encodeType('Group', typedData.types)).toBe(
-    'Group(string name,Person[] members)Person(string name,address[] wallets)',
-  );
-
-  expect(utils.encodeType('Person', typedData.types)).toBe(
-    'Person(string name,address[] wallets)',
-  );
   expect(ethUtil.bufferToHex(utils.hashType('Person', typedData.types))).toBe(
     '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
   );
@@ -2093,9 +2165,6 @@ it('signedTypeData_v4', function () {
     ),
   ).toBe('0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168');
 
-  expect(utils.encodeType('Mail', typedData.types)).toBe(
-    'Mail(Person from,Person[] to,string contents)Person(string name,address[] wallets)',
-  );
   expect(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types))).toBe(
     '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
   );
@@ -2186,13 +2255,6 @@ it('signedTypeData_v4', function () {
 
   const utils = sigUtil.TypedDataUtils;
 
-  expect(utils.encodeType('Group', typedData.types)).toBe(
-    'Group(string name,Person[] members)Person(string name,address[] wallets)',
-  );
-
-  expect(utils.encodeType('Person', typedData.types)).toBe(
-    'Person(string name,address[] wallets)',
-  );
   expect(ethUtil.bufferToHex(utils.hashType('Person', typedData.types))).toBe(
     '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
   );
@@ -2214,9 +2276,6 @@ it('signedTypeData_v4', function () {
     ),
   ).toBe('0xefa62530c7ae3a290f8a13a5fc20450bdb3a6af19d9d9d2542b5a94e631a9168');
 
-  expect(utils.encodeType('Mail', typedData.types)).toBe(
-    'Mail(Person from,Person[] to,string contents)Person(string name,address[] wallets)',
-  );
   expect(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types))).toBe(
     '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
   );
@@ -2293,10 +2352,6 @@ it('signedTypeData_v4 with recursive types', function () {
   };
 
   const utils = sigUtil.TypedDataUtils;
-
-  expect(utils.encodeType('Person', typedData.types)).toBe(
-    'Person(string name,Person mother,Person father)',
-  );
 
   expect(ethUtil.bufferToHex(utils.hashType('Person', typedData.types))).toBe(
     '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
@@ -2397,10 +2452,6 @@ it('signedTypeMessage V4 with recursive types', function () {
   };
 
   const utils = sigUtil.TypedDataUtils;
-
-  expect(utils.encodeType('Person', typedData.types)).toBe(
-    'Person(string name,Person mother,Person father)',
-  );
 
   expect(ethUtil.bufferToHex(utils.hashType('Person', typedData.types))).toBe(
     '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',

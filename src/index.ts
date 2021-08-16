@@ -51,7 +51,7 @@ export interface TypedMessage<T extends MessageTypes> {
   message: Record<string, unknown>;
 }
 
-const TYPED_MESSAGE_SCHEMA = {
+export const TYPED_MESSAGE_SCHEMA = {
   type: 'object',
   properties: {
     types: {
@@ -299,10 +299,15 @@ function sanitizeData<T extends MessageTypes>(
 }
 
 /**
- * Signs a typed message as per EIP-712 and returns its keccak hash
+ * Hash a typed message according to EIP-712. The returned message starts with the EIP-712 prefix,
+ * which is "1901", followed by the hash of the domain separator, then the data (if any).
+ * The result is hashed again and returned.
  *
- * @param {Object} typedData - Types message data to hash as per eip-712
- * @returns {Buffer} - keccak hash of the resulting signed message
+ * This function does not sign the message. The resulting hash must still be signed to create an
+ * EIP-712 signature.
+ *
+ * @param {Object} typedData - The typed message to hash.
+ * @returns {Buffer} - The hash of the typed message.
  */
 function eip712Hash<T extends MessageTypes>(
   typedData: TypedData | TypedMessage<T>,
@@ -335,7 +340,7 @@ function eip712Hash<T extends MessageTypes>(
 /**
  * A collection of utility functions used for signing typed data
  */
-const TypedDataUtils = {
+export const TypedDataUtils = {
   encodeData,
   encodeType,
   findTypeDependencies,
@@ -345,7 +350,7 @@ const TypedDataUtils = {
   eip712Hash,
 };
 
-function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
+export function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
   const rSig = ethUtil.fromSigned(r);
   const sSig = ethUtil.fromSigned(s);
   const vSig = ethUtil.bufferToInt(v);
@@ -355,7 +360,7 @@ function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
   return ethUtil.addHexPrefix(rStr.concat(sStr, vStr)).toString('hex');
 }
 
-function normalize(input: number | string): string {
+export function normalize(input: number | string): string {
   if (!input) {
     return undefined;
   }
@@ -374,7 +379,7 @@ function normalize(input: number | string): string {
   return ethUtil.addHexPrefix(input.toLowerCase());
 }
 
-function personalSign<T extends MessageTypes>(
+export function personalSign<T extends MessageTypes>(
   privateKey: Buffer,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
 ): string {
@@ -385,7 +390,7 @@ function personalSign<T extends MessageTypes>(
   return serialized;
 }
 
-function recoverPersonalSignature<T extends MessageTypes>(
+export function recoverPersonalSignature<T extends MessageTypes>(
   msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
 ): string {
   const publicKey = getPublicKeyFor(msgParams);
@@ -394,19 +399,19 @@ function recoverPersonalSignature<T extends MessageTypes>(
   return senderHex;
 }
 
-function extractPublicKey<T extends MessageTypes>(
+export function extractPublicKey<T extends MessageTypes>(
   msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
 ): string {
   const publicKey = getPublicKeyFor(msgParams);
   return `0x${publicKey.toString('hex')}`;
 }
 
-function externalTypedSignatureHash(typedData: EIP712TypedData[]): string {
-  const hashBuffer = typedSignatureHash(typedData);
+export function typedSignatureHash(typedData: EIP712TypedData[]): string {
+  const hashBuffer = _typedSignatureHash(typedData);
   return ethUtil.bufferToHex(hashBuffer);
 }
 
-function encrypt<T extends MessageTypes>(
+export function encrypt<T extends MessageTypes>(
   receiverPublicKey: string,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
   version: string,
@@ -456,7 +461,7 @@ function encrypt<T extends MessageTypes>(
   }
 }
 
-function encryptSafely<T extends MessageTypes>(
+export function encryptSafely<T extends MessageTypes>(
   receiverPublicKey: string,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
   version: string,
@@ -500,7 +505,7 @@ function encryptSafely<T extends MessageTypes>(
   return encrypt(receiverPublicKey, paddedMsgParams, version);
 }
 
-function decrypt(
+export function decrypt(
   encryptedData: EthEncryptedData,
   receiverPrivateKey: string,
 ): string {
@@ -546,7 +551,7 @@ function decrypt(
   }
 }
 
-function decryptSafely(
+export function decryptSafely(
   encryptedData: EthEncryptedData,
   receiverPrivateKey: string,
 ): string {
@@ -556,7 +561,7 @@ function decryptSafely(
   return dataWithPadding.data;
 }
 
-function getEncryptionPublicKey(privateKey: string): string {
+export function getEncryptionPublicKey(privateKey: string): string {
   const privateKeyUint8Array = nacl_decodeHex(privateKey);
   const encryptionPublicKey =
     nacl.box.keyPair.fromSecretKey(privateKeyUint8Array).publicKey;
@@ -582,14 +587,14 @@ function getEncryptionPublicKey(privateKey: string): string {
  * @param version - The signing version to use.
  * @returns The signature
  */
-function signTypedData<T extends MessageTypes>(
+export function signTypedData<T extends MessageTypes>(
   privateKey: Buffer,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
   version: Version,
 ): string {
   const messageHash =
     version === 'V1'
-      ? typedSignatureHash(msgParams.data)
+      ? _typedSignatureHash(msgParams.data)
       : TypedDataUtils.eip712Hash(msgParams.data, version);
   const sig = ethUtil.ecsign(messageHash, privateKey);
   return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s));
@@ -605,42 +610,24 @@ function signTypedData<T extends MessageTypes>(
  * @param version - The signing version to use.
  * @returns The address of the signer.
  */
-function recoverTypedSignature<T extends MessageTypes>(
+export function recoverTypedSignature<T extends MessageTypes>(
   msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
   version: Version,
 ): string {
   const messageHash =
     version === 'V1'
-      ? typedSignatureHash(msgParams.data)
+      ? _typedSignatureHash(msgParams.data)
       : TypedDataUtils.eip712Hash(msgParams.data, version);
   const publicKey = recoverPublicKey(messageHash, msgParams.sig);
   const sender = ethUtil.publicToAddress(publicKey);
   return ethUtil.bufferToHex(sender);
 }
 
-export {
-  TYPED_MESSAGE_SCHEMA,
-  TypedDataUtils,
-  concatSig,
-  normalize,
-  personalSign,
-  recoverPersonalSignature,
-  extractPublicKey,
-  externalTypedSignatureHash as typedSignatureHash,
-  encrypt,
-  encryptSafely,
-  decrypt,
-  decryptSafely,
-  getEncryptionPublicKey,
-  signTypedData,
-  recoverTypedSignature,
-};
-
 /**
  * @param typedData - Array of data along with types, as per EIP712.
  * @returns Buffer
  */
-function typedSignatureHash<T extends MessageTypes>(
+function _typedSignatureHash<T extends MessageTypes>(
   typedData: TypedData | TypedMessage<T>,
 ): Buffer {
   const error = new Error('Expect argument to be non-empty array');
