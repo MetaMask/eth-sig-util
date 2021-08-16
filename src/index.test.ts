@@ -3075,7 +3075,7 @@ describe('normalize', function () {
     );
   });
 
-  it('should throw if given a BigInt', function () {
+  it('should throw if given a bigint', function () {
     const initial = BigInt(Number.MAX_SAFE_INTEGER);
     expect(() => sigUtil.normalize(initial as any)).toThrow(
       'eth-sig-util.normalize() requires hex string or integer input. received bigint: 9007199254740991',
