@@ -2737,6 +2737,8 @@ describe('TypedDataUtils.hashStruct', function () {
 });
 
 describe('TypedDataUtils.encodeType', () => {
+  // Note that these tests should mirror the `TypedDataUtils.hashType` tests. The `hashType`
+  // function just calls `encodeType` and hashes the result.
   it('should encode simple type', () => {
     const types = {
       Person: [{ name: 'name', type: 'string' }],
@@ -2818,6 +2820,96 @@ describe('TypedDataUtils.encodeType', () => {
     expect(() => sigUtil.TypedDataUtils.encodeType(primaryType, types)).toThrow(
       'No type definition specified: Mail',
     );
+  });
+});
+
+describe('TypedDataUtils.hashType', () => {
+  // These tests mirror the `TypedDataUtils.encodeType` tests. The same inputs are expected.
+  it('should hash simple type', () => {
+    const types = {
+      Person: [{ name: 'name', type: 'string' }],
+    };
+    const primaryType = 'Person';
+
+    expect(
+      sigUtil.TypedDataUtils.hashType(primaryType, types).toString('hex'),
+    ).toMatchInlineSnapshot(
+      `"fcbb73369ebb221abfdc626fdec0be9ca48ad89ef757b9a76eb7b31ddd261338"`,
+    );
+  });
+
+  it('should hash complex type', () => {
+    const types = {
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallet', type: 'address' },
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person[]' },
+        { name: 'contents', type: 'string' },
+      ],
+    };
+    const primaryType = 'Mail';
+
+    expect(
+      sigUtil.TypedDataUtils.hashType(primaryType, types).toString('hex'),
+    ).toMatchInlineSnapshot(
+      `"dd57d9596af52b430ced3d5b52d4e3d5dccfdf3e0572db1dcf526baad311fbd1"`,
+    );
+  });
+
+  it('should hash recursive type', () => {
+    const types = {
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallet', type: 'address' },
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person' },
+        { name: 'contents', type: 'string' },
+        { name: 'replyTo', type: 'Mail' },
+      ],
+    };
+    const primaryType = 'Mail';
+
+    expect(
+      sigUtil.TypedDataUtils.hashType(primaryType, types).toString('hex'),
+    ).toMatchInlineSnapshot(
+      `"66658e9662034bcd21df657297dab8ba47f0ae05dd8aa253cc935d9aacfd9d10"`,
+    );
+  });
+
+  it('should hash unrecognized non-primary types', () => {
+    const types = {
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person' },
+        { name: 'contents', type: 'string' },
+      ],
+    };
+    const primaryType = 'Mail';
+
+    expect(
+      sigUtil.TypedDataUtils.hashType(primaryType, types).toString('hex'),
+    ).toMatchInlineSnapshot(
+      `"c0aee50a43b64ca632347f993c5a39cbddcae6ae329a7a111357622dc88dc1fb"`,
+    );
+  });
+
+  it('should throw if primary type is missing', () => {
+    const types = {
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallet', type: 'address' },
+      ],
+    };
+    const primaryType = 'Mail';
+
+    expect(() =>
+      sigUtil.TypedDataUtils.hashType(primaryType, types).toString('hex'),
+    ).toThrow('No type definition specified: Mail');
   });
 });
 
@@ -3532,9 +3624,6 @@ it('signedTypeData', function () {
   const address = ethUtil.privateToAddress(privateKey);
   const sig = sigUtil.signTypedData(privateKey, { data: typedData }, 'V3');
 
-  expect(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types))).toBe(
-    '0xa0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2',
-  );
   expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V3'))).toBe(
     '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2',
   );
@@ -3596,9 +3685,6 @@ it('signedTypeData with bytes', function () {
     'V3',
   );
 
-  expect(
-    ethUtil.bufferToHex(utils.hashType('Mail', typedDataWithBytes.types)),
-  ).toBe('0x43999c52db673245777eb64b0330105de064e52179581a340a9856c32372528e');
   expect(ethUtil.bufferToHex(utils.eip712Hash(typedDataWithBytes, 'V3'))).toBe(
     '0xb4aaf457227fec401db772ec22d2095d1235ee5d0833f56f59108c9ffc90fb4b',
   );
@@ -3664,13 +3750,6 @@ it('signedTypeData_v4', function () {
 
   const utils = sigUtil.TypedDataUtils;
 
-  expect(ethUtil.bufferToHex(utils.hashType('Person', typedData.types))).toBe(
-    '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
-  );
-
-  expect(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types))).toBe(
-    '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
-  );
   expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
     '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2',
   );
@@ -3743,13 +3822,6 @@ it('signedTypeData_v4', function () {
 
   const utils = sigUtil.TypedDataUtils;
 
-  expect(ethUtil.bufferToHex(utils.hashType('Person', typedData.types))).toBe(
-    '0xfabfe1ed996349fc6027709802be19d047da1aa5d6894ff5f6486d92db2e6860',
-  );
-
-  expect(ethUtil.bufferToHex(utils.hashType('Mail', typedData.types))).toBe(
-    '0x4bd8a9a2b93427bb184aca81e24beb30ffa3c747e2a33d4225ec08bf12e2e753',
-  );
   expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
     '0xa85c2e2b118698e88db68a8105b794a8cc7cec074e89ef991cb4f5f533819cc2',
   );
@@ -3809,10 +3881,6 @@ it('signedTypeData_v4 with recursive types', function () {
 
   const utils = sigUtil.TypedDataUtils;
 
-  expect(ethUtil.bufferToHex(utils.hashType('Person', typedData.types))).toBe(
-    '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
-  );
-
   expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
     '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c',
   );
@@ -3871,10 +3939,6 @@ it('signedTypeMessage V4 with recursive types', function () {
   };
 
   const utils = sigUtil.TypedDataUtils;
-
-  expect(ethUtil.bufferToHex(utils.hashType('Person', typedData.types))).toBe(
-    '0x7c5c8e90cb92c8da53b893b24962513be98afcf1b57b00327ae4cc14e3a64116',
-  );
 
   expect(ethUtil.bufferToHex(utils.eip712Hash(typedData, 'V4'))).toBe(
     '0x807773b9faa9879d4971b43856c4d60c2da15c6f8c062bd9d33afefb756de19c',
