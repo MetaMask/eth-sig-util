@@ -350,6 +350,14 @@ export const TypedDataUtils = {
   eip712Hash,
 };
 
+/**
+ * Concatenate an extended ECDSA signature into a hex string
+ *
+ * @param v - The 'v' portion of the signature
+ * @param r - The 'r' portion of the signature
+ * @param s - The 's' portion of the signature
+ * @returns The concatenated ECDSA signature
+ */
 export function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
   const rSig = ethUtil.fromSigned(r);
   const sSig = ethUtil.fromSigned(s);

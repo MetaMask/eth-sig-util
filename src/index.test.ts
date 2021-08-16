@@ -1510,6 +1510,208 @@ describe('TypedDataUtils.encodeType', () => {
   });
 });
 
+describe('TypedDataUtils.findTypeDependencies', () => {
+  it('should return type dependencies of a simple type', function () {
+    const types = {
+      Person: [{ name: 'name', type: 'string' }],
+    };
+    const primaryType = 'Person';
+
+    expect(
+      sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
+    ).toStrictEqual(['Person']);
+  });
+
+  it('should return type dependencies of an array type', function () {
+    const types = {
+      Person: [{ name: 'name', type: 'string' }],
+    };
+    const primaryType = 'Person[]';
+
+    expect(
+      sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
+    ).toStrictEqual(['Person']);
+  });
+
+  it('should return type dependencies of a complex type', function () {
+    const types = {
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallet', type: 'address' },
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person[]' },
+        { name: 'contents', type: 'string' },
+      ],
+    };
+    const primaryType = 'Mail';
+
+    expect(
+      sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
+    ).toStrictEqual(['Mail', 'Person']);
+  });
+
+  it('should return type dependencies of a recursive type', function () {
+    const types = {
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallet', type: 'address' },
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person[]' },
+        { name: 'contents', type: 'string' },
+        { name: 'replyTo', type: 'Mail' },
+      ],
+    };
+    const primaryType = 'Mail';
+
+    expect(
+      sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
+    ).toStrictEqual(['Mail', 'Person']);
+  });
+
+  it('should return empty array if primary type is missing', function () {
+    const primaryType = 'Person';
+
+    expect(
+      sigUtil.TypedDataUtils.findTypeDependencies(primaryType, {}),
+    ).toStrictEqual([]);
+  });
+});
+
+describe('TypedDataUtils.sanitizeData', function () {
+  it('should return correctly formatted data unchanged', function () {
+    const typedMessage = {
+      domain: {},
+      message: {},
+      primaryType: 'Person' as const,
+      types: {
+        EIP712Domain: [{ name: 'name', type: 'string' }],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+      },
+    };
+
+    const sanitizedTypedMessage =
+      sigUtil.TypedDataUtils.sanitizeData(typedMessage);
+
+    expect(sanitizedTypedMessage).toStrictEqual(typedMessage);
+  });
+
+  it("should add `EIP712Domain` to `types` if it's missing", function () {
+    const typedMessage = {
+      domain: {},
+      message: {},
+      primaryType: 'Person' as const,
+      types: {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+      },
+    };
+
+    const sanitizedTypedMessage = sigUtil.TypedDataUtils.sanitizeData(
+      typedMessage as any,
+    );
+
+    expect(sanitizedTypedMessage).toStrictEqual({
+      ...typedMessage,
+      types: { ...typedMessage.types, EIP712Domain: [] },
+    });
+  });
+
+  it('should sanitize empty object', function () {
+    const typedMessage = {};
+
+    const sanitizedTypedMessage = sigUtil.TypedDataUtils.sanitizeData(
+      typedMessage as any,
+    );
+
+    expect(sanitizedTypedMessage).toStrictEqual({});
+  });
+
+  it('should omit unrecognized properties', function () {
+    const expectedMessage = {
+      domain: {},
+      message: {},
+      primaryType: 'Person' as const,
+      types: {
+        EIP712Domain: [{ name: 'name', type: 'string' }],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+      },
+    };
+    const typedMessage = { ...expectedMessage, extraStuff: 'Extra stuff' };
+
+    const sanitizedTypedMessage =
+      sigUtil.TypedDataUtils.sanitizeData(typedMessage);
+
+    expect(sanitizedTypedMessage).toStrictEqual(expectedMessage);
+  });
+});
+
+describe('concatSig', function () {
+  it('should concatenate an extended ECDSA signature', function () {
+    expect(
+      sigUtil.concatSig(
+        Buffer.from('1', 'hex'),
+        Buffer.from('1', 'hex'),
+        Buffer.from('1', 'hex'),
+      ),
+    ).toMatchSnapshot();
+  });
+
+  it('should concatenate an all-zero extended ECDSA signature', function () {
+    expect(
+      sigUtil.concatSig(
+        Buffer.from('0', 'hex'),
+        Buffer.from('0', 'hex'),
+        Buffer.from('0', 'hex'),
+      ),
+    ).toMatchSnapshot();
+  });
+
+  it('should return a hex-prefixed string', function () {
+    const signature = sigUtil.concatSig(
+      Buffer.from('1', 'hex'),
+      Buffer.from('1', 'hex'),
+      Buffer.from('1', 'hex'),
+    );
+
+    expect(typeof signature).toBe('string');
+    expect(signature.slice(0, 2)).toBe('0x');
+  });
+
+  it('should encode an impossibly large extended ECDSA signature', function () {
+    const largeNumber = Number.MAX_SAFE_INTEGER.toString(16);
+    expect(
+      sigUtil.concatSig(
+        Buffer.from(largeNumber, 'hex'),
+        Buffer.from(largeNumber, 'hex'),
+        Buffer.from(largeNumber, 'hex'),
+      ),
+    ).toMatchSnapshot();
+  });
+
+  it('should throw if a portion of the signature is larger than the maximum safe integer', function () {
+    const largeNumber = '20000000000000'; // This is Number.MAX_SAFE_INTEGER + 1, in hex
+    expect(() =>
+      sigUtil.concatSig(
+        Buffer.from(largeNumber, 'hex'),
+        Buffer.from(largeNumber, 'hex'),
+        Buffer.from(largeNumber, 'hex'),
+      ),
+    ).toThrow('Number can only safely store up to 53 bits');
+  });
+});
+
 it('normalize address lower cases', function () {
   const initial = '0xA06599BD35921CfB5B71B4BE3869740385b0B306';
   const result = sigUtil.normalize(initial);
