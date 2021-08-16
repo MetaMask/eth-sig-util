@@ -1657,6 +1657,61 @@ describe('TypedDataUtils.sanitizeData', function () {
   });
 });
 
+describe('concatSig', function () {
+  it('should concatenate an extended ECDSA signature', function () {
+    expect(
+      sigUtil.concatSig(
+        Buffer.from('1', 'hex'),
+        Buffer.from('1', 'hex'),
+        Buffer.from('1', 'hex'),
+      ),
+    ).toMatchSnapshot();
+  });
+
+  it('should concatenate an all-zero extended ECDSA signature', function () {
+    expect(
+      sigUtil.concatSig(
+        Buffer.from('0', 'hex'),
+        Buffer.from('0', 'hex'),
+        Buffer.from('0', 'hex'),
+      ),
+    ).toMatchSnapshot();
+  });
+
+  it('should return a hex-prefixed string', function () {
+    const signature = sigUtil.concatSig(
+      Buffer.from('1', 'hex'),
+      Buffer.from('1', 'hex'),
+      Buffer.from('1', 'hex'),
+    );
+
+    expect(typeof signature).toBe('string');
+    expect(signature.slice(0, 2)).toBe('0x');
+  });
+
+  it('should encode an impossibly large extended ECDSA signature', function () {
+    const largeNumber = Number.MAX_SAFE_INTEGER.toString(16);
+    expect(
+      sigUtil.concatSig(
+        Buffer.from(largeNumber, 'hex'),
+        Buffer.from(largeNumber, 'hex'),
+        Buffer.from(largeNumber, 'hex'),
+      ),
+    ).toMatchSnapshot();
+  });
+
+  it('should throw if a portion of the signature is larger than the maximum safe integer', function () {
+    const largeNumber = '20000000000000'; // This is Number.MAX_SAFE_INTEGER + 1, in hex
+    expect(() =>
+      sigUtil.concatSig(
+        Buffer.from(largeNumber, 'hex'),
+        Buffer.from(largeNumber, 'hex'),
+        Buffer.from(largeNumber, 'hex'),
+      ),
+    ).toThrow('Number can only safely store up to 53 bits');
+  });
+});
+
 it('normalize address lower cases', function () {
   const initial = '0xA06599BD35921CfB5B71B4BE3869740385b0B306';
   const result = sigUtil.normalize(initial);
