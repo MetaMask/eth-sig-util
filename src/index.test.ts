@@ -3049,7 +3049,7 @@ describe('normalize', function () {
     expect(result).toBe('0x');
   });
 
-  // TODO: Add validation to disallow undefined.
+  // TODO: Add validation to disallow null.
   it('should return undefined if given null', function () {
     const initial = null;
     expect(sigUtil.normalize(initial as any)).toBeUndefined();
