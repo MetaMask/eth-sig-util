@@ -1510,6 +1510,77 @@ describe('TypedDataUtils.encodeType', () => {
   });
 });
 
+describe('TypedDataUtils.findTypeDependencies', () => {
+  it('should return type dependencies of a simple type', function () {
+    const types = {
+      Person: [{ name: 'name', type: 'string' }],
+    };
+    const primaryType = 'Person';
+
+    expect(
+      sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
+    ).toStrictEqual(['Person']);
+  });
+
+  it('should return type dependencies of an array type', function () {
+    const types = {
+      Person: [{ name: 'name', type: 'string' }],
+    };
+    const primaryType = 'Person[]';
+
+    expect(
+      sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
+    ).toStrictEqual(['Person']);
+  });
+
+  it('should return type dependencies of a complex type', function () {
+    const types = {
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallet', type: 'address' },
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person[]' },
+        { name: 'contents', type: 'string' },
+      ],
+    };
+    const primaryType = 'Mail';
+
+    expect(
+      sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
+    ).toStrictEqual(['Mail', 'Person']);
+  });
+
+  it('should return type dependencies of a recursive type', function () {
+    const types = {
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallet', type: 'address' },
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person[]' },
+        { name: 'contents', type: 'string' },
+        { name: 'replyTo', type: 'Mail' },
+      ],
+    };
+    const primaryType = 'Mail';
+
+    expect(
+      sigUtil.TypedDataUtils.findTypeDependencies(primaryType, types),
+    ).toStrictEqual(['Mail', 'Person']);
+  });
+
+  it('should return empty array if primary type is missing', function () {
+    const primaryType = 'Person';
+
+    expect(
+      sigUtil.TypedDataUtils.findTypeDependencies(primaryType, {}),
+    ).toStrictEqual([]);
+  });
+});
+
 it('normalize address lower cases', function () {
   const initial = '0xA06599BD35921CfB5B71B4BE3869740385b0B306';
   const result = sigUtil.normalize(initial);
