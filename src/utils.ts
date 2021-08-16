@@ -18,5 +18,11 @@ export function padWithZeroes(hexString: string, targetLength: number): string {
     );
   }
 
+  if (targetLength < 0) {
+    throw new Error(
+      `Expected a non-negative integer target length. Received: ${targetLength}`,
+    );
+  }
+
   return String.prototype.padStart.call(hexString, targetLength, '0');
 }
