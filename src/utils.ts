@@ -6,8 +6,8 @@
  * If the input string is "0x"-prefixed or not a hex string, an error will be
  * thrown.
  *
- * @param hexString The hexadecimal string to pad with zeroes.
- * @param targetLength The target length of the hexadecimal string.
+ * @param hexString - The hexadecimal string to pad with zeroes.
+ * @param targetLength - The target length of the hexadecimal string.
  * @returns The input string front-padded with zeroes, or the original string
  * if it was already greater than or equal to to the target length.
  */
