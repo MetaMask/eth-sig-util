@@ -297,10 +297,15 @@ function sanitizeData<T extends MessageTypes>(
 }
 
 /**
- * Signs a typed message as per EIP-712 and returns its keccak hash
+ * Hash a typed message according to EIP-712. The returned message starts with the EIP-712 prefix,
+ * which is "1901", followed by the hash of the domain separator, then the data (if any).
+ * The result is hashed again and returned.
  *
- * @param {Object} typedData - Types message data to hash as per eip-712
- * @returns {Buffer} - keccak hash of the resulting signed message
+ * This function does not sign the message. The resulting hash must still be signed to create an
+ * EIP-712 signature.
+ *
+ * @param {Object} typedData - The typed message to hash.
+ * @returns {Buffer} - The hash of the typed message.
  */
 function eip712Hash<T extends MessageTypes>(
   typedData: TypedData | TypedMessage<T>,
