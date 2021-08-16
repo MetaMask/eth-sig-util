@@ -3055,7 +3055,7 @@ describe('normalize', function () {
     expect(sigUtil.normalize(initial as any)).toBeUndefined();
   });
 
-  // TODO: Add validation to disallow null.
+  // TODO: Add validation to disallow undefined.
   it('should return undefined if given undefined', function () {
     const initial = undefined;
     expect(sigUtil.normalize(initial as any)).toBeUndefined();
