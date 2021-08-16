@@ -3082,7 +3082,7 @@ describe('normalize', function () {
     );
   });
 
-  it('should throw if given a sumbol', function () {
+  it('should throw if given a symbol', function () {
     const initial = Symbol('test');
     expect(() => sigUtil.normalize(initial as any)).toThrow(
       'Cannot convert a Symbol value to a string',
