@@ -3160,6 +3160,10 @@ describe('TypedDataUtils.eip712Hash', function () {
                 name: 'verifyingContract',
                 type: 'address',
               },
+              {
+                name: 'salt',
+                type: 'bytes32',
+              },
             ],
           },
           primaryType: 'EIP712Domain',
@@ -3168,6 +3172,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             version: '1',
             chainId: 1,
             verifyingContract: '0x0000000000000000000000000000000000000000',
+            salt: Buffer.from(new Int32Array([1, 2, 3])),
           },
           message: {},
         },
@@ -3199,6 +3204,10 @@ describe('TypedDataUtils.eip712Hash', function () {
                 type: 'address',
               },
               {
+                name: 'salt',
+                type: 'bytes32',
+              },
+              {
                 name: 'extraField',
                 type: 'string',
               },
@@ -3210,6 +3219,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             version: '1',
             chainId: 1,
             verifyingContract: '0x0000000000000000000000000000000000000000',
+            salt: Buffer.from(new Int32Array([1, 2, 3])),
             extraField: 'stuff',
           },
           message: {},
@@ -3242,6 +3252,10 @@ describe('TypedDataUtils.eip712Hash', function () {
                 type: 'address',
               },
               {
+                name: 'customSalt',
+                type: 'bytes32',
+              },
+              {
                 name: 'extraField',
                 type: 'string',
               },
@@ -3254,6 +3268,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             customChainId: 1,
             customVerifyingContract:
               '0x0000000000000000000000000000000000000000',
+            customSalt: Buffer.from(new Int32Array([1, 2, 3])),
             extraField: 'stuff',
           },
           message: {},
@@ -3285,6 +3300,10 @@ describe('TypedDataUtils.eip712Hash', function () {
                 name: 'verifyingContract',
                 type: 'address',
               },
+              {
+                name: 'salt',
+                type: 'bytes32',
+              },
             ],
             Message: [{ name: 'data', type: 'string' }],
           },
@@ -3294,6 +3313,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             version: '1',
             chainId: 1,
             verifyingContract: '0x0000000000000000000000000000000000000000',
+            salt: Buffer.from(new Int32Array([1, 2, 3])),
           },
           message: {
             data: 'Hello!',
@@ -3405,6 +3425,10 @@ describe('TypedDataUtils.eip712Hash', function () {
                 name: 'verifyingContract',
                 type: 'address',
               },
+              {
+                name: 'salt',
+                type: 'bytes32',
+              },
             ],
           },
           primaryType: 'EIP712Domain',
@@ -3413,6 +3437,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             version: '1',
             chainId: 1,
             verifyingContract: '0x0000000000000000000000000000000000000000',
+            salt: Buffer.from(new Int32Array([1, 2, 3])),
           },
           message: {},
         },
@@ -3444,6 +3469,10 @@ describe('TypedDataUtils.eip712Hash', function () {
                 type: 'address',
               },
               {
+                name: 'salt',
+                type: 'bytes32',
+              },
+              {
                 name: 'extraField',
                 type: 'string',
               },
@@ -3455,6 +3484,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             version: '1',
             chainId: 1,
             verifyingContract: '0x0000000000000000000000000000000000000000',
+            salt: Buffer.from(new Int32Array([1, 2, 3])),
             extraField: 'stuff',
           },
           message: {},
@@ -3487,6 +3517,10 @@ describe('TypedDataUtils.eip712Hash', function () {
                 type: 'address',
               },
               {
+                name: 'customSalt',
+                type: 'bytes32',
+              },
+              {
                 name: 'extraField',
                 type: 'string',
               },
@@ -3499,6 +3533,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             customChainId: 1,
             customVerifyingContract:
               '0x0000000000000000000000000000000000000000',
+            customSalt: Buffer.from(new Int32Array([1, 2, 3])),
             extraField: 'stuff',
           },
           message: {},
@@ -3530,6 +3565,10 @@ describe('TypedDataUtils.eip712Hash', function () {
                 name: 'verifyingContract',
                 type: 'address',
               },
+              {
+                name: 'salt',
+                type: 'bytes32',
+              },
             ],
             Message: [{ name: 'data', type: 'string' }],
           },
@@ -3539,6 +3578,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             version: '1',
             chainId: 1,
             verifyingContract: '0x0000000000000000000000000000000000000000',
+            salt: Buffer.from(new Int32Array([1, 2, 3])),
           },
           message: {
             data: 'Hello!',
