@@ -1738,10 +1738,43 @@ describe('normalize', function () {
     expect(result).toBe('0x');
   });
 
+  // TODO: Add validation to disallow undefined.
+  it('should return undefined if given null', function () {
+    const initial = null;
+    expect(sigUtil.normalize(initial as any)).toBeUndefined();
+  });
+
+  // TODO: Add validation to disallow null.
+  it('should return undefined if given undefined', function () {
+    const initial = undefined;
+    expect(sigUtil.normalize(initial as any)).toBeUndefined();
+  });
+
   it('should throw if given an object', function () {
     const initial = {};
     expect(() => sigUtil.normalize(initial as any)).toThrow(
       'eth-sig-util.normalize() requires hex string or integer input. received object:',
+    );
+  });
+
+  it('should throw if given a boolean', function () {
+    const initial = true;
+    expect(() => sigUtil.normalize(initial as any)).toThrow(
+      'eth-sig-util.normalize() requires hex string or integer input. received boolean: true',
+    );
+  });
+
+  it('should throw if given a bigint', function () {
+    const initial = BigInt(Number.MAX_SAFE_INTEGER);
+    expect(() => sigUtil.normalize(initial as any)).toThrow(
+      'eth-sig-util.normalize() requires hex string or integer input. received bigint: 9007199254740991',
+    );
+  });
+
+  it('should throw if given a sumbol', function () {
+    const initial = Symbol('test');
+    expect(() => sigUtil.normalize(initial as any)).toThrow(
+      'Cannot convert a Symbol value to a string',
     );
   });
 });
