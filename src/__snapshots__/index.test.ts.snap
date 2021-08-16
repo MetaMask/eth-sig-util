@@ -1,5 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`TypedDataUtils.eip712Hash V3 should hash a minimal valid typed message 1`] = `"8d4a3f4082945b7879e2b55f181c31a77c8c0a464b70669458abbaaf99de4c38"`;
+
+exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with a domain separator that uses all fields 1`] = `"122d1c8ef94b76dad44dcb03fa772361e20855c63311a15d5afe02d1b38f6077"`;
+
+exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with data 1`] = `"122d1c8ef94b76dad44dcb03fa772361e20855c63311a15d5afe02d1b38f6077"`;
+
+exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with extra domain seperator fields 1`] = `"056edc00a07b3c2f8272146428402cc56419cea26ecdd743301b78053e5aba92"`;
+
+exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with only custom domain seperator fields 1`] = `"8e713ff4064ccd8d5cf047d72d1417ba966ed0a4df27251e36aae310414a59b6"`;
+
+exports[`TypedDataUtils.eip712Hash V4 should hash a minimal valid typed message 1`] = `"8d4a3f4082945b7879e2b55f181c31a77c8c0a464b70669458abbaaf99de4c38"`;
+
+exports[`TypedDataUtils.eip712Hash V4 should hash a typed message with a domain separator that uses all fields. 1`] = `"122d1c8ef94b76dad44dcb03fa772361e20855c63311a15d5afe02d1b38f6077"`;
+
+exports[`TypedDataUtils.eip712Hash V4 should hash a typed message with data 1`] = `"122d1c8ef94b76dad44dcb03fa772361e20855c63311a15d5afe02d1b38f6077"`;
+
+exports[`TypedDataUtils.eip712Hash V4 should hash a typed message with extra domain seperator fields 1`] = `"056edc00a07b3c2f8272146428402cc56419cea26ecdd743301b78053e5aba92"`;
+
+exports[`TypedDataUtils.eip712Hash V4 should hash a typed message with only custom domain seperator fields 1`] = `"8e713ff4064ccd8d5cf047d72d1417ba966ed0a4df27251e36aae310414a59b6"`;
+
 exports[`TypedDataUtils.encodeData V3 example data type "address" should encode "0x0" (type "string") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada2990000000000000000000000000000000000000000000000000000000000000000"`;
 
 exports[`TypedDataUtils.encodeData V3 example data type "address" should encode "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada299000000000000000000000000bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"`;
