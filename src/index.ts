@@ -3,6 +3,8 @@ import * as ethAbi from 'ethereumjs-abi';
 import * as nacl from 'tweetnacl';
 import * as naclUtil from 'tweetnacl-util';
 
+import { padWithZeroes } from './utils';
+
 export type TypedData = string | EIP712TypedData | EIP712TypedData[];
 
 interface EIP712TypedData {
@@ -684,34 +686,6 @@ function getPublicKeyFor<T extends MessageTypes>(
   const message = ethUtil.toBuffer(msgParams.data);
   const msgHash = ethUtil.hashPersonalMessage(message);
   return recoverPublicKey(msgHash, msgParams.sig);
-}
-
-/**
- * Pads the front of the given hex string with zeroes until it reaches the
- * target length. If the input string is already longer than or equal to the
- * target length, it is returned unmodified.
- *
- * If the input string is "0x"-prefixed or not a hex string, an error will be
- * thrown.
- *
- * @param hexString The hexadecimal string to pad with zeroes.
- * @param targetLength The target length of the hexadecimal string.
- * @returns The input string front-padded with zeroes, or the original string
- * if it was already greater than or equal to to the target length.
- */
-export function padWithZeroes(hexString: string, targetLength: number): string {
-  if (hexString !== '' && !/^[a-f0-9]+$/iu.test(hexString)) {
-    throw new Error(
-      `Expected an unprefixed hex string. Received: ${hexString}`,
-    );
-  }
-
-  if (hexString.length < targetLength) {
-    return `${new Array(targetLength - hexString.length)
-      .fill(0)
-      .join('')}${hexString}`;
-  }
-  return hexString;
 }
 
 // converts hex strings to the Uint8Array format used by nacl
