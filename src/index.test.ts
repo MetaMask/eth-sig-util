@@ -3134,7 +3134,7 @@ describe('TypedDataUtils.eip712Hash', function () {
       );
     });
 
-    it('should hash a typed message with a domain separator that uses all fields.', function () {
+    it('should hash a typed message with a domain separator that uses all fields', function () {
       const hash = sigUtil.TypedDataUtils.eip712Hash(
         {
           types: {
