@@ -400,7 +400,7 @@ export function normalize(input: number | string): string {
  * Create an Ethereum-specific signature for a message.
  *
  * This function is equivalent to the `eth_sign` Ethereum JSON-RPC method as specified in EIP-1417,
- * as well as the MetaMask provider `personal_sign` method.
+ * as well as the MetaMask's `personal_sign` method.
  *
  * @param privateKey - The key to sign with.
  * @param msgParams - The message parameters. Currently includes just the message data.
