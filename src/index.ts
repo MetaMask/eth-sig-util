@@ -436,7 +436,7 @@ export function recoverPersonalSignature<T extends MessageTypes>(
 }
 
 /**
- * Recover the public key of the account used to  create the given Ethereum signature. The message
+ * Recover the public key of the account used to create the given Ethereum signature. The message
  * must have been signed using the `personalSign` function, or an equivalent function.
  *
  * @param msgParams - The message parameters, which includes both the message and the signature.
