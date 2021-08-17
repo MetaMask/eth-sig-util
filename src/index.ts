@@ -396,6 +396,16 @@ export function normalize(input: number | string): string {
   return ethUtil.addHexPrefix(input.toLowerCase());
 }
 
+/**
+ * Create an Ethereum-specific signature for a message.
+ *
+ * This function is equivalent to the `eth_sign` Ethereum JSON-RPC method as specified in EIP-1417,
+ * as well as the MetaMask's `personal_sign` method.
+ *
+ * @param privateKey - The key to sign with.
+ * @param msgParams - The message parameters. Currently includes just the message data.
+ * @param msgParams.data - The data to sign.
+ */
 export function personalSign<T extends MessageTypes>(
   privateKey: Buffer,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
@@ -407,6 +417,15 @@ export function personalSign<T extends MessageTypes>(
   return serialized;
 }
 
+/**
+ * Recover the address of the account used to create the given Ethereum signature. The message
+ * must have been signed using the `personalSign` function, or an equivalent function.
+ *
+ * @param msgParams - The message parameters, which includes both the message and the signature.
+ * @param msgParams.data - The message that was signed.
+ * @param msgParams.sig - The signature for the message.
+ * @returns The address of the message signer.
+ */
 export function recoverPersonalSignature<T extends MessageTypes>(
   msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
 ): string {
@@ -416,6 +435,15 @@ export function recoverPersonalSignature<T extends MessageTypes>(
   return senderHex;
 }
 
+/**
+ * Recover the public key of the account used to create the given Ethereum signature. The message
+ * must have been signed using the `personalSign` function, or an equivalent function.
+ *
+ * @param msgParams - The message parameters, which includes both the message and the signature.
+ * @param msgParams.data - The message that was signed.
+ * @param msgParams.sig - The signature for the message.
+ * @returns The public key of the message signer.
+ */
 export function extractPublicKey<T extends MessageTypes>(
   msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
 ): string {
@@ -423,11 +451,28 @@ export function extractPublicKey<T extends MessageTypes>(
   return `0x${publicKey.toString('hex')}`;
 }
 
+/**
+ * Generate the "V1" type hash for the provided typed message.
+ *
+ * The type hash will be generated in accordance with an earlier version of the EIP-712
+ * specification. This type hash is used in `signTypedData_v1`.
+ *
+ * @param typedData - The typed message.
+ * @returns The type hash for the provided message.
+ */
 export function typedSignatureHash(typedData: EIP712TypedData[]): string {
   const hashBuffer = _typedSignatureHash(typedData);
   return ethUtil.bufferToHex(hashBuffer);
 }
 
+/**
+ * Encrypt a message.
+ *
+ * @param receiverPublicKey - The public key of the message recipient.
+ * @param msgParams - The message parameters. Currently includes just the message data.
+ * @param version - The type of encryption to use.
+ * @returns The encrypted data.
+ */
 export function encrypt<T extends MessageTypes>(
   receiverPublicKey: string,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
@@ -478,6 +523,17 @@ export function encrypt<T extends MessageTypes>(
   }
 }
 
+/**
+ * Encrypt a message in a way that obscures the message length.
+ *
+ * The message is padded to a multiple of 2048 before being encrypted so that the length of the
+ * resulting encrypted message can't be used to guess the exact length of the original message.
+ *
+ * @param receiverPublicKey - The public key of the message recipient.
+ * @param msgParams - The message parameters. Currently includes just the message data.
+ * @param version - The type of encryption to use.
+ * @returns The encrypted data.
+ */
 export function encryptSafely<T extends MessageTypes>(
   receiverPublicKey: string,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
@@ -522,6 +578,13 @@ export function encryptSafely<T extends MessageTypes>(
   return encrypt(receiverPublicKey, paddedMsgParams, version);
 }
 
+/**
+ * Decrypt a message.
+ *
+ * @param encryptedData - The encrypted data.
+ * @param receiverPrivateKey - The private key to decrypt with.
+ * @returns The decrypted message.
+ */
 export function decrypt(
   encryptedData: EthEncryptedData,
   receiverPrivateKey: string,
@@ -568,6 +631,13 @@ export function decrypt(
   }
 }
 
+/**
+ * Decrypt a message that has been encrypted using `encryptSafely`.
+ *
+ * @param encryptedData - The encrypted data.
+ * @param receiverPrivateKey - The private key to decrypt with.
+ * @returns The decrypted message.
+ */
 export function decryptSafely(
   encryptedData: EthEncryptedData,
   receiverPrivateKey: string,
@@ -640,10 +710,6 @@ export function recoverTypedSignature<T extends MessageTypes>(
   return ethUtil.bufferToHex(sender);
 }
 
-/**
- * @param typedData - Array of data along with types, as per EIP712.
- * @returns Buffer
- */
 function _typedSignatureHash<T extends MessageTypes>(
   typedData: TypedData | TypedMessage<T>,
 ): Buffer {
