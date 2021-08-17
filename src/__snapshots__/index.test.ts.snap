@@ -4,7 +4,7 @@ exports[`TypedDataUtils.eip712Hash V3 should hash a minimal valid typed message 
 
 exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with a domain separator that uses all fields 1`] = `"54ffed5209a17ac210ef3823740b3852ee9cd518b84ee39f0a3fa7f2f9b4205b"`;
 
-exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with data 1`] = `"54ffed5209a17ac210ef3823740b3852ee9cd518b84ee39f0a3fa7f2f9b4205b"`;
+exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with data 1`] = `"d2669f23b7849020ad41bcbff5b51372793f91320e0f901641945568ed7322be"`;
 
 exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with extra domain seperator fields 1`] = `"2323c742c20093ee44c2a0abef2b950062a3d70b3453ef4995a072dba9e47d7d"`;
 
@@ -14,7 +14,7 @@ exports[`TypedDataUtils.eip712Hash V4 should hash a minimal valid typed message 
 
 exports[`TypedDataUtils.eip712Hash V4 should hash a typed message with a domain separator that uses all fields. 1`] = `"54ffed5209a17ac210ef3823740b3852ee9cd518b84ee39f0a3fa7f2f9b4205b"`;
 
-exports[`TypedDataUtils.eip712Hash V4 should hash a typed message with data 1`] = `"54ffed5209a17ac210ef3823740b3852ee9cd518b84ee39f0a3fa7f2f9b4205b"`;
+exports[`TypedDataUtils.eip712Hash V4 should hash a typed message with data 1`] = `"d2669f23b7849020ad41bcbff5b51372793f91320e0f901641945568ed7322be"`;
 
 exports[`TypedDataUtils.eip712Hash V4 should hash a typed message with extra domain seperator fields 1`] = `"2323c742c20093ee44c2a0abef2b950062a3d70b3453ef4995a072dba9e47d7d"`;
 
