@@ -3714,40 +3714,78 @@ describe('normalize', function () {
   });
 });
 
-it('personalSign and recover', function () {
-  const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b';
-  const privKeyHex =
-    '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0';
-  const privKey = Buffer.from(privKeyHex, 'hex');
-  const message = 'Hello, world!';
-  const msgParams: sigUtil.MsgParams<string> = { data: message };
-
-  const signed = sigUtil.personalSign(privKey, msgParams);
-  msgParams.sig = signed;
-  const recovered = sigUtil.recoverPersonalSignature(
-    msgParams as sigUtil.SignedMsgParams<string>,
+describe('personalSign', function () {
+  const privateKey = Buffer.from(
+    '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0',
+    'hex',
   );
+  const helloWorldSignature =
+    '0x90a938f7457df6e8f741264c32697fc52f9a8f867c52dd70713d9d2d472f2e415d9c94148991bbe1f4a1818d1dff09165782749c877f5cf1eff4ef126e55714d1c';
+  const helloWorldMessage = 'Hello, world!';
 
-  expect(recovered).toBe(address);
-});
+  it('should sign a message', function () {
+    expect(sigUtil.personalSign(privateKey, { data: helloWorldMessage })).toBe(
+      helloWorldSignature,
+    );
+  });
 
-it('personalSign and extractPublicKey', function () {
-  const privKeyHex =
-    '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0';
-  const pubKeyHex =
-    '0x9e9e45b2ec5f070b4e26f57c7fedf647afa7a03e894789816fbd12fedc5acd79d0dfeea925688e177caccb8f5e09f0c289bbcfc7adb98d76f5f8c5259478903a';
+  it('should recover the address from a signature', function () {
+    const address = ethUtil.addHexPrefix(
+      ethUtil.privateToAddress(privateKey).toString('hex'),
+    );
 
-  const privKey = Buffer.from(privKeyHex, 'hex');
-  const message = 'Hello, world!';
-  const msgParams: sigUtil.MsgParams<string> = { data: message };
+    expect(
+      sigUtil.recoverPersonalSignature({
+        data: helloWorldMessage,
+        sig: helloWorldSignature,
+      }),
+    ).toBe(address);
+  });
 
-  const signed = sigUtil.personalSign(privKey, msgParams);
-  msgParams.sig = signed;
-  const publicKey = sigUtil.extractPublicKey(
-    msgParams as sigUtil.SignedMsgParams<string>,
-  );
+  it('should recover the public key from a signature', function () {
+    const publicKey = ethUtil.addHexPrefix(
+      ethUtil.privateToPublic(privateKey).toString('hex'),
+    );
 
-  expect(publicKey).toBe(pubKeyHex);
+    expect(
+      sigUtil.extractPublicKey({
+        data: helloWorldMessage,
+        sig: helloWorldSignature,
+      }),
+    ).toBe(publicKey);
+  });
+
+  it('should sign a message and recover the address of the signer', function () {
+    const address = ethUtil.addHexPrefix(
+      ethUtil.privateToAddress(privateKey).toString('hex'),
+    );
+    const signature = sigUtil.personalSign(privateKey, {
+      data: helloWorldMessage,
+    });
+
+    expect(
+      sigUtil.recoverPersonalSignature({
+        data: helloWorldMessage,
+        sig: signature,
+      }),
+    ).toBe(address);
+  });
+
+  it('should sign a message and recover the public key of the signer', function () {
+    const publicKey = ethUtil.addHexPrefix(
+      ethUtil.privateToPublic(privateKey).toString('hex'),
+    );
+    const signature = sigUtil.personalSign(privateKey, {
+      data: helloWorldMessage,
+    });
+
+    expect(
+      sigUtil.extractPublicKey({
+        data: helloWorldMessage,
+        sig: signature,
+      }),
+    ).toBe(publicKey);
+  });
 });
 
 it('signTypedData and recoverTypedSignature V1 - single message', function () {
