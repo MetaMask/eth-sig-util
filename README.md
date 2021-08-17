@@ -1,16 +1,18 @@
-# Eth-Sig-Util [![CircleCI](https://circleci.com/gh/MetaMask/eth-sig-util.svg?style=svg)](https://circleci.com/gh/MetaMask/eth-sig-util)
+# `@metamask/eth-sig-util`
 
-A small collection of ethereum signing functions.
+A small collection of Ethereum signing functions.
 
 You can find usage examples [here](https://github.com/metamask/test-dapp)
 
-[Available on NPM](https://www.npmjs.com/package/eth-sig-util)
+[Available on NPM](https://www.npmjs.com/package/@metamask/eth-sig-util)
 
 ## Installation
 
-```shell
-npm install eth-sig-util --save
-```
+`yarn add @metamask/eth-sig-util`
+
+or
+
+`npm install @metamask/eth-sig-util`
 
 ## Methods
 
@@ -36,37 +38,21 @@ msgParams should have a `data` key that is hex-encoded data unsigned, and a `sig
 
 Returns a hex-encoded sender address.
 
-### signTypedData (privateKeyBuffer, msgParams)
+### signTypedData (privateKeyBuffer, msgParams, version)
 
-Signs typed data as per [an early draft of EIP 712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca).
-
-Data should be under `data` key of `msgParams`. The method returns prefixed signature.
-
-### signTypedData_v3 (privateKeyBuffer, msgParams)
-
-Signs typed data as per the published version of [EIP 712](https://github.com/ethereum/EIPs/pull/712).
+Sign typed data according to EIP-712. The signing differs based upon the `version`, which is explained in the table below.
 
 Data should be under `data` key of `msgParams`. The method returns prefixed signature.
 
-### signTypedData_v4 (privateKeyBuffer, msgParams)
+| Version | Description                                                  |
+| ------- | ------------------------------------------------------------ |
+| `V1`    | This is based on [an early version of EIP-712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca) that lacked some later security improvements, and should generally be neglected in favor of `V3`. |
+| `V3`    | Based on [EIP 712](https://eips.ethereum.org/EIPS/eip-712), except that arrays and recursive data structures are not supported |
+| `V4`    | Based on [EIP 712](https://eips.ethereum.org/EIPS/eip-712), including support for arrays and recursive data types. |
 
-Signs typed data as per an extension of the published version of [EIP 712](https://github.com/MetaMask/eth-sig-util/pull/54).
+### recoverTypedSignature ({data, sig}, version)
 
-This extension adds support for arrays and recursive data types.
-
-Data should be under `data` key of `msgParams`. The method returns prefixed signature.
-
-### recoverTypedSignature ({data, sig})
-
-Return address of a signer that did `signTypedData`.
-
-Expects the same data that were used for signing. `sig` is a prefixed signature.
-
-### recoverTypedSignature_V4 ({data, sig})
-
-Return address of a signer that did `signTypedData` as per an extension of the published version of [EIP 712](https://github.com/MetaMask/eth-sig-util/pull/54).
-
-This extension adds support for arrays and recursive data types.
+Recover the address of the account used to sign the provided signature. The `version` parameter must match the version the signature was created with.
 
 Expects the same data that were used for signing. `sig` is a prefixed signature.
 
@@ -92,6 +78,44 @@ Returns a hex-encoded public key.
 
 ### Testing and Linting
 
-Run `yarn test` to run the tests.
+Run `yarn test` to run the tests once. To run tests on file changes, run `yarn test:watch`.
 
 Run `yarn lint` to run the linter, or run `yarn lint:fix` to run the linter and fix any automatically fixable issues.
+
+### Release & Publishing
+
+The project follows the same release process as the other libraries in the MetaMask organization. The GitHub Actions [`action-create-release-pr`](https://github.com/MetaMask/action-create-release-pr) and [`action-publish-release`](https://github.com/MetaMask/action-publish-release) are used to automate the release process; see those repositories for more information about how they work.
+
+1. Choose a release version.
+
+   - The release version should be chosen according to SemVer. Analyze the changes to see whether they include any breaking changes, new features, or deprecations, then choose the appropriate SemVer version. See [the SemVer specification](https://semver.org/) for more information.
+
+2. If this release is backporting changes onto a previous release, then ensure there is a major version branch for that version (e.g. `1.x` for a `v1` backport release).
+
+   - The major version branch should be set to the most recent release with that major version. For example, when backporting a `v1.0.2` release, you'd want to ensure there was a `1.x` branch that was set to the `v1.0.1` tag.
+
+3. Trigger the [`workflow_dispatch`](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) event [manually](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow) for the `Create Release Pull Request` action to create the release PR.
+
+   - For a backport release, the base branch should be the major version branch that you ensured existed in step 2. For a normal release, the base branch should be the main branch for that repository (which should be the default value).
+   - This should trigger the [`action-create-release-pr`](https://github.com/MetaMask/action-create-release-pr) workflow to create the release PR.
+
+4. Update the changelog to move each change entry into the appropriate change category ([See here](https://keepachangelog.com/en/1.0.0/#types) for the full list of change categories, and the correct ordering), and edit them to be more easily understood by users of the package.
+
+   - Generally any changes that don't affect consumers of the package (e.g. lockfile changes or development environment changes) are omitted. Exceptions may be made for changes that might be of interest despite not having an effect upon the published package (e.g. major test improvements, security improvements, improved documentation, etc.).
+   - Try to explain each change in terms that users of the package would understand (e.g. avoid referencing internal variables/concepts).
+   - Consolidate related changes into one change entry if it makes it easier to explain.
+   - Run `yarn auto-changelog validate --rc` to check that the changelog is correctly formatted.
+
+5. Review and QA the release.
+
+   - If changes are made to the base branch, the release branch will need to be updated with these changes and review/QA will need to restart again. As such, it's probably best to avoid merging other PRs into the base branch while review is underway.
+
+6. Squash & Merge the release.
+
+   - This should trigger the [`action-publish-release`](https://github.com/MetaMask/action-publish-release) workflow to tag the final release commit and publish the release on GitHub.
+
+7. Publish the release on npm.
+
+   - Be very careful to use a clean local environment to publish the release, and follow exactly the same steps used during CI.
+   - Use `npm publish --dry-run` to examine the release contents to ensure the correct files are included. Compare to previous releases if necessary (e.g. using `https://unpkg.com/browse/[package name]@[package version]/`).
+   - Once you are confident the release contents are correct, publish the release using `npm publish`.

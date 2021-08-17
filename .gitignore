@@ -8,4 +8,9 @@ package-lock.json
 dist
 test/*.js
 
+# ESLint
 /.eslintcache
+
+# Jest
+/coverage
+

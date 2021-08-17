@@ -1,0 +1,635 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TypedDataUtils.eip712Hash V3 should hash a minimal valid typed message 1`] = `"8d4a3f4082945b7879e2b55f181c31a77c8c0a464b70669458abbaaf99de4c38"`;
+
+exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with a domain separator that uses all fields 1`] = `"54ffed5209a17ac210ef3823740b3852ee9cd518b84ee39f0a3fa7f2f9b4205b"`;
+
+exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with data 1`] = `"54ffed5209a17ac210ef3823740b3852ee9cd518b84ee39f0a3fa7f2f9b4205b"`;
+
+exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with extra domain seperator fields 1`] = `"2323c742c20093ee44c2a0abef2b950062a3d70b3453ef4995a072dba9e47d7d"`;
+
+exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with only custom domain seperator fields 1`] = `"3efa3ef0305f56ba5bba62000500e29fe82c5314bca2f958c64e31b2498560f8"`;
+
+exports[`TypedDataUtils.eip712Hash V4 should hash a minimal valid typed message 1`] = `"8d4a3f4082945b7879e2b55f181c31a77c8c0a464b70669458abbaaf99de4c38"`;
+
+exports[`TypedDataUtils.eip712Hash V4 should hash a typed message with a domain separator that uses all fields. 1`] = `"54ffed5209a17ac210ef3823740b3852ee9cd518b84ee39f0a3fa7f2f9b4205b"`;
+
+exports[`TypedDataUtils.eip712Hash V4 should hash a typed message with data 1`] = `"54ffed5209a17ac210ef3823740b3852ee9cd518b84ee39f0a3fa7f2f9b4205b"`;
+
+exports[`TypedDataUtils.eip712Hash V4 should hash a typed message with extra domain seperator fields 1`] = `"2323c742c20093ee44c2a0abef2b950062a3d70b3453ef4995a072dba9e47d7d"`;
+
+exports[`TypedDataUtils.eip712Hash V4 should hash a typed message with only custom domain seperator fields 1`] = `"3efa3ef0305f56ba5bba62000500e29fe82c5314bca2f958c64e31b2498560f8"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "address" should encode "0x0" (type "string") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada2990000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "address" should encode "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada299000000000000000000000000bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "address" should encode "10" (type "number") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada299000000000000000000000000000000000000000000000000000000000000000a"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "address" should encode "9007199254740991" (type "number") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada299000000000000000000000000000000000000000000000000001fffffffffffff"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "address" should encode "bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada29900000000000000000000000000000023eafa60608dacea43aa64cbe38e38e38d"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bool" should encode "-1" (type "number") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000001"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bool" should encode "0" (type "number") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bool" should encode "1" (type "number") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000001"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bool" should encode "9007199254740991" (type "number") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000001"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bool" should encode "false" (type "boolean") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bool" should encode "false" (type "string") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000001"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bool" should encode "true" (type "boolean") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000001"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bool" should encode "true" (type "string") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000001"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes" should encode "0x10" (type "string") 1`] = `"fe4e90aeb2dead25fb44e8b67b2f9cdb3cabea1f7555b81fcc61f7103acf5d50967f2a2c7f3d22f9278175c1e6aa39cf9171db91dceacd5ee0f37c2e507b5abe"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes" should encode "10" (type "Buffer") 1`] = `"fe4e90aeb2dead25fb44e8b67b2f9cdb3cabea1f7555b81fcc61f7103acf5d501a192fabce13988b84994d4296e6cdc418d55e2f1d7f942188d4040b94fc57ac"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes" should encode "10" (type "number") 1`] = `"fe4e90aeb2dead25fb44e8b67b2f9cdb3cabea1f7555b81fcc61f7103acf5d500ef9d8f8804d174666011a394cab7901679a8944d24249fd148a6a36071151f8"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes" should encode "10" (type "string") 1`] = `"fe4e90aeb2dead25fb44e8b67b2f9cdb3cabea1f7555b81fcc61f7103acf5d501a192fabce13988b84994d4296e6cdc418d55e2f1d7f942188d4040b94fc57ac"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes1" should encode "-1" (type "number") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d40000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes1" should encode "0" (type "number") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d40000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes1" should encode "0x10" (type "string") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d41000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes1" should encode "1" (type "number") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d40100000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes1" should encode "10" (type "Buffer") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d43130000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes1" should encode "10" (type "number") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d40a00000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes1" should encode "9007199254740991" (type "number") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d41fffffffffffff00000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes32" should encode "-1" (type "number") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes32" should encode "0" (type "number") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes32" should encode "0x10" (type "string") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b1000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes32" should encode "1" (type "number") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b0100000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes32" should encode "10" (type "Buffer") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b3130000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes32" should encode "10" (type "number") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b0a00000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "bytes32" should encode "9007199254740991" (type "number") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b1fffffffffffff00000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int" should encode "-9007199254740991" (type "number") 1`] = `"eb542693947f45083bc98c9628ebab536657139910ee549407af31fe8f8fe49cffffffffffffffffffffffffffffffffffffffffffffffffffe0000000000001"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int" should encode "0" (type "number") 1`] = `"eb542693947f45083bc98c9628ebab536657139910ee549407af31fe8f8fe49c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int" should encode "0" (type "string") 1`] = `"eb542693947f45083bc98c9628ebab536657139910ee549407af31fe8f8fe49c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int" should encode "0x0" (type "string") 1`] = `"eb542693947f45083bc98c9628ebab536657139910ee549407af31fe8f8fe49c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int" should encode "9007199254740991" (type "number") 1`] = `"eb542693947f45083bc98c9628ebab536657139910ee549407af31fe8f8fe49c000000000000000000000000000000000000000000000000001fffffffffffff"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int8" should encode "-255" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fbffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int8" should encode "0" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int8" should encode "0" (type "string") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int8" should encode "0x0" (type "string") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int8" should encode "255" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb00000000000000000000000000000000000000000000000000000000000000ff"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int256" should encode "-9007199254740991" (type "number") 1`] = `"92df05a78cb59efa9932e6f413a3ac303b2277ff40968e8a21bd96c6e085f729ffffffffffffffffffffffffffffffffffffffffffffffffffe0000000000001"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int256" should encode "0" (type "number") 1`] = `"92df05a78cb59efa9932e6f413a3ac303b2277ff40968e8a21bd96c6e085f7290000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int256" should encode "0" (type "string") 1`] = `"92df05a78cb59efa9932e6f413a3ac303b2277ff40968e8a21bd96c6e085f7290000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int256" should encode "0x0" (type "string") 1`] = `"92df05a78cb59efa9932e6f413a3ac303b2277ff40968e8a21bd96c6e085f7290000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int256" should encode "9007199254740991" (type "number") 1`] = `"92df05a78cb59efa9932e6f413a3ac303b2277ff40968e8a21bd96c6e085f729000000000000000000000000000000000000000000000000001fffffffffffff"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "string" should encode "0xabcd" (type "string") 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd77b446f7f7431b79d3ee0ee3faafefd90f1f8cc91b5c88cf21bac16ac0c8590b"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "string" should encode "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd27aef794f1afdd9a6773306ef8f29c344d0552ebe46aae1268c55a683c37e68e"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "string" should encode "10" (type "number") 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd0ef9d8f8804d174666011a394cab7901679a8944d24249fd148a6a36071151f8"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "string" should encode "Hello!" (type "string") 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd6cdba77591a790691c694fa0be937f835b8a589095e427022aa1035e579ee596"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "string" should encode "😁" (type "string") 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fdefd5e893bdf9a51aa4d52297a64d0f7b1091407c347ca2eb8c02657e50717843"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "uint" should encode "0" (type "number") 1`] = `"8648acc768404f6d212f46260e326812d31b253b3963e2482f8bba6a0ca7fef10000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "uint" should encode "0" (type "string") 1`] = `"8648acc768404f6d212f46260e326812d31b253b3963e2482f8bba6a0ca7fef10000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "uint" should encode "0x0" (type "string") 1`] = `"8648acc768404f6d212f46260e326812d31b253b3963e2482f8bba6a0ca7fef10000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "uint" should encode "9007199254740991" (type "number") 1`] = `"8648acc768404f6d212f46260e326812d31b253b3963e2482f8bba6a0ca7fef1000000000000000000000000000000000000000000000000001fffffffffffff"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "uint8" should encode "0" (type "number") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "uint8" should encode "0" (type "string") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "uint8" should encode "0x0" (type "string") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "uint8" should encode "255" (type "number") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c00000000000000000000000000000000000000000000000000000000000000ff"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "uint256" should encode "0" (type "number") 1`] = `"313eafedfe20c8366f87086b9ac5b8b0ad47b49842a8eb76a8a746dfea3ff8d10000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "uint256" should encode "0" (type "string") 1`] = `"313eafedfe20c8366f87086b9ac5b8b0ad47b49842a8eb76a8a746dfea3ff8d10000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "uint256" should encode "0x0" (type "string") 1`] = `"313eafedfe20c8366f87086b9ac5b8b0ad47b49842a8eb76a8a746dfea3ff8d10000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "uint256" should encode "9007199254740991" (type "number") 1`] = `"313eafedfe20c8366f87086b9ac5b8b0ad47b49842a8eb76a8a746dfea3ff8d1000000000000000000000000000000000000000000000000001fffffffffffff"`;
+
+exports[`TypedDataUtils.encodeData V3 should encode data when given extraneous types 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd6cdba77591a790691c694fa0be937f835b8a589095e427022aa1035e579ee596"`;
+
+exports[`TypedDataUtils.encodeData V3 should encode data with a custom type property set to undefined 1`] = `"a0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8"`;
+
+exports[`TypedDataUtils.encodeData V3 should encode data with a dynamic property set to null 1`] = `"a0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"`;
+
+exports[`TypedDataUtils.encodeData V3 should encode data with a dynamic property set to undefined 1`] = `"a0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1"`;
+
+exports[`TypedDataUtils.encodeData V3 should encode data with a recursive data type 1`] = `"66658e9662034bcd21df657297dab8ba47f0ae05dd8aa253cc935d9aacfd9d10fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8585a30736f22452235ee25aabb6e4c2a6a22c8cf007855687a076a95d15f00c0"`;
+
+exports[`TypedDataUtils.encodeData V3 should encode data with an atomic property set to undefined 1`] = `"2445b23f0dc0a35bae9b7bd2bd12c89a2db0f66a4a73c8e8b95df6729c227c43fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d16cdba77591a790691c694fa0be937f835b8a589095e427022aa1035e579ee596"`;
+
+exports[`TypedDataUtils.encodeData V3 should encode data with custom type 1`] = `"a0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "address" should encode "0x0" (type "string") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada2990000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "address" should encode "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada299000000000000000000000000bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "address" should encode "10" (type "number") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada299000000000000000000000000000000000000000000000000000000000000000a"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "address" should encode "9007199254740991" (type "number") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada299000000000000000000000000000000000000000000000000001fffffffffffff"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "address" should encode "bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada29900000000000000000000000000000023eafa60608dacea43aa64cbe38e38e38d"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "address" should encode array of all address example data 1`] = `"1cf487eff7ac1d95e8069104ae1f91e4ecc076c3a5c23645a8b93a413d1bc711fa75cd6a6143b2ef96f5b20e286458c4c04dbfc80f6ea0eef003042890658d63"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bool" should encode "-1" (type "number") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000001"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bool" should encode "0" (type "number") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bool" should encode "1" (type "number") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000001"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bool" should encode "9007199254740991" (type "number") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000001"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bool" should encode "false" (type "boolean") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bool" should encode "false" (type "string") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000001"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bool" should encode "true" (type "boolean") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000001"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bool" should encode "true" (type "string") 1`] = `"83478c46da931c2f6871fdb6febd69a27b0ebc8c91f3e2cf580c3bd8777690060000000000000000000000000000000000000000000000000000000000000001"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bool" should encode array of all bool example data 1`] = `"f2b07a6e9f364e1284b89fa1c7ea1c89520fd1eb16169108f5c86e3ff94a80ab67ab9e81b4411ccf66289482fc98cdf324bcadcc0e113aa64abf6c115dda652d"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes" should encode "0x10" (type "string") 1`] = `"fe4e90aeb2dead25fb44e8b67b2f9cdb3cabea1f7555b81fcc61f7103acf5d50967f2a2c7f3d22f9278175c1e6aa39cf9171db91dceacd5ee0f37c2e507b5abe"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes" should encode "10" (type "Buffer") 1`] = `"fe4e90aeb2dead25fb44e8b67b2f9cdb3cabea1f7555b81fcc61f7103acf5d501a192fabce13988b84994d4296e6cdc418d55e2f1d7f942188d4040b94fc57ac"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes" should encode "10" (type "number") 1`] = `"fe4e90aeb2dead25fb44e8b67b2f9cdb3cabea1f7555b81fcc61f7103acf5d500ef9d8f8804d174666011a394cab7901679a8944d24249fd148a6a36071151f8"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes" should encode "10" (type "string") 1`] = `"fe4e90aeb2dead25fb44e8b67b2f9cdb3cabea1f7555b81fcc61f7103acf5d501a192fabce13988b84994d4296e6cdc418d55e2f1d7f942188d4040b94fc57ac"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes" should encode array of all bytes example data 1`] = `"93f286650d21b73fafa0cf1f6da3997b287c960d06b6f072958b05a5502e54fec964742242e21f8943cc82ff74617f3ed0cf245665fe94771f7370376eefb3e4"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes1" should encode "-1" (type "number") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d40000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes1" should encode "0" (type "number") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d40000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes1" should encode "0x10" (type "string") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d41000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes1" should encode "1" (type "number") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d40100000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes1" should encode "10" (type "Buffer") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d43130000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes1" should encode "10" (type "number") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d40a00000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes1" should encode "9007199254740991" (type "number") 1`] = `"d8a209ce0fa251cc20dc51c9e2a6f02972a597da1b7ad07b3f2d6c1072f947d41fffffffffffff00000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes1" should encode array of all bytes1 example data 1`] = `"1e57d55fc891c8f082cff324b667e4ed7e807773f2dcbe0d0c7a74e4556bf8e5db853c63de26376b9da8f3d0b6d6a2baea1220764ac348253dd51d741deb5664"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes32" should encode "-1" (type "number") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes32" should encode "0" (type "number") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes32" should encode "0x10" (type "string") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b1000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes32" should encode "1" (type "number") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b0100000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes32" should encode "10" (type "Buffer") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b3130000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes32" should encode "10" (type "number") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b0a00000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes32" should encode "9007199254740991" (type "number") 1`] = `"52655953990606cd6b4a6e2c47eaca3268e30dcbd0cd930457e9877b65b4457b1fffffffffffff00000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "bytes32" should encode array of all bytes32 example data 1`] = `"75cc52002948d7a0f70c257e540f4687c12b56e30b3a0ee3e5e6f71e1f76ec13db853c63de26376b9da8f3d0b6d6a2baea1220764ac348253dd51d741deb5664"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int" should encode "-9007199254740991" (type "number") 1`] = `"eb542693947f45083bc98c9628ebab536657139910ee549407af31fe8f8fe49cffffffffffffffffffffffffffffffffffffffffffffffffffe0000000000001"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int" should encode "0" (type "number") 1`] = `"eb542693947f45083bc98c9628ebab536657139910ee549407af31fe8f8fe49c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int" should encode "0" (type "string") 1`] = `"eb542693947f45083bc98c9628ebab536657139910ee549407af31fe8f8fe49c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int" should encode "0x0" (type "string") 1`] = `"eb542693947f45083bc98c9628ebab536657139910ee549407af31fe8f8fe49c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int" should encode "9007199254740991" (type "number") 1`] = `"eb542693947f45083bc98c9628ebab536657139910ee549407af31fe8f8fe49c000000000000000000000000000000000000000000000000001fffffffffffff"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int" should encode array of all int example data 1`] = `"f1e952da5f44a2503d1cc29bec179593cf7f5b7e05b1aedfa8fbb97ec1cf944ddb561d5e1d1b52adaa4c13e82c4cf8eb7b434f9cdf00afca99876cdb9a41fd8b"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode "-255" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fbffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode "0" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode "0" (type "string") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode "0x0" (type "string") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode "255" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb00000000000000000000000000000000000000000000000000000000000000ff"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode array of all int8 example data 1`] = `"91759f19c54cc4a4d7476b7d4cd66f7b7d5d3fa0a4d6c16a2b0d700eae493a76bd5c1899378bae107a8d8dbdf757cce31cd3bac12b7b30ef2b1f4d623f92e4c3"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int256" should encode "-9007199254740991" (type "number") 1`] = `"92df05a78cb59efa9932e6f413a3ac303b2277ff40968e8a21bd96c6e085f729ffffffffffffffffffffffffffffffffffffffffffffffffffe0000000000001"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int256" should encode "0" (type "number") 1`] = `"92df05a78cb59efa9932e6f413a3ac303b2277ff40968e8a21bd96c6e085f7290000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int256" should encode "0" (type "string") 1`] = `"92df05a78cb59efa9932e6f413a3ac303b2277ff40968e8a21bd96c6e085f7290000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int256" should encode "0x0" (type "string") 1`] = `"92df05a78cb59efa9932e6f413a3ac303b2277ff40968e8a21bd96c6e085f7290000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int256" should encode "9007199254740991" (type "number") 1`] = `"92df05a78cb59efa9932e6f413a3ac303b2277ff40968e8a21bd96c6e085f729000000000000000000000000000000000000000000000000001fffffffffffff"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int256" should encode array of all int256 example data 1`] = `"49bbb3a2417df7595b381726082b4d105bdacd79d8e3d4936b8f2aae95d9e26edb561d5e1d1b52adaa4c13e82c4cf8eb7b434f9cdf00afca99876cdb9a41fd8b"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "string" should encode "0xabcd" (type "string") 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd77b446f7f7431b79d3ee0ee3faafefd90f1f8cc91b5c88cf21bac16ac0c8590b"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "string" should encode "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd27aef794f1afdd9a6773306ef8f29c344d0552ebe46aae1268c55a683c37e68e"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "string" should encode "10" (type "number") 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd0ef9d8f8804d174666011a394cab7901679a8944d24249fd148a6a36071151f8"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "string" should encode "Hello!" (type "string") 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd6cdba77591a790691c694fa0be937f835b8a589095e427022aa1035e579ee596"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "string" should encode "😁" (type "string") 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fdefd5e893bdf9a51aa4d52297a64d0f7b1091407c347ca2eb8c02657e50717843"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "string" should encode array of all string example data 1`] = `"164981f89fce9e79b32d9ba340130ac688927a8f06271379c98ec1dc07f640c0446c3d672744ab2d474513bfe40dafcd40e9026a1a2c9d65fdd268aa5c80dc21"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint" should encode "0" (type "number") 1`] = `"8648acc768404f6d212f46260e326812d31b253b3963e2482f8bba6a0ca7fef10000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint" should encode "0" (type "string") 1`] = `"8648acc768404f6d212f46260e326812d31b253b3963e2482f8bba6a0ca7fef10000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint" should encode "0x0" (type "string") 1`] = `"8648acc768404f6d212f46260e326812d31b253b3963e2482f8bba6a0ca7fef10000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint" should encode "9007199254740991" (type "number") 1`] = `"8648acc768404f6d212f46260e326812d31b253b3963e2482f8bba6a0ca7fef1000000000000000000000000000000000000000000000000001fffffffffffff"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint" should encode array of all uint example data 1`] = `"f0165070b5df224705b23b1e1c0f90a919132c2ba1a147a7bc5ae3f10b07b17e466f8762ff33f5d78b80f620538cd343b1823cc87cd806412f5d280cfad3b799"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint8" should encode "0" (type "number") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint8" should encode "0" (type "string") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint8" should encode "0x0" (type "string") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint8" should encode "255" (type "number") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c00000000000000000000000000000000000000000000000000000000000000ff"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint8" should encode array of all uint8 example data 1`] = `"f515e568fc9efe827acaa374898c1ce18080cbf5246ed3c0498992505cf0b60b88bd1b5590273cfe86bc0567a197ff76a62140538fb65b94d501f4e8bdb93cbd"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint256" should encode "0" (type "number") 1`] = `"313eafedfe20c8366f87086b9ac5b8b0ad47b49842a8eb76a8a746dfea3ff8d10000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint256" should encode "0" (type "string") 1`] = `"313eafedfe20c8366f87086b9ac5b8b0ad47b49842a8eb76a8a746dfea3ff8d10000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint256" should encode "0x0" (type "string") 1`] = `"313eafedfe20c8366f87086b9ac5b8b0ad47b49842a8eb76a8a746dfea3ff8d10000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint256" should encode "9007199254740991" (type "number") 1`] = `"313eafedfe20c8366f87086b9ac5b8b0ad47b49842a8eb76a8a746dfea3ff8d1000000000000000000000000000000000000000000000000001fffffffffffff"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint256" should encode array of all uint256 example data 1`] = `"cdf19ca88de01fa689a36bc72e26bca5dcb8b87b50500b28ff442503c5dff8eb466f8762ff33f5d78b80f620538cd343b1823cc87cd806412f5d280cfad3b799"`;
+
+exports[`TypedDataUtils.encodeData V4 should encode data when given extraneous types 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd6cdba77591a790691c694fa0be937f835b8a589095e427022aa1035e579ee596"`;
+
+exports[`TypedDataUtils.encodeData V4 should encode data with a custom data type array 1`] = `"077b2e5169bfc57ed1b6acf858d27ae9b8311db1ccf71df99dfcf9efe8eec43856cacfdc07c6f697bc1bc978cf38559d5c729ed1cd1177e047df929e19dc2a2e8548546251a0cc6d0005e1a792e00f85feed5056e580102ed1afa615f87bb130b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8"`;
+
+exports[`TypedDataUtils.encodeData V4 should encode data with a custom type property set to null 1`] = `"a0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c80000000000000000000000000000000000000000000000000000000000000000b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8"`;
+
+exports[`TypedDataUtils.encodeData V4 should encode data with a custom type property set to undefined 1`] = `"a0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c80000000000000000000000000000000000000000000000000000000000000000b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8"`;
+
+exports[`TypedDataUtils.encodeData V4 should encode data with a dynamic property set to null 1`] = `"a0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"`;
+
+exports[`TypedDataUtils.encodeData V4 should encode data with a recursive data type 1`] = `"66658e9662034bcd21df657297dab8ba47f0ae05dd8aa253cc935d9aacfd9d10fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8161abe35f76debc1e0496baa54308eb1f1331218276bf01c4af34ee637780b25"`;
+
+exports[`TypedDataUtils.encodeData V4 should encode data with custom type 1`] = `"a0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c8cd54f074a4af31b4411ff6a60c9719dbd559c221c8ac3492d9d872b041d703d1b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "address" should hash "0x0" (type "string") 1`] = `"c93aa5d5f1b1efece209c34fceee0aeb33da38ea34dbdd4df854e9708a636fea"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "address" should hash "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"ab14541443c6f456616e472ecca6d4fc887f862760d3a056b348441a9e0fd1c6"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "address" should hash "10" (type "number") 1`] = `"ce14e365ba45aa306d169b4cd22bd4a4dd45b07f68948757788cd974302272b9"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "address" should hash "9007199254740991" (type "number") 1`] = `"edb736a49622b7860bcec9c56c2b0346870f5bf02b7e516722c51be85c740bd3"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "address" should hash "bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"4d9b02d96f7647b8d3acfafc97b2faa65ef7b442ea647f8c8f6f606d4d794d34"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bool" should hash "-1" (type "number") 1`] = `"df410941012cfe7070ec9abfdb367531856dda97faaa5134e46c313058e8415e"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bool" should hash "0" (type "number") 1`] = `"8015e06ae558f4ef85aa3a10a88e0530c81d4c6437ea005773d0ae01fa87e98f"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bool" should hash "1" (type "number") 1`] = `"df410941012cfe7070ec9abfdb367531856dda97faaa5134e46c313058e8415e"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bool" should hash "9007199254740991" (type "number") 1`] = `"df410941012cfe7070ec9abfdb367531856dda97faaa5134e46c313058e8415e"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bool" should hash "false" (type "boolean") 1`] = `"8015e06ae558f4ef85aa3a10a88e0530c81d4c6437ea005773d0ae01fa87e98f"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bool" should hash "false" (type "string") 1`] = `"df410941012cfe7070ec9abfdb367531856dda97faaa5134e46c313058e8415e"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bool" should hash "true" (type "boolean") 1`] = `"df410941012cfe7070ec9abfdb367531856dda97faaa5134e46c313058e8415e"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bool" should hash "true" (type "string") 1`] = `"df410941012cfe7070ec9abfdb367531856dda97faaa5134e46c313058e8415e"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes" should hash "0x10" (type "string") 1`] = `"724dca4470f2d466424cc9f6ee09f55034659518ef5426fde3af846aa6fefcd6"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes" should hash "10" (type "Buffer") 1`] = `"7223320363eca5bb181c12017960acf7bdbb70a05b684bf42bb31f422a19ed0c"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes" should hash "10" (type "number") 1`] = `"b6976a8d3ca85d894db066bed9dd1eac9a3ac6b0e87155e28e958215cd078f1b"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes" should hash "10" (type "string") 1`] = `"7223320363eca5bb181c12017960acf7bdbb70a05b684bf42bb31f422a19ed0c"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes1" should hash "-1" (type "number") 1`] = `"7ac24420f34ed860bcaeeeaa671447f3d4830177fa06022e6f7424ca2a482041"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes1" should hash "0" (type "number") 1`] = `"7ac24420f34ed860bcaeeeaa671447f3d4830177fa06022e6f7424ca2a482041"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes1" should hash "0x10" (type "string") 1`] = `"e900d48fde06ac14ab54c8c9246180736dffaafbd702b4448d95266e515c698f"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes1" should hash "1" (type "number") 1`] = `"c84c962fe80560aae67c8b46cc1d901abf65728d1fccce809a93435e1ff053dc"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes1" should hash "10" (type "Buffer") 1`] = `"7a9f9769fc28b3d34a1acabdbac6aad4c227c30d7ec06da6ea98986a2402d61e"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes1" should hash "10" (type "number") 1`] = `"042571d85305b5304f1ec048ee522d52f7750cd802c2a56783abdb1d4dbfa207"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes1" should hash "9007199254740991" (type "number") 1`] = `"224aa7830e89b97cde54f24a6e6f189ae53303bc371a9937e78437b172ca1b45"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes32" should hash "-1" (type "number") 1`] = `"724c93ad5b90d8174128477a263c7409b5e04b404e41f29f2ab4ec85706a8adf"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes32" should hash "0" (type "number") 1`] = `"724c93ad5b90d8174128477a263c7409b5e04b404e41f29f2ab4ec85706a8adf"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes32" should hash "0x10" (type "string") 1`] = `"e12c668b2a048da24f2cbefcaebf992a22406fc4fb16e93881c41ec30760077a"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes32" should hash "1" (type "number") 1`] = `"c1e60a5b178f07e19a88d6ba804fd66454da16b0ef30544efaf05e9166a5ce77"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes32" should hash "10" (type "Buffer") 1`] = `"f0954c59ac57c9bc45fb997ef895fce917cfcaca6c452b0678bc3a89a4ca0e32"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes32" should hash "10" (type "number") 1`] = `"88f9527b959d7651b65276b40513cd46e3f41d791b727a44278721a2a36809b4"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes32" should hash "9007199254740991" (type "number") 1`] = `"df80d4e7982c6aae5b1f697b9da4811ae768d198aba8aea8470d4658d0dc5625"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int" should hash "-9007199254740991" (type "number") 1`] = `"828639b34ed68e48e9c6938edb70f9bbe9aaf716df431a47cfef19e66959c6b0"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int" should hash "0" (type "number") 1`] = `"7152867e6c08ec6c73e80791694b4c9c29630ce5203d52d4a2a00e551f8fd673"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int" should hash "0" (type "string") 1`] = `"7152867e6c08ec6c73e80791694b4c9c29630ce5203d52d4a2a00e551f8fd673"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int" should hash "0x0" (type "string") 1`] = `"7152867e6c08ec6c73e80791694b4c9c29630ce5203d52d4a2a00e551f8fd673"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int" should hash "9007199254740991" (type "number") 1`] = `"58688562012b128b5b702e46276e9ee8815955345556708ae7d25e49a9717eb5"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int8" should hash "-255" (type "number") 1`] = `"5176307b3ebcc216e0c74964fab1ffc6aea9af022f5e1ff5218e8c8f271308a5"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int8" should hash "0" (type "number") 1`] = `"7e41c54c3c21ff362622f9159b9b1566b4d9d883fe397da923f8415f1f2d1b89"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int8" should hash "0" (type "string") 1`] = `"7e41c54c3c21ff362622f9159b9b1566b4d9d883fe397da923f8415f1f2d1b89"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int8" should hash "0x0" (type "string") 1`] = `"7e41c54c3c21ff362622f9159b9b1566b4d9d883fe397da923f8415f1f2d1b89"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int8" should hash "255" (type "number") 1`] = `"6af1c0206f5eca44c09a657cc0e5b0492c3c50fdac13b4d0f9230629cb4a5524"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int256" should hash "-9007199254740991" (type "number") 1`] = `"ca8549280a9bd8667b6bdbf0d0eba01c9088d221db3836601e47d90351cba5ec"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int256" should hash "0" (type "number") 1`] = `"ccf20a1de5e96bc817d94d9d27528918348beb21127fd4b077789d4ba83aaf18"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int256" should hash "0" (type "string") 1`] = `"ccf20a1de5e96bc817d94d9d27528918348beb21127fd4b077789d4ba83aaf18"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int256" should hash "0x0" (type "string") 1`] = `"ccf20a1de5e96bc817d94d9d27528918348beb21127fd4b077789d4ba83aaf18"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int256" should hash "9007199254740991" (type "number") 1`] = `"bab9169a0079a42c1cd2d180095cf08a1dd0429496b1aeb69fced72472812876"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "string" should hash "0xabcd" (type "string") 1`] = `"4560af2575aabbf895509b931fce6f2d9699df2aff56c44f768cd887c755a826"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "string" should hash "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"214632528de591d75e17abdeb0ccae3dab34a3be73b696af781a227af8070309"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "string" should hash "10" (type "number") 1`] = `"df09ff353f47aae6eb9a7c188daaa88a55d3469a603a1c35e86793f248b59958"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "string" should hash "Hello!" (type "string") 1`] = `"15d2c54cdaa22a6a3a8dbd89086b2ffcf0853857db9bcf1541765a8f769a63ba"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "string" should hash "😁" (type "string") 1`] = `"ca0bd988509ebbefdabd88aba786ff9825dbdaf2532339957ca3ea4e44fc183a"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "uint" should hash "0" (type "number") 1`] = `"865464863c9a46afbad30a6c25cabcba74a7f1b80b7e48ab1b00206d2c074caf"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "uint" should hash "0" (type "string") 1`] = `"865464863c9a46afbad30a6c25cabcba74a7f1b80b7e48ab1b00206d2c074caf"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "uint" should hash "0x0" (type "string") 1`] = `"865464863c9a46afbad30a6c25cabcba74a7f1b80b7e48ab1b00206d2c074caf"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "uint" should hash "9007199254740991" (type "number") 1`] = `"a9213a44af227656d5a7d16228d7082862c94eb0ae84491f42e74cee35a5e202"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "uint8" should hash "0" (type "number") 1`] = `"73ee3fc1fa9dc8c99c59fcb1d9d8c9fe181510086128e4763618d7c6b2208361"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "uint8" should hash "0" (type "string") 1`] = `"73ee3fc1fa9dc8c99c59fcb1d9d8c9fe181510086128e4763618d7c6b2208361"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "uint8" should hash "0x0" (type "string") 1`] = `"73ee3fc1fa9dc8c99c59fcb1d9d8c9fe181510086128e4763618d7c6b2208361"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "uint8" should hash "255" (type "number") 1`] = `"30b2c001d2daa96e91576d1019a1842f75d983de5f89934671dc02074971b850"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "uint256" should hash "0" (type "number") 1`] = `"c4adc42f66c4586eb979042b897a75bc2bd4c8fb866531c44100a22168cdcdbc"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "uint256" should hash "0" (type "string") 1`] = `"c4adc42f66c4586eb979042b897a75bc2bd4c8fb866531c44100a22168cdcdbc"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "uint256" should hash "0x0" (type "string") 1`] = `"c4adc42f66c4586eb979042b897a75bc2bd4c8fb866531c44100a22168cdcdbc"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "uint256" should hash "9007199254740991" (type "number") 1`] = `"3cfc99947ae18942816da1e3a94b479043b95f4de5851660ce9d53fe5f29b686"`;
+
+exports[`TypedDataUtils.hashStruct V3 should hash data when given extraneous types 1`] = `"15d2c54cdaa22a6a3a8dbd89086b2ffcf0853857db9bcf1541765a8f769a63ba"`;
+
+exports[`TypedDataUtils.hashStruct V3 should hash data with a custom type property set to undefined 1`] = `"adb6678488e67a64751a5e102fb22d40eae1eaa02809c52458562c9158bcf2c9"`;
+
+exports[`TypedDataUtils.hashStruct V3 should hash data with a dynamic property set to null 1`] = `"d2a1810699ec28c0c42814956e9f333a82abe619c42a5610e568c2c4c21af66e"`;
+
+exports[`TypedDataUtils.hashStruct V3 should hash data with a dynamic property set to undefined 1`] = `"8c6273864d5942235f90965f11c0a66344a02be03ae4961c4bdc9b9db849463e"`;
+
+exports[`TypedDataUtils.hashStruct V3 should hash data with a recursive data type 1`] = `"08fafba26ad35ef7eb49050d251805e1e6b873bd4a096bfd11ad0d3a276161c0"`;
+
+exports[`TypedDataUtils.hashStruct V3 should hash data with an atomic property set to undefined 1`] = `"b95cd7bb59592ce59cdba3b1c9c42c8dcd68fc8a59bd26f12f9a13805e34af16"`;
+
+exports[`TypedDataUtils.hashStruct V3 should hash data with custom type 1`] = `"c52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "address" should hash "0x0" (type "string") 1`] = `"c93aa5d5f1b1efece209c34fceee0aeb33da38ea34dbdd4df854e9708a636fea"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "address" should hash "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"ab14541443c6f456616e472ecca6d4fc887f862760d3a056b348441a9e0fd1c6"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "address" should hash "10" (type "number") 1`] = `"ce14e365ba45aa306d169b4cd22bd4a4dd45b07f68948757788cd974302272b9"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "address" should hash "9007199254740991" (type "number") 1`] = `"edb736a49622b7860bcec9c56c2b0346870f5bf02b7e516722c51be85c740bd3"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "address" should hash "bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"4d9b02d96f7647b8d3acfafc97b2faa65ef7b442ea647f8c8f6f606d4d794d34"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "address" should hash array of all address example data 1`] = `"fee33414e29960601d222dc4ac9695a24e631218ff4bab72376686b7a867d644"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bool" should hash "-1" (type "number") 1`] = `"df410941012cfe7070ec9abfdb367531856dda97faaa5134e46c313058e8415e"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bool" should hash "0" (type "number") 1`] = `"8015e06ae558f4ef85aa3a10a88e0530c81d4c6437ea005773d0ae01fa87e98f"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bool" should hash "1" (type "number") 1`] = `"df410941012cfe7070ec9abfdb367531856dda97faaa5134e46c313058e8415e"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bool" should hash "9007199254740991" (type "number") 1`] = `"df410941012cfe7070ec9abfdb367531856dda97faaa5134e46c313058e8415e"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bool" should hash "false" (type "boolean") 1`] = `"8015e06ae558f4ef85aa3a10a88e0530c81d4c6437ea005773d0ae01fa87e98f"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bool" should hash "false" (type "string") 1`] = `"df410941012cfe7070ec9abfdb367531856dda97faaa5134e46c313058e8415e"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bool" should hash "true" (type "boolean") 1`] = `"df410941012cfe7070ec9abfdb367531856dda97faaa5134e46c313058e8415e"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bool" should hash "true" (type "string") 1`] = `"df410941012cfe7070ec9abfdb367531856dda97faaa5134e46c313058e8415e"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bool" should hash array of all bool example data 1`] = `"6f00436587cd0a7f731ee48fd94e198edb2139db837718bb8fc49016083f3e57"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes" should hash "0x10" (type "string") 1`] = `"724dca4470f2d466424cc9f6ee09f55034659518ef5426fde3af846aa6fefcd6"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes" should hash "10" (type "Buffer") 1`] = `"7223320363eca5bb181c12017960acf7bdbb70a05b684bf42bb31f422a19ed0c"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes" should hash "10" (type "number") 1`] = `"b6976a8d3ca85d894db066bed9dd1eac9a3ac6b0e87155e28e958215cd078f1b"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes" should hash "10" (type "string") 1`] = `"7223320363eca5bb181c12017960acf7bdbb70a05b684bf42bb31f422a19ed0c"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes" should hash array of all bytes example data 1`] = `"229b923e2aca4d65c347bec3235d7514bd107762bff4b891cfd1bc02e8636aeb"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes1" should hash "-1" (type "number") 1`] = `"7ac24420f34ed860bcaeeeaa671447f3d4830177fa06022e6f7424ca2a482041"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes1" should hash "0" (type "number") 1`] = `"7ac24420f34ed860bcaeeeaa671447f3d4830177fa06022e6f7424ca2a482041"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes1" should hash "0x10" (type "string") 1`] = `"e900d48fde06ac14ab54c8c9246180736dffaafbd702b4448d95266e515c698f"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes1" should hash "1" (type "number") 1`] = `"c84c962fe80560aae67c8b46cc1d901abf65728d1fccce809a93435e1ff053dc"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes1" should hash "10" (type "Buffer") 1`] = `"7a9f9769fc28b3d34a1acabdbac6aad4c227c30d7ec06da6ea98986a2402d61e"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes1" should hash "10" (type "number") 1`] = `"042571d85305b5304f1ec048ee522d52f7750cd802c2a56783abdb1d4dbfa207"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes1" should hash "9007199254740991" (type "number") 1`] = `"224aa7830e89b97cde54f24a6e6f189ae53303bc371a9937e78437b172ca1b45"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes1" should hash array of all bytes1 example data 1`] = `"921fdc86bdfa6ebce66ad328c5fc7083d0d5e55aa485fe852951d64dfcb35a97"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes32" should hash "-1" (type "number") 1`] = `"724c93ad5b90d8174128477a263c7409b5e04b404e41f29f2ab4ec85706a8adf"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes32" should hash "0" (type "number") 1`] = `"724c93ad5b90d8174128477a263c7409b5e04b404e41f29f2ab4ec85706a8adf"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes32" should hash "0x10" (type "string") 1`] = `"e12c668b2a048da24f2cbefcaebf992a22406fc4fb16e93881c41ec30760077a"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes32" should hash "1" (type "number") 1`] = `"c1e60a5b178f07e19a88d6ba804fd66454da16b0ef30544efaf05e9166a5ce77"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes32" should hash "10" (type "Buffer") 1`] = `"f0954c59ac57c9bc45fb997ef895fce917cfcaca6c452b0678bc3a89a4ca0e32"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes32" should hash "10" (type "number") 1`] = `"88f9527b959d7651b65276b40513cd46e3f41d791b727a44278721a2a36809b4"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes32" should hash "9007199254740991" (type "number") 1`] = `"df80d4e7982c6aae5b1f697b9da4811ae768d198aba8aea8470d4658d0dc5625"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "bytes32" should hash array of all bytes32 example data 1`] = `"18c1d960af1aa842eaf29de0f1516b42b88b1ce877e1eafc960bab55bbe5e304"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int" should hash "-9007199254740991" (type "number") 1`] = `"828639b34ed68e48e9c6938edb70f9bbe9aaf716df431a47cfef19e66959c6b0"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int" should hash "0" (type "number") 1`] = `"7152867e6c08ec6c73e80791694b4c9c29630ce5203d52d4a2a00e551f8fd673"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int" should hash "0" (type "string") 1`] = `"7152867e6c08ec6c73e80791694b4c9c29630ce5203d52d4a2a00e551f8fd673"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int" should hash "0x0" (type "string") 1`] = `"7152867e6c08ec6c73e80791694b4c9c29630ce5203d52d4a2a00e551f8fd673"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int" should hash "9007199254740991" (type "number") 1`] = `"58688562012b128b5b702e46276e9ee8815955345556708ae7d25e49a9717eb5"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int" should hash array of all int example data 1`] = `"d16177fae6110a0f8b8f527d47c595bbb7174f8b7eaef8f1867bb87827834f5c"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash "-255" (type "number") 1`] = `"5176307b3ebcc216e0c74964fab1ffc6aea9af022f5e1ff5218e8c8f271308a5"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash "0" (type "number") 1`] = `"7e41c54c3c21ff362622f9159b9b1566b4d9d883fe397da923f8415f1f2d1b89"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash "0" (type "string") 1`] = `"7e41c54c3c21ff362622f9159b9b1566b4d9d883fe397da923f8415f1f2d1b89"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash "0x0" (type "string") 1`] = `"7e41c54c3c21ff362622f9159b9b1566b4d9d883fe397da923f8415f1f2d1b89"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash "255" (type "number") 1`] = `"6af1c0206f5eca44c09a657cc0e5b0492c3c50fdac13b4d0f9230629cb4a5524"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash array of all int8 example data 1`] = `"526b53feebd1ecdce33c443de5f84c56fa0a1b9c449906c922375307fc038014"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int256" should hash "-9007199254740991" (type "number") 1`] = `"ca8549280a9bd8667b6bdbf0d0eba01c9088d221db3836601e47d90351cba5ec"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int256" should hash "0" (type "number") 1`] = `"ccf20a1de5e96bc817d94d9d27528918348beb21127fd4b077789d4ba83aaf18"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int256" should hash "0" (type "string") 1`] = `"ccf20a1de5e96bc817d94d9d27528918348beb21127fd4b077789d4ba83aaf18"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int256" should hash "0x0" (type "string") 1`] = `"ccf20a1de5e96bc817d94d9d27528918348beb21127fd4b077789d4ba83aaf18"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int256" should hash "9007199254740991" (type "number") 1`] = `"bab9169a0079a42c1cd2d180095cf08a1dd0429496b1aeb69fced72472812876"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int256" should hash array of all int256 example data 1`] = `"85f9609b0fa0359c908f0d1effd2ca69a1bd1a983f473c142e26acdef6eb7ff1"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "string" should hash "0xabcd" (type "string") 1`] = `"4560af2575aabbf895509b931fce6f2d9699df2aff56c44f768cd887c755a826"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "string" should hash "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"214632528de591d75e17abdeb0ccae3dab34a3be73b696af781a227af8070309"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "string" should hash "10" (type "number") 1`] = `"df09ff353f47aae6eb9a7c188daaa88a55d3469a603a1c35e86793f248b59958"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "string" should hash "Hello!" (type "string") 1`] = `"15d2c54cdaa22a6a3a8dbd89086b2ffcf0853857db9bcf1541765a8f769a63ba"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "string" should hash "😁" (type "string") 1`] = `"ca0bd988509ebbefdabd88aba786ff9825dbdaf2532339957ca3ea4e44fc183a"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "string" should hash array of all string example data 1`] = `"8a06ba7853752159aad26061592e1cabd0d2bff33391fe48a20aceeb686d1edc"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint" should hash "0" (type "number") 1`] = `"865464863c9a46afbad30a6c25cabcba74a7f1b80b7e48ab1b00206d2c074caf"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint" should hash "0" (type "string") 1`] = `"865464863c9a46afbad30a6c25cabcba74a7f1b80b7e48ab1b00206d2c074caf"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint" should hash "0x0" (type "string") 1`] = `"865464863c9a46afbad30a6c25cabcba74a7f1b80b7e48ab1b00206d2c074caf"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint" should hash "9007199254740991" (type "number") 1`] = `"a9213a44af227656d5a7d16228d7082862c94eb0ae84491f42e74cee35a5e202"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint" should hash array of all uint example data 1`] = `"420e09236f286bb5a68736a7848e26108542d57c2b0030693eea99f41ef92125"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint8" should hash "0" (type "number") 1`] = `"73ee3fc1fa9dc8c99c59fcb1d9d8c9fe181510086128e4763618d7c6b2208361"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint8" should hash "0" (type "string") 1`] = `"73ee3fc1fa9dc8c99c59fcb1d9d8c9fe181510086128e4763618d7c6b2208361"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint8" should hash "0x0" (type "string") 1`] = `"73ee3fc1fa9dc8c99c59fcb1d9d8c9fe181510086128e4763618d7c6b2208361"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint8" should hash "255" (type "number") 1`] = `"30b2c001d2daa96e91576d1019a1842f75d983de5f89934671dc02074971b850"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint8" should hash array of all uint8 example data 1`] = `"66db87ae5c12bcea050f54891a0ceb924753764a4b1ead83ae8692d752a2a26a"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint256" should hash "0" (type "number") 1`] = `"c4adc42f66c4586eb979042b897a75bc2bd4c8fb866531c44100a22168cdcdbc"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint256" should hash "0" (type "string") 1`] = `"c4adc42f66c4586eb979042b897a75bc2bd4c8fb866531c44100a22168cdcdbc"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint256" should hash "0x0" (type "string") 1`] = `"c4adc42f66c4586eb979042b897a75bc2bd4c8fb866531c44100a22168cdcdbc"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint256" should hash "9007199254740991" (type "number") 1`] = `"3cfc99947ae18942816da1e3a94b479043b95f4de5851660ce9d53fe5f29b686"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint256" should hash array of all uint256 example data 1`] = `"f44a78e7f58e62916b00244626970fb046c4e6495bd453c83298686c00d8e9f0"`;
+
+exports[`TypedDataUtils.hashStruct V4 should hash data when given extraneous types 1`] = `"15d2c54cdaa22a6a3a8dbd89086b2ffcf0853857db9bcf1541765a8f769a63ba"`;
+
+exports[`TypedDataUtils.hashStruct V4 should hash data with a custom data type array 1`] = `"ac26cc7aa2cb9a8a445fae4e48b33f978b558da9b16e26381c53814d3317f541"`;
+
+exports[`TypedDataUtils.hashStruct V4 should hash data with a custom type property set to null 1`] = `"fdecfae63c304f6fc7795188607e3838f5bf6798e47f147efdb2c71fcec1335e"`;
+
+exports[`TypedDataUtils.hashStruct V4 should hash data with a custom type property set to undefined 1`] = `"fdecfae63c304f6fc7795188607e3838f5bf6798e47f147efdb2c71fcec1335e"`;
+
+exports[`TypedDataUtils.hashStruct V4 should hash data with a dynamic property set to null 1`] = `"d2a1810699ec28c0c42814956e9f333a82abe619c42a5610e568c2c4c21af66e"`;
+
+exports[`TypedDataUtils.hashStruct V4 should hash data with a recursive data type 1`] = `"098a3fdba6dae9a89a220b7adbe1f38cf5d2aeabd94657aea65bb8aeef44f02e"`;
+
+exports[`TypedDataUtils.hashStruct V4 should hash data with custom type 1`] = `"c52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e"`;
+
+exports[`concatSig should concatenate an all-zero extended ECDSA signature 1`] = `"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`concatSig should concatenate an extended ECDSA signature 1`] = `"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`concatSig should encode an impossibly large extended ECDSA signature 1`] = `"0x000000000000000000000000000000000000000000000000001fffffffffffff000000000000000000000000000000000000000000000000001fffffffffffff1fffffffffffff"`;

@@ -3,6 +3,8 @@ import * as ethAbi from 'ethereumjs-abi';
 import * as nacl from 'tweetnacl';
 import * as naclUtil from 'tweetnacl-util';
 
+import { padWithZeroes } from './utils';
+
 export type TypedData = string | EIP712TypedData | EIP712TypedData[];
 
 interface EIP712TypedData {
@@ -45,11 +47,12 @@ export interface TypedMessage<T extends MessageTypes> {
     version?: string;
     chainId?: number;
     verifyingContract?: string;
+    salt?: ArrayBuffer;
   };
   message: Record<string, unknown>;
 }
 
-const TYPED_MESSAGE_SCHEMA = {
+export const TYPED_MESSAGE_SCHEMA = {
   type: 'object',
   properties: {
     types: {
@@ -89,256 +92,291 @@ function getSolidityTypes() {
 }
 
 /**
- * A collection of utility functions used for signing typed data
+ * Encodes an object by encoding and concatenating each of its members
+ *
+ * @param {string} primaryType - Root type
+ * @param {Object} data - Object to encode
+ * @param {Object} types - Type definitions
+ * @param {Version} version - The EIP-712 version the encoding should comply with
+ * @returns {Buffer} - Encoded representation of an object
  */
-const TypedDataUtils = {
-  /**
-   * Encodes an object by encoding and concatenating each of its members
-   *
-   * @param {string} primaryType - Root type
-   * @param {Object} data - Object to encode
-   * @param {Object} types - Type definitions
-   * @returns {Buffer} - Encoded representation of an object
-   */
-  encodeData(
-    primaryType: string,
-    data: Record<string, unknown>,
-    types: Record<string, MessageTypeProperty[]>,
-    useV4 = true,
-  ): Buffer {
-    const encodedTypes = ['bytes32'];
-    const encodedValues = [this.hashType(primaryType, types)];
+function encodeData(
+  primaryType: string,
+  data: Record<string, unknown>,
+  types: Record<string, MessageTypeProperty[]>,
+  version: Version,
+): Buffer {
+  const encodedTypes = ['bytes32'];
+  const encodedValues: unknown[] = [hashType(primaryType, types)];
 
-    if (useV4) {
-      const encodeField = (name, type, value) => {
-        if (types[type] !== undefined) {
-          return [
-            'bytes32',
-            value == null // eslint-disable-line no-eq-null
-              ? '0x0000000000000000000000000000000000000000000000000000000000000000'
-              : ethUtil.keccak(this.encodeData(type, value, types, useV4)),
-          ];
+  if (version === 'V4') {
+    const encodeField = (name, type, value) => {
+      if (types[type] !== undefined) {
+        return [
+          'bytes32',
+          value == null // eslint-disable-line no-eq-null
+            ? '0x0000000000000000000000000000000000000000000000000000000000000000'
+            : ethUtil.keccak(encodeData(type, value, types, version)),
+        ];
+      }
+
+      if (value === undefined) {
+        throw new Error(`missing value for field ${name} of type ${type}`);
+      }
+
+      if (type === 'bytes') {
+        return ['bytes32', ethUtil.keccak(value)];
+      }
+
+      if (type === 'string') {
+        // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
+        if (typeof value === 'string') {
+          value = Buffer.from(value, 'utf8');
         }
+        return ['bytes32', ethUtil.keccak(value)];
+      }
 
-        if (value === undefined) {
-          throw new Error(`missing value for field ${name} of type ${type}`);
-        }
+      if (type.lastIndexOf(']') === type.length - 1) {
+        const parsedType = type.slice(0, type.lastIndexOf('['));
+        const typeValuePairs = value.map((item) =>
+          encodeField(name, parsedType, item),
+        );
+        return [
+          'bytes32',
+          ethUtil.keccak(
+            ethAbi.rawEncode(
+              typeValuePairs.map(([t]) => t),
+              typeValuePairs.map(([, v]) => v),
+            ),
+          ),
+        ];
+      }
 
-        if (type === 'bytes') {
-          return ['bytes32', ethUtil.keccak(value)];
-        }
+      return [type, value];
+    };
 
-        if (type === 'string') {
+    for (const field of types[primaryType]) {
+      const [type, value] = encodeField(
+        field.name,
+        field.type,
+        data[field.name],
+      );
+      encodedTypes.push(type);
+      encodedValues.push(value);
+    }
+  } else {
+    for (const field of types[primaryType]) {
+      let value = data[field.name];
+      if (value !== undefined) {
+        if (field.type === 'bytes') {
+          encodedTypes.push('bytes32');
+          value = ethUtil.keccak(value);
+          encodedValues.push(value);
+        } else if (field.type === 'string') {
+          encodedTypes.push('bytes32');
           // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
           if (typeof value === 'string') {
             value = Buffer.from(value, 'utf8');
           }
-          return ['bytes32', ethUtil.keccak(value)];
-        }
-
-        if (type.lastIndexOf(']') === type.length - 1) {
-          const parsedType = type.slice(0, type.lastIndexOf('['));
-          const typeValuePairs = value.map((item) =>
-            encodeField(name, parsedType, item),
-          );
-          return [
-            'bytes32',
-            ethUtil.keccak(
-              ethAbi.rawEncode(
-                typeValuePairs.map(([t]) => t),
-                typeValuePairs.map(([, v]) => v),
-              ),
+          value = ethUtil.keccak(value);
+          encodedValues.push(value);
+        } else if (types[field.type] !== undefined) {
+          encodedTypes.push('bytes32');
+          value = ethUtil.keccak(
+            encodeData(
+              field.type,
+              // TODO: Add validation to ensure this is a string-indexed
+              // object, so that this type cast can be removed
+              value as Record<string, unknown>,
+              types,
+              version,
             ),
-          ];
-        }
-
-        return [type, value];
-      };
-
-      for (const field of types[primaryType]) {
-        const [type, value] = encodeField(
-          field.name,
-          field.type,
-          data[field.name],
-        );
-        encodedTypes.push(type);
-        encodedValues.push(value);
-      }
-    } else {
-      for (const field of types[primaryType]) {
-        let value = data[field.name];
-        if (value !== undefined) {
-          if (field.type === 'bytes') {
-            encodedTypes.push('bytes32');
-            value = ethUtil.keccak(value);
-            encodedValues.push(value);
-          } else if (field.type === 'string') {
-            encodedTypes.push('bytes32');
-            // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
-            if (typeof value === 'string') {
-              value = Buffer.from(value, 'utf8');
-            }
-            value = ethUtil.keccak(value);
-            encodedValues.push(value);
-          } else if (types[field.type] !== undefined) {
-            encodedTypes.push('bytes32');
-            value = ethUtil.keccak(
-              this.encodeData(field.type, value, types, useV4),
-            );
-            encodedValues.push(value);
-          } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
-            throw new Error(
-              'Arrays are unimplemented in encodeData; use V4 extension',
-            );
-          } else {
-            encodedTypes.push(field.type);
-            encodedValues.push(value);
-          }
+          );
+          encodedValues.push(value);
+        } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
+          throw new Error(
+            'Arrays are unimplemented in encodeData; use V4 extension',
+          );
+        } else {
+          encodedTypes.push(field.type);
+          encodedValues.push(value);
         }
       }
     }
+  }
 
-    return ethAbi.rawEncode(encodedTypes, encodedValues);
-  },
+  return ethAbi.rawEncode(encodedTypes, encodedValues);
+}
 
-  /**
-   * Encodes the type of an object by encoding a comma delimited list of its members
-   *
-   * @param {string} primaryType - Root type to encode
-   * @param {Object} types - Type definitions
-   * @returns {string} - Encoded representation of the type of an object
-   */
-  encodeType(
-    primaryType: string,
-    types: Record<string, MessageTypeProperty[]>,
-  ): string {
-    let result = '';
-    let deps = this.findTypeDependencies(primaryType, types).filter(
-      (dep) => dep !== primaryType,
-    );
-    deps = [primaryType].concat(deps.sort());
-    for (const type of deps) {
-      const children = types[type];
-      if (!children) {
-        throw new Error(`No type definition specified: ${type}`);
-      }
-      result += `${type}(${types[type]
-        .map(({ name, type: t }) => `${t} ${name}`)
-        .join(',')})`;
-    }
-    return result;
-  },
+/**
+ * Encodes the type of an object by encoding a comma delimited list of its members
+ *
+ * @param {string} primaryType - Root type to encode
+ * @param {Object} types - Type definitions
+ * @returns {string} - Encoded representation of the type of an object
+ */
+function encodeType(
+  primaryType: string,
+  types: Record<string, MessageTypeProperty[]>,
+): string {
+  let result = '';
+  const unsortedDeps = findTypeDependencies(primaryType, types);
+  unsortedDeps.delete(primaryType);
 
-  /**
-   * Finds all types within a type definition object
-   *
-   * @param {string} primaryType - Root type
-   * @param {Object} types - Type definitions
-   * @param {Array} results - current set of accumulated types
-   * @returns {Array} - Set of all types found in the type definition
-   */
-  findTypeDependencies(
-    primaryType: string,
-    types: Record<string, MessageTypeProperty[]>,
-    results: string[] = [],
-  ): string[] {
-    [primaryType] = primaryType.match(/^\w*/u);
-    if (results.includes(primaryType) || types[primaryType] === undefined) {
-      return results;
+  const deps = [primaryType, ...Array.from(unsortedDeps).sort()];
+  for (const type of deps) {
+    const children = types[type];
+    if (!children) {
+      throw new Error(`No type definition specified: ${type}`);
     }
-    results.push(primaryType);
-    for (const field of types[primaryType]) {
-      for (const dep of this.findTypeDependencies(field.type, types, results)) {
-        !results.includes(dep) && results.push(dep);
-      }
-    }
+
+    result += `${type}(${types[type]
+      .map(({ name, type: t }) => `${t} ${name}`)
+      .join(',')})`;
+  }
+
+  return result;
+}
+
+/**
+ * Finds all types within a type definition object
+ *
+ * @param {string} primaryType - Root type
+ * @param {Object} types - Type definitions
+ * @param {Array} results - current set of accumulated types
+ * @returns {Array} - Set of all types found in the type definition
+ */
+function findTypeDependencies(
+  primaryType: string,
+  types: Record<string, MessageTypeProperty[]>,
+  results: Set<string> = new Set(),
+): Set<string> {
+  [primaryType] = primaryType.match(/^\w*/u);
+  if (results.has(primaryType) || types[primaryType] === undefined) {
     return results;
-  },
+  }
 
-  /**
-   * Hashes an object
-   *
-   * @param {string} primaryType - Root type
-   * @param {Object} data - Object to hash
-   * @param {Object} types - Type definitions
-   * @returns {Buffer} - Hash of an object
-   */
-  hashStruct(
-    primaryType: string,
-    data: Record<string, unknown>,
-    types: Record<string, unknown>,
-    useV4 = true,
-  ): Buffer {
-    return ethUtil.keccak(this.encodeData(primaryType, data, types, useV4));
-  },
+  results.add(primaryType);
 
-  /**
-   * Hashes the type of an object
-   *
-   * @param {string} primaryType - Root type to hash
-   * @param {Object} types - Type definitions
-   * @returns {Buffer} - Hash of an object
-   */
-  hashType(primaryType: string, types: Record<string, unknown>): Buffer {
-    return ethUtil.keccak(this.encodeType(primaryType, types));
-  },
+  for (const field of types[primaryType]) {
+    findTypeDependencies(field.type, types, results);
+  }
+  return results;
+}
 
-  /**
-   * Removes properties from a message object that are not defined per EIP-712
-   *
-   * @param {Object} data - typed message object
-   * @returns {Object} - typed message object with only allowed fields
-   */
-  sanitizeData<T extends MessageTypes>(
-    data: TypedData | TypedMessage<T>,
-  ): TypedMessage<T> {
-    const sanitizedData: Partial<TypedMessage<T>> = {};
-    for (const key in TYPED_MESSAGE_SCHEMA.properties) {
-      if (data[key]) {
-        sanitizedData[key] = data[key];
-      }
+/**
+ * Hashes an object
+ *
+ * @param {string} primaryType - Root type
+ * @param {Object} data - Object to hash
+ * @param {Object} types - Type definitions
+ * @returns {Buffer} - Hash of an object
+ */
+function hashStruct(
+  primaryType: string,
+  data: Record<string, unknown>,
+  types: Record<string, MessageTypeProperty[]>,
+  version: Version,
+): Buffer {
+  return ethUtil.keccak(encodeData(primaryType, data, types, version));
+}
+
+/**
+ * Hashes the type of an object
+ *
+ * @param {string} primaryType - Root type to hash
+ * @param {Object} types - Type definitions
+ * @returns {Buffer} - Hash of an object
+ */
+function hashType(
+  primaryType: string,
+  types: Record<string, MessageTypeProperty[]>,
+): Buffer {
+  return ethUtil.keccak(encodeType(primaryType, types));
+}
+
+/**
+ * Removes properties from a message object that are not defined per EIP-712
+ *
+ * @param {Object} data - typed message object
+ * @returns {Object} - typed message object with only allowed fields
+ */
+function sanitizeData<T extends MessageTypes>(
+  data: TypedData | TypedMessage<T>,
+): TypedMessage<T> {
+  const sanitizedData: Partial<TypedMessage<T>> = {};
+  for (const key in TYPED_MESSAGE_SCHEMA.properties) {
+    if (data[key]) {
+      sanitizedData[key] = data[key];
     }
-    if ('types' in sanitizedData) {
-      sanitizedData.types = { EIP712Domain: [], ...sanitizedData.types };
-    }
-    return sanitizedData as Required<TypedMessage<T>>;
-  },
+  }
+  if ('types' in sanitizedData) {
+    sanitizedData.types = { EIP712Domain: [], ...sanitizedData.types };
+  }
+  return sanitizedData as Required<TypedMessage<T>>;
+}
 
-  /**
-   * Signs a typed message as per EIP-712 and returns its keccak hash
-   *
-   * @param {Object} typedData - Types message data to hash as per eip-712
-   * @returns {Buffer} - keccak hash of the resulting signed message
-   */
-  eip712Hash<T extends MessageTypes>(
-    typedData: Partial<TypedData | TypedMessage<T>>,
-    useV4 = true,
-  ): Buffer {
-    const sanitizedData = this.sanitizeData(typedData);
-    const parts = [Buffer.from('1901', 'hex')];
+/**
+ * Hash a typed message according to EIP-712. The returned message starts with the EIP-712 prefix,
+ * which is "1901", followed by the hash of the domain separator, then the data (if any).
+ * The result is hashed again and returned.
+ *
+ * This function does not sign the message. The resulting hash must still be signed to create an
+ * EIP-712 signature.
+ *
+ * @param {Object} typedData - The typed message to hash.
+ * @returns {Buffer} - The hash of the typed message.
+ */
+function eip712Hash<T extends MessageTypes>(
+  typedData: TypedData | TypedMessage<T>,
+  version: Version,
+): Buffer {
+  const sanitizedData = sanitizeData(typedData);
+  const parts = [Buffer.from('1901', 'hex')];
+  parts.push(
+    hashStruct(
+      'EIP712Domain',
+      sanitizedData.domain,
+      sanitizedData.types,
+      version,
+    ),
+  );
+  if (sanitizedData.primaryType !== 'EIP712Domain') {
     parts.push(
-      this.hashStruct(
-        'EIP712Domain',
-        sanitizedData.domain,
+      hashStruct(
+        // TODO: Validate that this is a string, so this type cast can be removed.
+        sanitizedData.primaryType as string,
+        sanitizedData.message,
         sanitizedData.types,
-        useV4,
+        version,
       ),
     );
-    if (sanitizedData.primaryType !== 'EIP712Domain') {
-      parts.push(
-        this.hashStruct(
-          sanitizedData.primaryType,
-          sanitizedData.message,
-          sanitizedData.types,
-          useV4,
-        ),
-      );
-    }
-    return ethUtil.keccak(Buffer.concat(parts));
-  },
+  }
+  return ethUtil.keccak(Buffer.concat(parts));
+}
+
+/**
+ * A collection of utility functions used for signing typed data
+ */
+export const TypedDataUtils = {
+  encodeData,
+  encodeType,
+  findTypeDependencies,
+  hashStruct,
+  hashType,
+  sanitizeData,
+  eip712Hash,
 };
 
-function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
+/**
+ * Concatenate an extended ECDSA signature into a hex string
+ *
+ * @param v - The 'v' portion of the signature
+ * @param r - The 'r' portion of the signature
+ * @param s - The 's' portion of the signature
+ * @returns The concatenated ECDSA signature
+ */
+export function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
   const rSig = ethUtil.fromSigned(r);
   const sSig = ethUtil.fromSigned(s);
   const vSig = ethUtil.bufferToInt(v);
@@ -348,7 +386,13 @@ function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
   return ethUtil.addHexPrefix(rStr.concat(sStr, vStr)).toString('hex');
 }
 
-function normalize(input: number | string): string {
+/**
+ * Normalize the input to a 0x-prefixed hex string.
+ *
+ * @param input - The value to normalize.
+ * @returns The normalized 0x-prefixed hex string.
+ */
+export function normalize(input: number | string): string {
   if (!input) {
     return undefined;
   }
@@ -367,7 +411,17 @@ function normalize(input: number | string): string {
   return ethUtil.addHexPrefix(input.toLowerCase());
 }
 
-function personalSign<T extends MessageTypes>(
+/**
+ * Create an Ethereum-specific signature for a message.
+ *
+ * This function is equivalent to the `eth_sign` Ethereum JSON-RPC method as specified in EIP-1417,
+ * as well as the MetaMask's `personal_sign` method.
+ *
+ * @param privateKey - The key to sign with.
+ * @param msgParams - The message parameters. Currently includes just the message data.
+ * @param msgParams.data - The data to sign.
+ */
+export function personalSign<T extends MessageTypes>(
   privateKey: Buffer,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
 ): string {
@@ -378,7 +432,16 @@ function personalSign<T extends MessageTypes>(
   return serialized;
 }
 
-function recoverPersonalSignature<T extends MessageTypes>(
+/**
+ * Recover the address of the account used to create the given Ethereum signature. The message
+ * must have been signed using the `personalSign` function, or an equivalent function.
+ *
+ * @param msgParams - The message parameters, which includes both the message and the signature.
+ * @param msgParams.data - The message that was signed.
+ * @param msgParams.sig - The signature for the message.
+ * @returns The address of the message signer.
+ */
+export function recoverPersonalSignature<T extends MessageTypes>(
   msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
 ): string {
   const publicKey = getPublicKeyFor(msgParams);
@@ -387,37 +450,45 @@ function recoverPersonalSignature<T extends MessageTypes>(
   return senderHex;
 }
 
-function extractPublicKey<T extends MessageTypes>(
+/**
+ * Recover the public key of the account used to create the given Ethereum signature. The message
+ * must have been signed using the `personalSign` function, or an equivalent function.
+ *
+ * @param msgParams - The message parameters, which includes both the message and the signature.
+ * @param msgParams.data - The message that was signed.
+ * @param msgParams.sig - The signature for the message.
+ * @returns The public key of the message signer.
+ */
+export function extractPublicKey<T extends MessageTypes>(
   msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
 ): string {
   const publicKey = getPublicKeyFor(msgParams);
   return `0x${publicKey.toString('hex')}`;
 }
 
-function externalTypedSignatureHash(typedData: EIP712TypedData[]): string {
-  const hashBuffer = typedSignatureHash(typedData);
+/**
+ * Generate the "V1" type hash for the provided typed message.
+ *
+ * The type hash will be generated in accordance with an earlier version of the EIP-712
+ * specification. This type hash is used in `signTypedData_v1`.
+ *
+ * @param typedData - The typed message.
+ * @returns The type hash for the provided message.
+ */
+export function typedSignatureHash(typedData: EIP712TypedData[]): string {
+  const hashBuffer = _typedSignatureHash(typedData);
   return ethUtil.bufferToHex(hashBuffer);
 }
 
-function signTypedDataLegacy<T extends MessageTypes>(
-  privateKey: Buffer,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>,
-): string {
-  const msgHash = typedSignatureHash(msgParams.data);
-  const sig = ethUtil.ecsign(msgHash, privateKey);
-  return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s));
-}
-
-function recoverTypedSignatureLegacy<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
-): string {
-  const msgHash = typedSignatureHash(msgParams.data);
-  const publicKey = recoverPublicKey(msgHash, msgParams.sig);
-  const sender = ethUtil.publicToAddress(publicKey);
-  return ethUtil.bufferToHex(sender);
-}
-
-function encrypt<T extends MessageTypes>(
+/**
+ * Encrypt a message.
+ *
+ * @param receiverPublicKey - The public key of the message recipient.
+ * @param msgParams - The message parameters. Currently includes just the message data.
+ * @param version - The type of encryption to use.
+ * @returns The encrypted data.
+ */
+export function encrypt<T extends MessageTypes>(
   receiverPublicKey: string,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
   version: string,
@@ -467,7 +538,18 @@ function encrypt<T extends MessageTypes>(
   }
 }
 
-function encryptSafely<T extends MessageTypes>(
+/**
+ * Encrypt a message in a way that obscures the message length.
+ *
+ * The message is padded to a multiple of 2048 before being encrypted so that the length of the
+ * resulting encrypted message can't be used to guess the exact length of the original message.
+ *
+ * @param receiverPublicKey - The public key of the message recipient.
+ * @param msgParams - The message parameters. Currently includes just the message data.
+ * @param version - The type of encryption to use.
+ * @returns The encrypted data.
+ */
+export function encryptSafely<T extends MessageTypes>(
   receiverPublicKey: string,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
   version: string,
@@ -511,7 +593,14 @@ function encryptSafely<T extends MessageTypes>(
   return encrypt(receiverPublicKey, paddedMsgParams, version);
 }
 
-function decrypt(
+/**
+ * Decrypt a message.
+ *
+ * @param encryptedData - The encrypted data.
+ * @param receiverPrivateKey - The private key to decrypt with.
+ * @returns The decrypted message.
+ */
+export function decrypt(
   encryptedData: EthEncryptedData,
   receiverPrivateKey: string,
 ): string {
@@ -557,7 +646,14 @@ function decrypt(
   }
 }
 
-function decryptSafely(
+/**
+ * Decrypt a message that has been encrypted using `encryptSafely`.
+ *
+ * @param encryptedData - The encrypted data.
+ * @param receiverPrivateKey - The private key to decrypt with.
+ * @returns The decrypted message.
+ */
+export function decryptSafely(
   encryptedData: EthEncryptedData,
   receiverPrivateKey: string,
 ): string {
@@ -567,7 +663,7 @@ function decryptSafely(
   return dataWithPadding.data;
 }
 
-function getEncryptionPublicKey(privateKey: string): string {
+export function getEncryptionPublicKey(privateKey: string): string {
   const privateKeyUint8Array = nacl_decodeHex(privateKey);
   const encryptionPublicKey =
     nacl.box.keyPair.fromSecretKey(privateKeyUint8Array).publicKey;
@@ -575,104 +671,61 @@ function getEncryptionPublicKey(privateKey: string): string {
 }
 
 /**
- * A generic entry point for all typed data methods to be passed, includes a version parameter.
+ * Sign typed data according to EIP-712. The signing differs based upon the `version`.
+ *
+ * V1 is based upon [an early version of EIP-712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca)
+ * that lacked some later security improvements, and should generally be
+ * neglected in favor of later versions.
+ *
+ * V3 is based on EIP-712, except that arrays and recursive data structures
+ * are not supported.
+ *
+ * V4 is based on EIP-712, and includes full support of arrays and recursive
+ * data structures.
+ *
+ * @param privateKey - The private key to sign with.
+ * @param msgParams - Signing parameters.
+ * @param msgParams.data - The typed data to sign.
+ * @param version - The signing version to use.
+ * @returns The signature
  */
-function signTypedMessage<T extends MessageTypes>(
+export function signTypedData<T extends MessageTypes>(
   privateKey: Buffer,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
-  version: Version = 'V4',
+  version: Version,
 ): string {
-  switch (version) {
-    case 'V1':
-      return signTypedDataLegacy(privateKey, msgParams);
-    case 'V3':
-      return signTypedData(privateKey, msgParams);
-    case 'V4':
-    default:
-      return signTypedData_v4(privateKey, msgParams);
-  }
-}
-
-function recoverTypedMessage<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
-  version: Version = 'V4',
-): string {
-  switch (version) {
-    case 'V1':
-      return recoverTypedSignatureLegacy(msgParams);
-    case 'V3':
-      return recoverTypedSignature(msgParams);
-    case 'V4':
-    default:
-      return recoverTypedSignature_v4(msgParams);
-  }
-}
-
-function signTypedData<T extends MessageTypes>(
-  privateKey: Buffer,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>,
-): string {
-  const message = TypedDataUtils.eip712Hash(msgParams.data, false);
-  const sig = ethUtil.ecsign(message, privateKey);
+  const messageHash =
+    version === 'V1'
+      ? _typedSignatureHash(msgParams.data)
+      : TypedDataUtils.eip712Hash(msgParams.data, version);
+  const sig = ethUtil.ecsign(messageHash, privateKey);
   return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s));
 }
-
-function signTypedData_v4<T extends MessageTypes>(
-  privateKey: Buffer,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>,
-): string {
-  const message = TypedDataUtils.eip712Hash(msgParams.data);
-  const sig = ethUtil.ecsign(message, privateKey);
-  return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s));
-}
-
-function recoverTypedSignature<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
-): string {
-  const message = TypedDataUtils.eip712Hash(msgParams.data, false);
-  const publicKey = recoverPublicKey(message, msgParams.sig);
-  const sender = ethUtil.publicToAddress(publicKey);
-  return ethUtil.bufferToHex(sender);
-}
-
-function recoverTypedSignature_v4<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
-): string {
-  const message = TypedDataUtils.eip712Hash(msgParams.data);
-  const publicKey = recoverPublicKey(message, msgParams.sig);
-  const sender = ethUtil.publicToAddress(publicKey);
-  return ethUtil.bufferToHex(sender);
-}
-
-export {
-  TYPED_MESSAGE_SCHEMA,
-  TypedDataUtils,
-  concatSig,
-  normalize,
-  personalSign,
-  recoverPersonalSignature,
-  extractPublicKey,
-  externalTypedSignatureHash as typedSignatureHash,
-  signTypedDataLegacy,
-  recoverTypedSignatureLegacy,
-  encrypt,
-  encryptSafely,
-  decrypt,
-  decryptSafely,
-  getEncryptionPublicKey,
-  signTypedMessage,
-  recoverTypedMessage,
-  signTypedData,
-  signTypedData_v4,
-  recoverTypedSignature,
-  recoverTypedSignature_v4,
-};
 
 /**
- * @param typedData - Array of data along with types, as per EIP712.
- * @returns Buffer
+ * Recover the address of the account that created the given EIP-712
+ * signature. The version provided must match the version used to
+ * create the signature.
+ *
+ * @param msgParams - Signing parameters.
+ * @param msgParams.data - The data that was signed.
+ * @param version - The signing version to use.
+ * @returns The address of the signer.
  */
-function typedSignatureHash<T extends MessageTypes>(
+export function recoverTypedSignature<T extends MessageTypes>(
+  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
+  version: Version,
+): string {
+  const messageHash =
+    version === 'V1'
+      ? _typedSignatureHash(msgParams.data)
+      : TypedDataUtils.eip712Hash(msgParams.data, version);
+  const publicKey = recoverPublicKey(messageHash, msgParams.sig);
+  const sender = ethUtil.publicToAddress(publicKey);
+  return ethUtil.bufferToHex(sender);
+}
+
+function _typedSignatureHash<T extends MessageTypes>(
   typedData: TypedData | TypedMessage<T>,
 ): Buffer {
   const error = new Error('Expect argument to be non-empty array');
@@ -718,14 +771,6 @@ function getPublicKeyFor<T extends MessageTypes>(
   const message = ethUtil.toBuffer(msgParams.data);
   const msgHash = ethUtil.hashPersonalMessage(message);
   return recoverPublicKey(msgHash, msgParams.sig);
-}
-
-function padWithZeroes(number: string, length: number): string {
-  let myString = `${number}`;
-  while (myString.length < length) {
-    myString = `0${myString}`;
-  }
-  return myString;
 }
 
 // converts hex strings to the Uint8Array format used by nacl
