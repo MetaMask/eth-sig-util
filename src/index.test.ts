@@ -1,6 +1,11 @@
 import * as ethUtil from 'ethereumjs-util';
 import * as sigUtil from '.';
 
+const privateKey = Buffer.from(
+  '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0',
+  'hex',
+);
+
 const encodeDataExamples = {
   // dynamic types supported by EIP-712:
   bytes: [10, '10', '0x10', Buffer.from('10', 'utf8')],
@@ -4039,10 +4044,8 @@ describe('normalize', function () {
 });
 
 describe('personalSign', function () {
-  const privateKey = Buffer.from(
-    '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0',
-    'hex',
-  );
+  // This is a signature of the message "Hello, world!" that was created using the private key in
+  // the top-level `privateKey` variable.
   const helloWorldSignature =
     '0x90a938f7457df6e8f741264c32697fc52f9a8f867c52dd70713d9d2d472f2e415d9c94148991bbe1f4a1818d1dff09165782749c877f5cf1eff4ef126e55714d1c';
   const helloWorldMessage = 'Hello, world!';
@@ -4112,70 +4115,2301 @@ describe('personalSign', function () {
   });
 });
 
-it('signTypedData and recoverTypedSignature V1 - single message', function () {
-  const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b';
-  const privKeyHex =
-    '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0';
+describe('signTypedData', function () {
+  describe('V1', function () {
+    const signTypedDataV1Examples = {
+      // dynamic types supported by EIP-712:
+      bytes: [10, '10', '0x10', Buffer.from('10', 'utf8')],
+      string: [
+        'Hello!',
+        '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        '0xabcd',
+        '😁',
+      ],
+      // atomic types supported by EIP-712:
+      address: [
+        '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbBbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB', // no apparent maximum length
+        '0x0',
+        10,
+        Number.MAX_SAFE_INTEGER,
+      ],
+      bool: [true, false, 'true', 'false', 0, 1, -1, Number.MAX_SAFE_INTEGER],
+      bytes1: [
+        '0x10',
+        10,
+        0,
+        1,
+        -1,
+        Number.MAX_SAFE_INTEGER,
+        Buffer.from('10', 'utf8'),
+      ],
+      bytes32: [
+        '0x10',
+        10,
+        0,
+        1,
+        -1,
+        Number.MAX_SAFE_INTEGER,
+        Buffer.from('10', 'utf8'),
+      ],
+      int8: [0, '0', '0x0', 255, -255],
+      int256: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER],
+      uint8: [0, '0', '0x0', 255, -255],
+      uint256: [
+        0,
+        '0',
+        '0x0',
+        Number.MAX_SAFE_INTEGER,
+        Number.MIN_SAFE_INTEGER,
+      ],
+      // atomic types not supported by EIP-712:
+      int: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER], // interpreted as `int256` by `ethereumjs-abi`
+      uint: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER], // interpreted as `uint256` by `ethereumjs-abi`
+      // `fixed` and `ufixed` types omitted because their encoding in `ethereumjs-abi` is very broken at the moment.
+      // `function` type omitted because it is not supported by `ethereumjs-abi`.
+    };
 
-  const privKey = Buffer.from(privKeyHex, 'hex');
+    const signTypedDataV1ErrorExamples = {
+      string: [
+        {
+          input: 10,
+          errorMessage:
+            'The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received type number (10)',
+        },
+      ],
+      address: [
+        {
+          input: 'bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+          errorMessage:
+            'Cannot convert string to buffer. toBuffer only supports 0x-prefixed hex strings and this string was given:',
+        },
+      ],
+      int8: [
+        { input: '256', errorMessage: 'Supplied int exceeds width: 8 vs 9' },
+      ],
+      bytes1: [
+        { input: 'a', errorMessage: 'Cannot convert string to buffer' },
+        { input: 'test', errorMessage: 'Cannot convert string to buffer' },
+      ],
+      bytes32: [
+        { input: 'a', errorMessage: 'Cannot convert string to buffer' },
+        { input: 'test', errorMessage: 'Cannot convert string to buffer' },
+      ],
+    };
 
-  const typedData = [
-    {
-      type: 'string',
-      name: 'message',
-      value: 'Hi, Alice!',
-    },
-  ];
+    // Union of all types from both sets of examples
+    const allSignTypedDataV1ExampleTypes = [
+      ...new Set(
+        Object.keys(encodeDataExamples).concat(
+          Object.keys(encodeDataErrorExamples),
+        ),
+      ),
+    ];
 
-  const msgParams = { data: typedData };
+    it('should throw when given an empty array', function () {
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: [],
+          },
+          'V1',
+        ),
+      ).toThrow('Expect argument to be non-empty array');
+    });
 
-  const signature = sigUtil.signTypedData(privKey, msgParams, 'V1');
-  const recovered = sigUtil.recoverTypedSignature(
-    {
-      data: msgParams.data,
-      sig: signature,
-    },
-    'V1',
-  );
-  expect(signature).toBe(
-    '0x49e75d475d767de7fcc67f521e0d86590723d872e6111e51c393e8c1e2f21d032dfaf5833af158915f035db6af4f37bf2d5d29781cd81f28a44c5cb4b9d241531b',
-  );
+    describe('example data', function () {
+      // Reassigned to silence "no-loop-func" ESLint rule
+      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
+      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
+      const _expect = expect;
+      const _it = it;
 
-  expect(address).toBe(recovered);
+      for (const type of allSignTypedDataV1ExampleTypes) {
+        describe(`type "${type}"`, function () {
+          // Test all examples that do not crash
+          const inputs = signTypedDataV1Examples[type] || [];
+          for (const input of inputs) {
+            const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+            _it(`should sign "${input}" (type "${inputType}")`, function () {
+              _expect(
+                sigUtil.signTypedData(
+                  privateKey,
+                  {
+                    data: [{ name: 'data', type, value: input }],
+                  },
+                  'V1',
+                ),
+              ).toMatchSnapshot();
+            });
+          }
+
+          // Test all examples that crash
+          const errorInputs = signTypedDataV1ErrorExamples[type] || [];
+          for (const { input, errorMessage } of errorInputs) {
+            const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+            _it(
+              `should fail to sign "${input}" (type "${inputType}")`,
+              function () {
+                _expect(() =>
+                  sigUtil.signTypedData(
+                    privateKey,
+                    {
+                      data: [{ name: 'data', type, value: input }],
+                    },
+                    'V1',
+                  ),
+                ).toThrow(errorMessage);
+              },
+            );
+          }
+
+          if (type === 'bytes') {
+            _it(
+              `should fail to sign array of all ${type} example data`,
+              function () {
+                _expect(() =>
+                  sigUtil.signTypedData(
+                    privateKey,
+                    {
+                      data: [
+                        { name: 'data', type: `${type}[]`, value: inputs },
+                      ],
+                    },
+                    'V1',
+                  ),
+                ).toThrow(
+                  'The "list[0]" argument must be an instance of Buffer or Uint8Array. Received type number (10)',
+                );
+              },
+            );
+          } else {
+            _it(`should sign array of all ${type} example data`, function () {
+              _expect(
+                sigUtil.signTypedData(
+                  privateKey,
+                  {
+                    data: [{ name: 'data', type: `${type}[]`, value: inputs }],
+                  },
+                  'V1',
+                ),
+              ).toMatchSnapshot();
+            });
+          }
+        });
+      }
+    });
+
+    it('should throw an error when an atomic property is set to null', function () {
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: [{ name: 'data', type: 'int32', value: null }],
+          },
+          'V1',
+        ),
+      ).toThrow(`Cannot read property 'toArray' of null`);
+    });
+
+    it('should sign data with an atomic property set to undefined', function () {
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: [{ name: 'data', type: 'int32', value: undefined }],
+          },
+          'V1',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should sign data with a dynamic property set to null', function () {
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: [{ name: 'data', type: 'string', value: null }],
+          },
+          'V1',
+        ),
+      ).toThrow(
+        'The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received null',
+      );
+    });
+
+    it('should sign data with a dynamic property set to undefined', function () {
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: [{ name: 'data', type: 'string', value: undefined }],
+          },
+          'V1',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should throw an error when trying to sign a function', function () {
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: [
+              {
+                name: 'data',
+                type: 'function',
+                value: () => console.log(test),
+              },
+            ],
+          },
+          'V1',
+        ),
+      ).toThrow('Unsupported or invalid type: function');
+    });
+
+    it('should throw an error when trying to sign an unrecognized type', function () {
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: [{ name: 'data', type: 'foo', value: 'test' }],
+          },
+          'V1',
+        ),
+      ).toThrow('Unsupported or invalid type: foo');
+    });
+  });
+
+  describe('V3', function () {
+    // This first group of tests mirrors the `TypedDataUtils.eip712Hash` tests, because all of
+    // those test cases are relevant here as well.
+
+    it('should sign a minimal valid typed message', function () {
+      const signature = sigUtil.signTypedData(
+        privateKey,
+        // This represents the most basic "typed message" that is valid according to our types.
+        // It's not a very useful message (it's totally empty), but it's complete according to the
+        // spec.
+        {
+          data: {
+            types: {
+              EIP712Domain: [],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {},
+            message: {},
+          },
+        },
+        'V3',
+      );
+
+      expect(signature).toMatchSnapshot();
+    });
+
+    it('minimal typed message signature should be identical to minimal valid typed message signature', function () {
+      const minimalSignature = sigUtil.signTypedData(
+        privateKey,
+        // This tests that when the mandatory fields `domain`, `message`, and `types.EIP712Domain`
+        // are omitted, the result is the same as if they were included but empty.
+        {
+          data: {
+            types: {},
+            primaryType: 'EIP712Domain',
+          },
+        } as any,
+        'V3',
+      );
+      const minimalValidSignature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {},
+            message: {},
+          },
+        },
+        'V3',
+      );
+
+      expect(minimalSignature).toBe(minimalValidSignature);
+    });
+
+    it('should ignore extra data properties', function () {
+      const minimalValidSignature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {},
+            message: {},
+          },
+        },
+        'V3',
+      );
+      const extraPropertiesSignature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {},
+            message: {},
+            extra: 'stuff',
+            moreExtra: 1,
+          },
+        } as any,
+        'V3',
+      );
+
+      expect(minimalValidSignature).toBe(extraPropertiesSignature);
+    });
+
+    it('should sign a typed message with a domain separator that uses all fields', function () {
+      const signature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [
+                {
+                  name: 'name',
+                  type: 'string',
+                },
+                {
+                  name: 'version',
+                  type: 'string',
+                },
+                {
+                  name: 'chainId',
+                  type: 'uint256',
+                },
+                {
+                  name: 'verifyingContract',
+                  type: 'address',
+                },
+                {
+                  name: 'salt',
+                  type: 'bytes32',
+                },
+              ],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {
+              name: 'example.metamask.io',
+              version: '1',
+              chainId: 1,
+              verifyingContract: '0x0000000000000000000000000000000000000000',
+              salt: Buffer.from(new Int32Array([1, 2, 3])),
+            },
+            message: {},
+          },
+        },
+        'V3',
+      );
+
+      expect(signature).toMatchSnapshot();
+    });
+
+    it('should sign a typed message with extra domain seperator fields', function () {
+      const signature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [
+                {
+                  name: 'name',
+                  type: 'string',
+                },
+                {
+                  name: 'version',
+                  type: 'string',
+                },
+                {
+                  name: 'chainId',
+                  type: 'uint256',
+                },
+                {
+                  name: 'verifyingContract',
+                  type: 'address',
+                },
+                {
+                  name: 'salt',
+                  type: 'bytes32',
+                },
+                {
+                  name: 'extraField',
+                  type: 'string',
+                },
+              ],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {
+              name: 'example.metamask.io',
+              version: '1',
+              chainId: 1,
+              verifyingContract: '0x0000000000000000000000000000000000000000',
+              salt: Buffer.from(new Int32Array([1, 2, 3])),
+              extraField: 'stuff',
+            },
+            message: {},
+          },
+        } as any,
+        'V3',
+      );
+
+      expect(signature).toMatchSnapshot();
+    });
+
+    it('should sign a typed message with only custom domain seperator fields', function () {
+      const signature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [
+                {
+                  name: 'customName',
+                  type: 'string',
+                },
+                {
+                  name: 'customVersion',
+                  type: 'string',
+                },
+                {
+                  name: 'customChainId',
+                  type: 'uint256',
+                },
+                {
+                  name: 'customVerifyingContract',
+                  type: 'address',
+                },
+                {
+                  name: 'customSalt',
+                  type: 'bytes32',
+                },
+                {
+                  name: 'extraField',
+                  type: 'string',
+                },
+              ],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {
+              customName: 'example.metamask.io',
+              customVersion: '1',
+              customChainId: 1,
+              customVerifyingContract:
+                '0x0000000000000000000000000000000000000000',
+              customSalt: Buffer.from(new Int32Array([1, 2, 3])),
+              extraField: 'stuff',
+            },
+            message: {},
+          },
+        } as any,
+        'V3',
+      );
+
+      expect(signature).toMatchSnapshot();
+    });
+
+    it('should sign a typed message with data', function () {
+      const signature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [
+                {
+                  name: 'name',
+                  type: 'string',
+                },
+                {
+                  name: 'version',
+                  type: 'string',
+                },
+                {
+                  name: 'chainId',
+                  type: 'uint256',
+                },
+                {
+                  name: 'verifyingContract',
+                  type: 'address',
+                },
+                {
+                  name: 'salt',
+                  type: 'bytes32',
+                },
+              ],
+              Message: [{ name: 'data', type: 'string' }],
+            },
+            primaryType: 'Message',
+            domain: {
+              name: 'example.metamask.io',
+              version: '1',
+              chainId: 1,
+              verifyingContract: '0x0000000000000000000000000000000000000000',
+              salt: Buffer.from(new Int32Array([1, 2, 3])),
+            },
+            message: {
+              data: 'Hello!',
+            },
+          },
+        },
+        'V3',
+      );
+
+      expect(signature).toMatchSnapshot();
+    });
+
+    // This second group of tests mirrors the `TypedDataUtils.encodeData` tests, because all of
+    // those test cases are relevant here as well.
+
+    describe('example data', function () {
+      // Reassigned to silence "no-loop-func" ESLint rule
+      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
+      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
+      const _expect = expect;
+      const _it = it;
+
+      for (const type of allExampleTypes) {
+        describe(`type "${type}"`, function () {
+          // Test all examples that do not crash
+          const inputs = encodeDataExamples[type] || [];
+          for (const input of inputs) {
+            const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+            _it(`should sign "${input}" (type "${inputType}")`, function () {
+              _expect(
+                sigUtil.signTypedData(
+                  privateKey,
+                  {
+                    data: {
+                      types: {
+                        EIP712Domain: [],
+                        Message: [{ name: 'data', type }],
+                      },
+                      primaryType: 'Message',
+                      domain: {},
+                      message: {
+                        data: input,
+                      },
+                    },
+                  },
+                  'V3',
+                ),
+              ).toMatchSnapshot();
+            });
+          }
+
+          // Test all examples that crash
+          const errorInputs = encodeDataErrorExamples[type] || [];
+          for (const { input, errorMessage } of errorInputs) {
+            const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+            _it(
+              `should fail to sign "${input}" (type "${inputType}")`,
+              function () {
+                _expect(() =>
+                  sigUtil.signTypedData(
+                    privateKey,
+                    {
+                      data: {
+                        types: {
+                          EIP712Domain: [],
+                          Message: [{ name: 'data', type }],
+                        },
+                        primaryType: 'Message',
+                        domain: {},
+                        message: {
+                          data: input,
+                        },
+                      },
+                    },
+                    'V3',
+                  ),
+                ).toThrow(errorMessage);
+              },
+            );
+          }
+
+          _it(
+            `should fail to sign array of all ${type} example data`,
+            function () {
+              _expect(() =>
+                sigUtil.signTypedData(
+                  privateKey,
+                  {
+                    data: {
+                      types: {
+                        EIP712Domain: [],
+                        Message: [{ name: 'data', type: `${type}[]` }],
+                      },
+                      primaryType: 'Message',
+                      domain: {},
+                      message: {
+                        data: inputs,
+                      },
+                    },
+                  },
+                  'V3',
+                ),
+              ).toThrow(
+                'Arrays are unimplemented in encodeData; use V4 extension',
+              );
+            },
+          );
+        });
+      }
+    });
+
+    it('should sign data with custom type', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V3',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should sign data with a recursive data type', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+          { name: 'replyTo', type: 'Mail' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+        replyTo: {
+          to: {
+            name: 'Cow',
+            wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+          },
+          from: {
+            name: 'Bob',
+            wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+          },
+          contents: 'Hello!',
+        },
+      };
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V3',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should throw an error when trying to sign a custom type array', function () {
+      const types = {
+        EIP712Domain: [],
+        Message: [{ name: 'data', type: 'string[]' }],
+      };
+      const message = { data: ['1', '2', '3'] };
+      const primaryType = 'Message';
+
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V3',
+        ),
+      ).toThrow('Arrays are unimplemented in encodeData; use V4 extension');
+    });
+
+    it('should ignore extra unspecified message properties', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      const originalSignature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types,
+            primaryType,
+            domain: {},
+            message,
+          },
+        },
+        'V3',
+      );
+      const messageWithExtraProperties = { ...message, foo: 'bar' };
+      const signatureWithExtraProperties = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types,
+            primaryType,
+            domain: {},
+            message: messageWithExtraProperties,
+          },
+        },
+        'V3',
+      );
+
+      expect(originalSignature).toBe(signatureWithExtraProperties);
+    });
+
+    it('should throw an error when an atomic property is set to null', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+          { name: 'length', type: 'int32' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello!',
+        length: null,
+      };
+
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V3',
+        ),
+      ).toThrow(`Cannot read property 'toArray' of null`);
+    });
+
+    it('should sign data with an atomic property set to undefined', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+          { name: 'length', type: 'int32' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello!',
+        length: undefined,
+      };
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V3',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should sign data with a dynamic property set to null', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: null,
+      };
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V3',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should sign data with a dynamic property set to undefined', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: undefined,
+      };
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V3',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should throw an error when a custom type property is set to null', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        to: null,
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V3',
+        ),
+      ).toThrow(`Cannot read property 'name' of null`);
+    });
+
+    it('should sign data with a custom type property set to undefined', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: undefined,
+        contents: 'Hello, Bob!',
+      };
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V3',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should throw an error when trying to sign a function', function () {
+      const types = {
+        EIP712Domain: [],
+        Message: [{ name: 'data', type: 'function' }],
+      };
+      const message = { data: 'test' };
+      const primaryType = 'Message';
+
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V3',
+        ),
+      ).toThrow('Unsupported or invalid type: function');
+    });
+
+    it('should throw an error when trying to sign with a missing primary type definition', function () {
+      const types = {
+        EIP712Domain: [],
+      };
+      const message = { data: 'test' };
+      const primaryType = 'Message';
+
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            } as any,
+          },
+          'V3',
+        ),
+      ).toThrow('No type definition specified: Message');
+    });
+
+    it('should throw an error when trying to sign an unrecognized type', function () {
+      const types = {
+        EIP712Domain: [],
+        Message: [{ name: 'data', type: 'foo' }],
+      };
+      const message = { data: 'test' };
+      const primaryType = 'Message';
+
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V3',
+        ),
+      ).toThrow('Unsupported or invalid type: foo');
+    });
+
+    it('should sign data when given extraneous types', function () {
+      const types = {
+        EIP712Domain: [],
+        Message: [{ name: 'data', type: 'string' }],
+        Extra: [{ name: 'data', type: 'string' }],
+      };
+      const message = { data: 'Hello!' };
+      const primaryType = 'Message';
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V3',
+        ),
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe('V4', function () {
+    // This first group of tests mirrors the `TypedDataUtils.eip712Hash` tests, because all of
+    // those test cases are relevant here as well.
+
+    it('should sign a minimal valid typed message', function () {
+      const signature = sigUtil.signTypedData(
+        privateKey,
+        // This represents the most basic "typed message" that is valid according to our types.
+        // It's not a very useful message (it's totally empty), but it's complete according to the
+        // spec.
+        {
+          data: {
+            types: {
+              EIP712Domain: [],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {},
+            message: {},
+          },
+        },
+        'V4',
+      );
+
+      expect(signature).toMatchSnapshot();
+    });
+
+    it('minimal typed message signature should be identical to minimal valid typed message signature', function () {
+      const minimalSignature = sigUtil.signTypedData(
+        privateKey,
+        // This tests that when the mandatory fields `domain`, `message`, and `types.EIP712Domain`
+        // are omitted, the result is the same as if they were included but empty.
+        {
+          data: {
+            types: {},
+            primaryType: 'EIP712Domain',
+          },
+        } as any,
+        'V4',
+      );
+      const minimalValidSignature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {},
+            message: {},
+          },
+        },
+        'V4',
+      );
+
+      expect(minimalSignature).toBe(minimalValidSignature);
+    });
+
+    it('should ignore extra data properties', function () {
+      const minimalValidSignature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {},
+            message: {},
+          },
+        },
+        'V4',
+      );
+      const extraPropertiesSignature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {},
+            message: {},
+            extra: 'stuff',
+            moreExtra: 1,
+          },
+        } as any,
+        'V4',
+      );
+
+      expect(minimalValidSignature).toBe(extraPropertiesSignature);
+    });
+
+    it('should sign a typed message with a domain separator that uses all fields', function () {
+      const signature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [
+                {
+                  name: 'name',
+                  type: 'string',
+                },
+                {
+                  name: 'version',
+                  type: 'string',
+                },
+                {
+                  name: 'chainId',
+                  type: 'uint256',
+                },
+                {
+                  name: 'verifyingContract',
+                  type: 'address',
+                },
+                {
+                  name: 'salt',
+                  type: 'bytes32',
+                },
+              ],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {
+              name: 'example.metamask.io',
+              version: '1',
+              chainId: 1,
+              verifyingContract: '0x0000000000000000000000000000000000000000',
+              salt: Buffer.from(new Int32Array([1, 2, 3])),
+            },
+            message: {},
+          },
+        },
+        'V4',
+      );
+
+      expect(signature).toMatchSnapshot();
+    });
+
+    it('should sign a typed message with extra domain seperator fields', function () {
+      const signature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [
+                {
+                  name: 'name',
+                  type: 'string',
+                },
+                {
+                  name: 'version',
+                  type: 'string',
+                },
+                {
+                  name: 'chainId',
+                  type: 'uint256',
+                },
+                {
+                  name: 'verifyingContract',
+                  type: 'address',
+                },
+                {
+                  name: 'salt',
+                  type: 'bytes32',
+                },
+                {
+                  name: 'extraField',
+                  type: 'string',
+                },
+              ],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {
+              name: 'example.metamask.io',
+              version: '1',
+              chainId: 1,
+              verifyingContract: '0x0000000000000000000000000000000000000000',
+              salt: Buffer.from(new Int32Array([1, 2, 3])),
+              extraField: 'stuff',
+            },
+            message: {},
+          },
+        } as any,
+        'V4',
+      );
+
+      expect(signature).toMatchSnapshot();
+    });
+
+    it('should sign a typed message with only custom domain seperator fields', function () {
+      const signature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [
+                {
+                  name: 'customName',
+                  type: 'string',
+                },
+                {
+                  name: 'customVersion',
+                  type: 'string',
+                },
+                {
+                  name: 'customChainId',
+                  type: 'uint256',
+                },
+                {
+                  name: 'customVerifyingContract',
+                  type: 'address',
+                },
+                {
+                  name: 'customSalt',
+                  type: 'bytes32',
+                },
+                {
+                  name: 'extraField',
+                  type: 'string',
+                },
+              ],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {
+              customName: 'example.metamask.io',
+              customVersion: '1',
+              customChainId: 1,
+              customVerifyingContract:
+                '0x0000000000000000000000000000000000000000',
+              customSalt: Buffer.from(new Int32Array([1, 2, 3])),
+              extraField: 'stuff',
+            },
+            message: {},
+          },
+        } as any,
+        'V4',
+      );
+
+      expect(signature).toMatchSnapshot();
+    });
+
+    it('should sign a typed message with data', function () {
+      const signature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types: {
+              EIP712Domain: [
+                {
+                  name: 'name',
+                  type: 'string',
+                },
+                {
+                  name: 'version',
+                  type: 'string',
+                },
+                {
+                  name: 'chainId',
+                  type: 'uint256',
+                },
+                {
+                  name: 'verifyingContract',
+                  type: 'address',
+                },
+                {
+                  name: 'salt',
+                  type: 'bytes32',
+                },
+              ],
+              Message: [{ name: 'data', type: 'string' }],
+            },
+            primaryType: 'Message',
+            domain: {
+              name: 'example.metamask.io',
+              version: '1',
+              chainId: 1,
+              verifyingContract: '0x0000000000000000000000000000000000000000',
+              salt: Buffer.from(new Int32Array([1, 2, 3])),
+            },
+            message: {
+              data: 'Hello!',
+            },
+          },
+        },
+        'V4',
+      );
+
+      expect(signature).toMatchSnapshot();
+    });
+
+    // This second group of tests mirrors the `TypedDataUtils.encodeData` tests, because all of
+    // those test cases are relevant here as well.
+    describe('example data', function () {
+      // Reassigned to silence "no-loop-func" ESLint rule
+      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
+      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
+      const _expect = expect;
+      const _it = it;
+
+      for (const type of allExampleTypes) {
+        describe(`type "${type}"`, function () {
+          // Test all examples that do not crash
+          const inputs = encodeDataExamples[type] || [];
+          for (const input of inputs) {
+            const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+            _it(`should sign "${input}" (type "${inputType}")`, function () {
+              const types = {
+                EIP712Domain: [],
+                Message: [{ name: 'data', type }],
+              };
+              const message = { data: input };
+              const primaryType = 'Message';
+
+              _expect(
+                sigUtil.signTypedData(
+                  privateKey,
+                  {
+                    data: {
+                      types,
+                      primaryType,
+                      domain: {},
+                      message,
+                    },
+                  },
+                  'V4',
+                ),
+              ).toMatchSnapshot();
+            });
+          }
+
+          // Test all examples that crash
+          const errorInputs = encodeDataErrorExamples[type] || [];
+          for (const { input, errorMessage } of errorInputs) {
+            const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+            _it(
+              `should fail to sign "${input}" (type "${inputType}")`,
+              function () {
+                const types = {
+                  EIP712Domain: [],
+                  Message: [{ name: 'data', type }],
+                };
+                const message = { data: input };
+                const primaryType = 'Message';
+
+                _expect(() =>
+                  sigUtil.signTypedData(
+                    privateKey,
+                    {
+                      data: {
+                        types,
+                        primaryType,
+                        domain: {},
+                        message,
+                      },
+                    },
+                    'V4',
+                  ),
+                ).toThrow(errorMessage);
+              },
+            );
+          }
+
+          _it(`should sign array of all ${type} example data`, function () {
+            const types = {
+              EIP712Domain: [],
+              Message: [{ name: 'data', type: `${type}[]` }],
+            };
+            const message = { data: inputs };
+            const primaryType = 'Message';
+            _expect(
+              sigUtil.signTypedData(
+                privateKey,
+                {
+                  data: {
+                    types,
+                    primaryType,
+                    domain: {},
+                    message,
+                  },
+                },
+                'V4',
+              ),
+            ).toMatchSnapshot();
+          });
+        });
+      }
+    });
+
+    it('should sign data with custom type', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V4',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should sign data with a recursive data type', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+          { name: 'replyTo', type: 'Mail' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+        replyTo: {
+          to: {
+            name: 'Cow',
+            wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+          },
+          from: {
+            name: 'Bob',
+            wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+          },
+          contents: 'Hello!',
+        },
+      };
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V4',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should sign data with a custom data type array', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address[]' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person[]' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: [
+            '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+            '0xDD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+          ],
+        },
+        to: [
+          {
+            name: 'Bob',
+            wallet: ['0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB'],
+          },
+        ],
+        contents: 'Hello, Bob!',
+      };
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V4',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should ignore extra unspecified message properties', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      const originalSignature = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types,
+            primaryType,
+            domain: {},
+            message,
+          },
+        },
+        'V4',
+      );
+      const messageWithExtraProperties = { ...message, foo: 'bar' };
+      const signatureWithExtraProperties = sigUtil.signTypedData(
+        privateKey,
+        {
+          data: {
+            types,
+            primaryType,
+            domain: {},
+            message: messageWithExtraProperties,
+          },
+        },
+        'V4',
+      );
+
+      expect(originalSignature).toBe(signatureWithExtraProperties);
+    });
+
+    it('should throw an error when an atomic property is set to null', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+          { name: 'length', type: 'int32' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello!',
+        length: null,
+      };
+
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V4',
+        ),
+      ).toThrow(`Cannot read property 'toArray' of null`);
+    });
+
+    it('should throw an error when an atomic property is set to undefined', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+          { name: 'length', type: 'int32' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello!',
+        length: undefined,
+      };
+
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V4',
+        ),
+      ).toThrow('missing value for field length of type int32');
+    });
+
+    it('should sign data with a dynamic property set to null', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: null,
+      };
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V4',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should throw an error when a dynamic property is set to undefined', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: undefined,
+      };
+
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V4',
+        ),
+      ).toThrow('missing value for field contents of type string');
+    });
+
+    it('should sign data with a custom type property set to null', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        to: null,
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        contents: 'Hello, Bob!',
+      };
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V4',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should sign data with a custom type property set to undefined', function () {
+      const types = {
+        EIP712Domain: [],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' },
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' },
+        ],
+      };
+      const primaryType = 'Mail';
+      const message = {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: undefined,
+        contents: 'Hello, Bob!',
+      };
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V4',
+        ),
+      ).toMatchSnapshot();
+    });
+
+    it('should throw an error when trying to encode a function', function () {
+      const types = {
+        EIP712Domain: [],
+        Message: [{ name: 'data', type: 'function' }],
+      };
+      const message = { data: 'test' };
+      const primaryType = 'Message';
+
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V4',
+        ),
+      ).toThrow('Unsupported or invalid type: function');
+    });
+
+    it('should throw an error when trying to sign with a missing primary type definition', function () {
+      const types = {
+        EIP712Domain: [],
+      };
+      const message = { data: 'test' };
+      const primaryType = 'Message';
+
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            } as any,
+          },
+          'V4',
+        ),
+      ).toThrow('No type definition specified: Message');
+    });
+
+    it('should throw an error when trying to sign an unrecognized type', function () {
+      const types = {
+        EIP712Domain: [],
+        Message: [{ name: 'data', type: 'foo' }],
+      };
+      const message = { data: 'test' };
+      const primaryType = 'Message';
+
+      expect(() =>
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V4',
+        ),
+      ).toThrow('Unsupported or invalid type: foo');
+    });
+
+    it('should sign data when given extraneous types', function () {
+      const types = {
+        EIP712Domain: [],
+        Message: [{ name: 'data', type: 'string' }],
+        Extra: [{ name: 'data', type: 'string' }],
+      };
+      const message = { data: 'Hello!' };
+      const primaryType = 'Message';
+
+      expect(
+        sigUtil.signTypedData(
+          privateKey,
+          {
+            data: {
+              types,
+              primaryType,
+              domain: {},
+              message,
+            },
+          },
+          'V4',
+        ),
+      ).toMatchSnapshot();
+    });
+  });
 });
 
-it('signTypedData and recoverTypedSignature V1 - multiple messages', function () {
-  const address = '0x29c76e6ad8f28bb1004902578fb108c507be341b';
-  const privKeyHex =
-    '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0';
+describe('recoverTypedSignature', function () {
+  describe('V1', function () {
+    // This is a signature of the message "[{ name: 'message', type: 'string', value: 'Hi, Alice!' }]"
+    // that was created using the private key in the top-level `privateKey` variable.
+    const exampleSignature =
+      '0x49e75d475d767de7fcc67f521e0d86590723d872e6111e51c393e8c1e2f21d032dfaf5833af158915f035db6af4f37bf2d5d29781cd81f28a44c5cb4b9d241531b';
 
-  const privKey = Buffer.from(privKeyHex, 'hex');
+    it('should recover the address of the signer', function () {
+      const address = ethUtil.addHexPrefix(
+        ethUtil.privateToAddress(privateKey).toString('hex'),
+      );
 
-  const typedData = [
-    {
-      type: 'string',
-      name: 'message',
-      value: 'Hi, Alice!',
-    },
-    {
-      type: 'uint8',
-      name: 'value',
-      value: 10,
-    },
-  ];
+      expect(
+        sigUtil.recoverTypedSignature(
+          {
+            data: [{ name: 'message', type: 'string', value: 'Hi, Alice!' }],
+            sig: exampleSignature,
+          },
+          'V1',
+        ),
+      ).toBe(address);
+    });
 
-  const msgParams = { data: typedData };
+    it('should sign typed data and recover the address of the signer', function () {
+      const address = ethUtil.addHexPrefix(
+        ethUtil.privateToAddress(privateKey).toString('hex'),
+      );
+      const message = [
+        { name: 'message', type: 'string', value: 'Hi, Alice!' },
+      ];
+      const signature = sigUtil.signTypedData(
+        privateKey,
+        { data: message },
+        'V1',
+      );
 
-  const signature = sigUtil.signTypedData(privKey, msgParams, 'V1');
-  const recovered = sigUtil.recoverTypedSignature(
-    {
-      data: msgParams.data,
-      sig: signature,
-    },
-    'V1',
-  );
+      expect(
+        sigUtil.recoverTypedSignature(
+          {
+            data: message,
+            sig: signature,
+          },
+          'V1',
+        ),
+      ).toBe(address);
+    });
+  });
 
-  expect(address).toBe(recovered);
+  describe('V3', function () {
+    // This is a signature of the message in the test below that was created using the private key
+    // in the top-level `privateKey` variable.
+    const exampleSignature =
+      '0xf6cda8eaf5137e8cc15d48d03a002b0512446e2a7acbc576c01cfbe40ad9345663ccda8884520d98dece9a8bfe38102851bdae7f69b3d8612b9808e6337801601b';
+
+    it('should recover the address of the signer', function () {
+      const address = ethUtil.addHexPrefix(
+        ethUtil.privateToAddress(privateKey).toString('hex'),
+      );
+      const types = {
+        EIP712Domain: [],
+        Message: [{ name: 'data', type: 'string' }],
+      };
+      const message = { data: 'test' };
+      const primaryType = 'Message' as const;
+      const typedMessage = {
+        types,
+        primaryType,
+        domain: {},
+        message,
+      };
+
+      expect(
+        sigUtil.recoverTypedSignature(
+          {
+            data: typedMessage,
+            sig: exampleSignature,
+          },
+          'V3',
+        ),
+      ).toBe(address);
+    });
+
+    it('should sign typed data and recover the address of the signer', function () {
+      const address = ethUtil.addHexPrefix(
+        ethUtil.privateToAddress(privateKey).toString('hex'),
+      );
+      const types = {
+        EIP712Domain: [],
+        Message: [{ name: 'data', type: 'string' }],
+      };
+      const message = { data: 'test' };
+      const primaryType = 'Message' as const;
+      const typedMessage = {
+        types,
+        primaryType,
+        domain: {},
+        message,
+      };
+      const signature = sigUtil.signTypedData(
+        privateKey,
+        { data: typedMessage },
+        'V3',
+      );
+
+      expect(
+        sigUtil.recoverTypedSignature(
+          {
+            data: typedMessage,
+            sig: signature,
+          },
+          'V3',
+        ),
+      ).toBe(address);
+    });
+  });
+
+  describe('V4', function () {
+    // This is a signature of the message in the test below that was created using the private key
+    // in the top-level `privateKey` variable.
+    const exampleSignature =
+      '0xf6cda8eaf5137e8cc15d48d03a002b0512446e2a7acbc576c01cfbe40ad9345663ccda8884520d98dece9a8bfe38102851bdae7f69b3d8612b9808e6337801601b';
+
+    it('should recover the address of the signer', function () {
+      const address = ethUtil.addHexPrefix(
+        ethUtil.privateToAddress(privateKey).toString('hex'),
+      );
+      const types = {
+        EIP712Domain: [],
+        Message: [{ name: 'data', type: 'string' }],
+      };
+      const message = { data: 'test' };
+      const primaryType = 'Message' as const;
+      const typedMessage = {
+        types,
+        primaryType,
+        domain: {},
+        message,
+      };
+
+      expect(
+        sigUtil.recoverTypedSignature(
+          {
+            data: typedMessage,
+            sig: exampleSignature,
+          },
+          'V4',
+        ),
+      ).toBe(address);
+    });
+
+    it('should sign typed data and recover the address of the signer', function () {
+      const address = ethUtil.addHexPrefix(
+        ethUtil.privateToAddress(privateKey).toString('hex'),
+      );
+      const types = {
+        EIP712Domain: [],
+        Message: [{ name: 'data', type: 'string' }],
+      };
+      const message = { data: 'test' };
+      const primaryType = 'Message' as const;
+      const typedMessage = {
+        types,
+        primaryType,
+        domain: {},
+        message,
+      };
+      const signature = sigUtil.signTypedData(
+        privateKey,
+        { data: typedMessage },
+        'V4',
+      );
+
+      expect(
+        sigUtil.recoverTypedSignature(
+          {
+            data: typedMessage,
+            sig: signature,
+          },
+          'V4',
+        ),
+      ).toBe(address);
+    });
+  });
 });
 
 it('typedSignatureHash - single value', function () {
@@ -4471,351 +6705,5 @@ it('Decryption failed because cyphertext is wrong or missing', function () {
 
   expect(() => sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)).toThrow(
     'Decryption failed.',
-  );
-});
-
-it('signedTypeData', function () {
-  const typedData = {
-    types: {
-      EIP712Domain: [
-        { name: 'name', type: 'string' },
-        { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
-      ],
-      Person: [
-        { name: 'name', type: 'string' },
-        { name: 'wallet', type: 'address' },
-      ],
-      Mail: [
-        { name: 'from', type: 'Person' },
-        { name: 'to', type: 'Person' },
-        { name: 'contents', type: 'string' },
-      ],
-    },
-    primaryType: 'Mail' as const,
-    domain: {
-      name: 'Ether Mail',
-      version: '1',
-      chainId: 1,
-      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-    },
-    message: {
-      from: {
-        name: 'Cow',
-        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-      },
-      to: {
-        name: 'Bob',
-        wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-      },
-      contents: 'Hello, Bob!',
-    },
-  };
-
-  const privateKey = ethUtil.keccak('cow');
-  const address = ethUtil.privateToAddress(privateKey);
-  const sig = sigUtil.signTypedData(privateKey, { data: typedData }, 'V3');
-
-  expect(ethUtil.bufferToHex(address)).toBe(
-    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
-  );
-  expect(sig).toBe(
-    '0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b915621c',
-  );
-});
-
-it('signedTypeData with bytes', function () {
-  const typedDataWithBytes = {
-    types: {
-      EIP712Domain: [
-        { name: 'name', type: 'string' },
-        { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
-      ],
-      Person: [
-        { name: 'name', type: 'string' },
-        { name: 'wallet', type: 'address' },
-      ],
-      Mail: [
-        { name: 'from', type: 'Person' },
-        { name: 'to', type: 'Person' },
-        { name: 'contents', type: 'string' },
-        { name: 'payload', type: 'bytes' },
-      ],
-    },
-    primaryType: 'Mail' as const,
-    domain: {
-      name: 'Ether Mail',
-      version: '1',
-      chainId: 1,
-      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-    },
-    message: {
-      from: {
-        name: 'Cow',
-        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-      },
-      to: {
-        name: 'Bob',
-        wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-      },
-      contents: 'Hello, Bob!',
-      payload:
-        '0x25192142931f380985072cdd991e37f65cf8253ba7a0e675b54163a1d133b8ca',
-    },
-  };
-  const privateKey = ethUtil.sha3('cow');
-  const address = ethUtil.privateToAddress(privateKey);
-  const sig = sigUtil.signTypedData(
-    privateKey,
-    { data: typedDataWithBytes },
-    'V3',
-  );
-
-  expect(ethUtil.bufferToHex(address)).toBe(
-    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
-  );
-  expect(sig).toBe(
-    '0xdd17ea877a7da411c85ff94bc54180631d0e86efdcd68876aeb2e051417b68e76be6858d67b20baf7be9c6402d49930bfea2535e9ae150e85838ee265094fd081b',
-  );
-});
-
-it('signedTypeData_v4', function () {
-  const typedData = {
-    types: {
-      EIP712Domain: [
-        { name: 'name', type: 'string' },
-        { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
-      ],
-      Person: [
-        { name: 'name', type: 'string' },
-        { name: 'wallets', type: 'address[]' },
-      ],
-      Mail: [
-        { name: 'from', type: 'Person' },
-        { name: 'to', type: 'Person[]' },
-        { name: 'contents', type: 'string' },
-      ],
-      Group: [
-        { name: 'name', type: 'string' },
-        { name: 'members', type: 'Person[]' },
-      ],
-    },
-    domain: {
-      name: 'Ether Mail',
-      version: '1',
-      chainId: 1,
-      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-    },
-    primaryType: 'Mail' as const,
-    message: {
-      from: {
-        name: 'Cow',
-        wallets: [
-          '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-          '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF',
-        ],
-      },
-      to: [
-        {
-          name: 'Bob',
-          wallets: [
-            '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-            '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
-            '0xB0B0b0b0b0b0B000000000000000000000000000',
-          ],
-        },
-      ],
-      contents: 'Hello, Bob!',
-    },
-  };
-
-  const privateKey = ethUtil.keccak('cow');
-
-  const address = ethUtil.privateToAddress(privateKey);
-  expect(ethUtil.bufferToHex(address)).toBe(
-    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
-  );
-
-  const sig = sigUtil.signTypedData(privateKey, { data: typedData }, 'V4');
-
-  expect(sig).toBe(
-    '0x65cbd956f2fae28a601bebc9b906cea0191744bd4c4247bcd27cd08f8eb6b71c78efdf7a31dc9abee78f492292721f362d296cf86b4538e07b51303b67f749061b',
-  );
-});
-
-it('signedTypeData_v4', function () {
-  const typedData = {
-    types: {
-      EIP712Domain: [
-        { name: 'name', type: 'string' },
-        { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
-      ],
-      Person: [
-        { name: 'name', type: 'string' },
-        { name: 'wallets', type: 'address[]' },
-      ],
-      Mail: [
-        { name: 'from', type: 'Person' },
-        { name: 'to', type: 'Person[]' },
-        { name: 'contents', type: 'string' },
-      ],
-      Group: [
-        { name: 'name', type: 'string' },
-        { name: 'members', type: 'Person[]' },
-      ],
-    },
-    domain: {
-      name: 'Ether Mail',
-      version: '1',
-      chainId: 1,
-      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-    },
-    primaryType: 'Mail' as const,
-    message: {
-      from: {
-        name: 'Cow',
-        wallets: [
-          '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-          '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF',
-        ],
-      },
-      to: [
-        {
-          name: 'Bob',
-          wallets: [
-            '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-            '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
-            '0xB0B0b0b0b0b0B000000000000000000000000000',
-          ],
-        },
-      ],
-      contents: 'Hello, Bob!',
-    },
-  };
-
-  const privateKey = ethUtil.keccak('cow');
-
-  const address = ethUtil.privateToAddress(privateKey);
-  expect(ethUtil.bufferToHex(address)).toBe(
-    '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
-  );
-
-  const sig = sigUtil.signTypedData(privateKey, { data: typedData }, 'V4');
-
-  expect(sig).toBe(
-    '0x65cbd956f2fae28a601bebc9b906cea0191744bd4c4247bcd27cd08f8eb6b71c78efdf7a31dc9abee78f492292721f362d296cf86b4538e07b51303b67f749061b',
-  );
-});
-
-it('signedTypeData_v4 with recursive types', function () {
-  const typedData = {
-    types: {
-      EIP712Domain: [
-        { name: 'name', type: 'string' },
-        { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
-      ],
-      Person: [
-        { name: 'name', type: 'string' },
-        { name: 'mother', type: 'Person' },
-        { name: 'father', type: 'Person' },
-      ],
-    },
-    domain: {
-      name: 'Family Tree',
-      version: '1',
-      chainId: 1,
-      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-    },
-    primaryType: 'Person' as const,
-    message: {
-      name: 'Jon',
-      mother: {
-        name: 'Lyanna',
-        father: {
-          name: 'Rickard',
-        },
-      },
-      father: {
-        name: 'Rhaegar',
-        father: {
-          name: 'Aeris II',
-        },
-      },
-    },
-  };
-
-  const privateKey = ethUtil.keccak('dragon');
-
-  const address = ethUtil.privateToAddress(privateKey);
-  expect(ethUtil.bufferToHex(address)).toBe(
-    '0x065a687103c9f6467380bee800ecd70b17f6b72f',
-  );
-
-  const sig = sigUtil.signTypedData(privateKey, { data: typedData }, 'V4');
-
-  expect(sig).toBe(
-    '0xf2ec61e636ff7bb3ac8bc2a4cc2c8b8f635dd1b2ec8094c963128b358e79c85c5ca6dd637ed7e80f0436fe8fce39c0e5f2082c9517fe677cc2917dcd6c84ba881c',
-  );
-});
-
-it('signedTypeMessage V4 with recursive types', function () {
-  const typedData = {
-    types: {
-      EIP712Domain: [
-        { name: 'name', type: 'string' },
-        { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
-      ],
-      Person: [
-        { name: 'name', type: 'string' },
-        { name: 'mother', type: 'Person' },
-        { name: 'father', type: 'Person' },
-      ],
-    },
-    domain: {
-      name: 'Family Tree',
-      version: '1',
-      chainId: 1,
-      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-    },
-    primaryType: 'Person' as const,
-    message: {
-      name: 'Jon',
-      mother: {
-        name: 'Lyanna',
-        father: {
-          name: 'Rickard',
-        },
-      },
-      father: {
-        name: 'Rhaegar',
-        father: {
-          name: 'Aeris II',
-        },
-      },
-    },
-  };
-
-  const privateKey = ethUtil.keccak('dragon');
-
-  const address = ethUtil.privateToAddress(privateKey);
-  expect(ethUtil.bufferToHex(address)).toBe(
-    '0x065a687103c9f6467380bee800ecd70b17f6b72f',
-  );
-
-  const sig = sigUtil.signTypedData(privateKey, { data: typedData }, 'V4');
-
-  expect(sig).toBe(
-    '0xf2ec61e636ff7bb3ac8bc2a4cc2c8b8f635dd1b2ec8094c963128b358e79c85c5ca6dd637ed7e80f0436fe8fce39c0e5f2082c9517fe677cc2917dcd6c84ba881c',
   );
 });
