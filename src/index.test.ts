@@ -4115,103 +4115,101 @@ describe('personalSign', function () {
   });
 });
 
+// Comments starting with "V1:" highlight differences relative to V3 and 4.
+const signTypedDataV1Examples = {
+  // dynamic types supported by EIP-712:
+  bytes: [10, '10', '0x10', Buffer.from('10', 'utf8')],
+  string: [
+    'Hello!',
+    '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+    '0xabcd',
+    '😁',
+  ],
+  // atomic types supported by EIP-712:
+  address: [
+    '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+    // V1: No apparent maximum address length
+    '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbBbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+    '0x0',
+    10,
+    Number.MAX_SAFE_INTEGER,
+  ],
+  bool: [true, false, 'true', 'false', 0, 1, -1, Number.MAX_SAFE_INTEGER],
+  bytes1: [
+    '0x10',
+    10,
+    0,
+    1,
+    -1,
+    Number.MAX_SAFE_INTEGER,
+    Buffer.from('10', 'utf8'),
+  ],
+  bytes32: [
+    '0x10',
+    10,
+    0,
+    1,
+    -1,
+    Number.MAX_SAFE_INTEGER,
+    Buffer.from('10', 'utf8'),
+  ],
+  int8: [0, '0', '0x0', 255, -255],
+  int256: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER],
+  uint8: [0, '0', '0x0', 255, -255],
+  uint256: [
+    0,
+    '0',
+    '0x0',
+    Number.MAX_SAFE_INTEGER,
+    // V1: Negative unsigned integers
+    Number.MIN_SAFE_INTEGER,
+  ],
+  // atomic types not supported by EIP-712:
+  int: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER], // interpreted as `int256` by `ethereumjs-abi`
+  uint: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER], // interpreted as `uint256` by `ethereumjs-abi`
+  // `fixed` and `ufixed` types omitted because their encoding in `ethereumjs-abi` is very broken at the moment.
+  // `function` type omitted because it is not supported by `ethereumjs-abi`.
+};
+
+const signTypedDataV1ErrorExamples = {
+  string: [
+    {
+      // V1: Does not accept numbers as strings (arguably correctly).
+      input: 10,
+      errorMessage:
+        'The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received type number (10)',
+    },
+  ],
+  address: [
+    {
+      // V1: Unprefixed addresses are not accepted.
+      input: 'bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+      errorMessage:
+        'Cannot convert string to buffer. toBuffer only supports 0x-prefixed hex strings and this string was given:',
+    },
+  ],
+  int8: [{ input: '256', errorMessage: 'Supplied int exceeds width: 8 vs 9' }],
+  bytes1: [
+    { input: 'a', errorMessage: 'Cannot convert string to buffer' },
+    { input: 'test', errorMessage: 'Cannot convert string to buffer' },
+  ],
+  bytes32: [
+    { input: 'a', errorMessage: 'Cannot convert string to buffer' },
+    { input: 'test', errorMessage: 'Cannot convert string to buffer' },
+  ],
+};
+
+// Union of all types from both sets of examples
+const allSignTypedDataV1ExampleTypes = [
+  ...new Set(
+    Object.keys(encodeDataExamples).concat(
+      Object.keys(encodeDataErrorExamples),
+    ),
+  ),
+];
+
 describe('signTypedData', function () {
   describe('V1', function () {
-    // Comments starting with "V1:" highlight differences relative to V3 and 4.
-    const signTypedDataV1Examples = {
-      // dynamic types supported by EIP-712:
-      bytes: [10, '10', '0x10', Buffer.from('10', 'utf8')],
-      string: [
-        'Hello!',
-        '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-        '0xabcd',
-        '😁',
-      ],
-      // atomic types supported by EIP-712:
-      address: [
-        '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-        // V1: No apparent maximum address length
-        '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbBbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-        '0x0',
-        10,
-        Number.MAX_SAFE_INTEGER,
-      ],
-      bool: [true, false, 'true', 'false', 0, 1, -1, Number.MAX_SAFE_INTEGER],
-      bytes1: [
-        '0x10',
-        10,
-        0,
-        1,
-        -1,
-        Number.MAX_SAFE_INTEGER,
-        Buffer.from('10', 'utf8'),
-      ],
-      bytes32: [
-        '0x10',
-        10,
-        0,
-        1,
-        -1,
-        Number.MAX_SAFE_INTEGER,
-        Buffer.from('10', 'utf8'),
-      ],
-      int8: [0, '0', '0x0', 255, -255],
-      int256: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER],
-      uint8: [0, '0', '0x0', 255, -255],
-      uint256: [
-        0,
-        '0',
-        '0x0',
-        Number.MAX_SAFE_INTEGER,
-        // V1: Negative unsigned integers
-        Number.MIN_SAFE_INTEGER,
-      ],
-      // atomic types not supported by EIP-712:
-      int: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER], // interpreted as `int256` by `ethereumjs-abi`
-      uint: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER], // interpreted as `uint256` by `ethereumjs-abi`
-      // `fixed` and `ufixed` types omitted because their encoding in `ethereumjs-abi` is very broken at the moment.
-      // `function` type omitted because it is not supported by `ethereumjs-abi`.
-    };
-
-    const signTypedDataV1ErrorExamples = {
-      string: [
-        {
-          // V1: Does not accept numbers as strings (arguably correctly).
-          input: 10,
-          errorMessage:
-            'The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received type number (10)',
-        },
-      ],
-      address: [
-        {
-          // V1: Unprefixed addresses are not accepted.
-          input: 'bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-          errorMessage:
-            'Cannot convert string to buffer. toBuffer only supports 0x-prefixed hex strings and this string was given:',
-        },
-      ],
-      int8: [
-        { input: '256', errorMessage: 'Supplied int exceeds width: 8 vs 9' },
-      ],
-      bytes1: [
-        { input: 'a', errorMessage: 'Cannot convert string to buffer' },
-        { input: 'test', errorMessage: 'Cannot convert string to buffer' },
-      ],
-      bytes32: [
-        { input: 'a', errorMessage: 'Cannot convert string to buffer' },
-        { input: 'test', errorMessage: 'Cannot convert string to buffer' },
-      ],
-    };
-
-    // Union of all types from both sets of examples
-    const allSignTypedDataV1ExampleTypes = [
-      ...new Set(
-        Object.keys(encodeDataExamples).concat(
-          Object.keys(encodeDataErrorExamples),
-        ),
-      ),
-    ];
-
     it('should throw when given an empty array', function () {
       expect(() =>
         sigUtil.signTypedData(
@@ -6418,103 +6416,123 @@ describe('recoverTypedSignature', function () {
   });
 });
 
-it('typedSignatureHash - single value', function () {
-  const typedData = [
+describe('typedSignatureHash', function () {
+  // Reassigned to silence "no-loop-func" ESLint rule
+  // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
+  // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
+  const _expect = expect;
+  const _it = it;
+
+  for (const type of allSignTypedDataV1ExampleTypes) {
+    describe(`type "${type}"`, function () {
+      // Test all examples that do not crash
+      const inputs = signTypedDataV1Examples[type] || [];
+      for (const input of inputs) {
+        const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+        _it(`should hash "${input}" (type "${inputType}")`, function () {
+          const typedData = [{ type, name: 'message', value: input }];
+
+          _expect(sigUtil.typedSignatureHash(typedData)).toMatchSnapshot();
+        });
+      }
+
+      const errorInputs = signTypedDataV1ErrorExamples[type] || [];
+      for (const { input, errorMessage } of errorInputs) {
+        const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
+        _it(
+          `should fail to hash "${input}" (type "${inputType}")`,
+          function () {
+            const typedData = [{ type, name: 'message', value: input }];
+
+            _expect(() => sigUtil.typedSignatureHash(typedData)).toThrow(
+              errorMessage,
+            );
+          },
+        );
+      }
+    });
+  }
+
+  const invalidTypedMessages = [
     {
-      type: 'string',
-      name: 'message',
-      value: 'Hi, Alice!',
+      input: [],
+      errorMessage: 'Expect argument to be non-empty array',
+      label: 'an empty array',
+    },
+    {
+      input: 42,
+      errorMessage: 'Expect argument to be non-empty array',
+      label: 'a number',
+    },
+    {
+      input: null,
+      errorMessage: "Cannot use 'in' operator to search for 'length' in null",
+      label: 'null',
+    },
+    {
+      input: undefined,
+      errorMessage: 'Expect argument to be non-empty array',
+      label: 'undefined',
+    },
+    {
+      input: [
+        {
+          type: 'jocker',
+          name: 'message',
+          value: 'Hi, Alice!',
+        },
+      ],
+      errorMessage: 'Unsupported or invalid type: jocker',
+      label: 'an unrecognized type',
+    },
+    {
+      input: [
+        {
+          name: 'message',
+          value: 'Hi, Alice!',
+        },
+      ],
+      errorMessage: "Cannot read property 'startsWith' of undefined",
+      label: 'no type',
+    },
+    {
+      input: [
+        {
+          type: 'string',
+          value: 'Hi, Alice!',
+        },
+      ],
+      errorMessage: 'Expect argument to be non-empty array',
+      label: 'no name',
     },
   ];
-  const hash = sigUtil.typedSignatureHash(typedData);
-  expect(hash).toBe(
-    '0x14b9f24872e28cc49e72dc104d7380d8e0ba84a3fe2e712704bcac66a5702bd5',
-  );
-});
 
-it('typedSignatureHash - multiple values', function () {
-  const typedData = [
-    {
-      type: 'string',
-      name: 'message',
-      value: 'Hi, Alice!',
-    },
-    {
-      type: 'uint8',
-      name: 'value',
-      value: 10,
-    },
-  ];
-  const hash = sigUtil.typedSignatureHash(typedData);
-  expect(hash).toBe(
-    '0xf7ad23226db5c1c00ca0ca1468fd49c8f8bbc1489bc1c382de5adc557a69c229',
-  );
-});
+  for (const { input, errorMessage, label } of invalidTypedMessages) {
+    _it(`should throw when given ${label}`, function () {
+      _expect(() => sigUtil.typedSignatureHash(input as any)).toThrow(
+        errorMessage,
+      );
+    });
+  }
 
-it('typedSignatureHash - bytes', function () {
-  const typedData = [
-    {
-      type: 'bytes',
-      name: 'message',
-      value: '0xdeadbeaf',
-    },
-  ];
-  const hash = sigUtil.typedSignatureHash(typedData);
-  expect(hash).toBe(
-    '0x6c69d03412450b174def7d1e48b3bcbbbd8f51df2e76e2c5b3a5d951125be3a9',
-  );
-});
+  it('should hash a message with multiple entries', function () {
+    const typedData = [
+      {
+        type: 'string',
+        name: 'message',
+        value: 'Hi, Alice!',
+      },
+      {
+        type: 'uint8',
+        name: 'value',
+        value: 10,
+      },
+    ];
 
-typedSignatureHashThrowsTest({
-  argument: [],
-  errorMessage: 'Expect argument to be non-empty array',
-  testLabel: 'empty array',
-});
-
-typedSignatureHashThrowsTest({
-  argument: 42,
-  errorMessage: 'Expect argument to be non-empty array',
-  testLabel: 'not array',
-});
-
-typedSignatureHashThrowsTest({
-  argument: null,
-  errorMessage: "Cannot use 'in' operator to search for 'length' in null",
-  testLabel: 'null',
-});
-
-typedSignatureHashThrowsTest({
-  argument: [
-    {
-      type: 'jocker',
-      name: 'message',
-      value: 'Hi, Alice!',
-    },
-  ],
-  errorMessage: 'Unsupported or invalid type: jocker',
-  testLabel: 'wrong type',
-});
-
-typedSignatureHashThrowsTest({
-  argument: [
-    {
-      name: 'message',
-      value: 'Hi, Alice!',
-    },
-  ],
-  errorMessage: "Cannot read property 'startsWith' of undefined",
-  testLabel: 'no type',
-});
-
-typedSignatureHashThrowsTest({
-  argument: [
-    {
-      type: 'string',
-      value: 'Hi, Alice!',
-    },
-  ],
-  errorMessage: 'Expect argument to be non-empty array',
-  testLabel: 'no name',
+    expect(sigUtil.typedSignatureHash(typedData)).toMatchInlineSnapshot(
+      `"0xf7ad23226db5c1c00ca0ca1468fd49c8f8bbc1489bc1c382de5adc557a69c229"`,
+    );
+  });
 });
 
 // personal_sign was declared without an explicit set of test data
@@ -6578,15 +6596,6 @@ function signatureTest(opts) {
     );
 
     expect(recovered).toBe(address);
-  });
-}
-
-function typedSignatureHashThrowsTest({ argument, errorMessage, testLabel }) {
-  const label = `typedSignatureHash - malformed arguments - ${testLabel}`;
-  it(label, function () {
-    expect(() => {
-      sigUtil.typedSignatureHash(argument);
-    }).toThrow(errorMessage);
   });
 }
 
