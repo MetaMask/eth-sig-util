@@ -467,10 +467,10 @@ export function extractPublicKey<T extends MessageTypes>(
 }
 
 /**
- * Generate the "V1" type hash for the provided typed message.
+ * Generate the "V1" hash for the provided typed message.
  *
- * The type hash will be generated in accordance with an earlier version of the EIP-712
- * specification. This type hash is used in `signTypedData_v1`.
+ * The hash will be generated in accordance with an earlier version of the EIP-712
+ * specification. This hash is used in `signTypedData_v1`.
  *
  * @param typedData - The typed message.
  * @returns The type hash for the provided message.
