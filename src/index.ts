@@ -63,7 +63,7 @@ export const TYPED_MESSAGE_SCHEMA = {
           type: 'object',
           properties: {
             name: { type: 'string' },
-            type: { type: 'string' },
+            type: { type: 'string', enum: getSolidityTypes() },
           },
           required: ['name', 'type'],
         },
@@ -75,6 +75,21 @@ export const TYPED_MESSAGE_SCHEMA = {
   },
   required: ['types', 'primaryType', 'domain', 'message'],
 };
+
+function getSolidityTypes() {
+  const types = ['bool', 'address', 'string', 'bytes'];
+  const ints = Array.from(new Array(32)).map(
+    (_, index) => `int${(index + 1) * 8}`,
+  );
+  const uints = Array.from(new Array(32)).map(
+    (_, index) => `uint${(index + 1) * 8}`,
+  );
+  const bytes = Array.from(new Array(32)).map(
+    (_, index) => `bytes${index + 1}`,
+  );
+
+  return [...types, ...ints, ...uints, ...bytes];
+}
 
 /**
  * Encodes an object by encoding and concatenating each of its members
@@ -452,10 +467,10 @@ export function extractPublicKey<T extends MessageTypes>(
 }
 
 /**
- * Generate the "V1" type hash for the provided typed message.
+ * Generate the "V1" hash for the provided typed message.
  *
- * The type hash will be generated in accordance with an earlier version of the EIP-712
- * specification. This type hash is used in `signTypedData_v1`.
+ * The hash will be generated in accordance with an earlier version of the EIP-712
+ * specification. This hash is used in `signTypedData_v1`.
  *
  * @param typedData - The typed message.
  * @returns The type hash for the provided message.
