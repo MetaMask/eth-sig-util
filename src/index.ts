@@ -77,7 +77,7 @@ export const TYPED_MESSAGE_SCHEMA = {
 };
 
 function getSolidityTypes() {
-  const types = ['bool', 'address', 'int', 'uint', 'string', 'byte'];
+  const types = ['bool', 'address', 'string', 'bytes'];
   const ints = Array.from(new Array(32)).map(
     (_, index) => `int${(index + 1) * 8}`,
   );
@@ -88,7 +88,7 @@ function getSolidityTypes() {
     (_, index) => `bytes${index + 1}`,
   );
 
-  return types.concat(ints).concat(uints).concat(bytes);
+  return [...types, ...ints, ...uints, ...bytes];
 }
 
 /**
