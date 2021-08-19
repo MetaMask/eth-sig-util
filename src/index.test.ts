@@ -3307,7 +3307,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             ],
             Message: [{ name: 'data', type: 'string' }],
           },
-          primaryType: 'EIP712Domain',
+          primaryType: 'Message',
           domain: {
             name: 'example.metamask.io',
             version: '1',
@@ -3323,6 +3323,93 @@ describe('TypedDataUtils.eip712Hash', function () {
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
+    });
+
+    it('should ignore message if the primary type is EIP712Domain', function () {
+      const hashWithMessage = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [
+              {
+                name: 'name',
+                type: 'string',
+              },
+              {
+                name: 'version',
+                type: 'string',
+              },
+              {
+                name: 'chainId',
+                type: 'uint256',
+              },
+              {
+                name: 'verifyingContract',
+                type: 'address',
+              },
+              {
+                name: 'salt',
+                type: 'bytes32',
+              },
+            ],
+            Message: [{ name: 'data', type: 'string' }],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {
+            name: 'example.metamask.io',
+            version: '1',
+            chainId: 1,
+            verifyingContract: '0x0000000000000000000000000000000000000000',
+            salt: Buffer.from(new Int32Array([1, 2, 3])),
+          },
+          message: {
+            data: 'Hello!',
+          },
+        },
+        'V3',
+      );
+      const hashWithoutMessage = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [
+              {
+                name: 'name',
+                type: 'string',
+              },
+              {
+                name: 'version',
+                type: 'string',
+              },
+              {
+                name: 'chainId',
+                type: 'uint256',
+              },
+              {
+                name: 'verifyingContract',
+                type: 'address',
+              },
+              {
+                name: 'salt',
+                type: 'bytes32',
+              },
+            ],
+            Message: [{ name: 'data', type: 'string' }],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {
+            name: 'example.metamask.io',
+            version: '1',
+            chainId: 1,
+            verifyingContract: '0x0000000000000000000000000000000000000000',
+            salt: Buffer.from(new Int32Array([1, 2, 3])),
+          },
+          message: {},
+        },
+        'V3',
+      );
+
+      expect(hashWithMessage.toString('hex')).toBe(
+        hashWithoutMessage.toString('hex'),
+      );
     });
   });
 
@@ -3572,7 +3659,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             ],
             Message: [{ name: 'data', type: 'string' }],
           },
-          primaryType: 'EIP712Domain',
+          primaryType: 'Message',
           domain: {
             name: 'example.metamask.io',
             version: '1',
@@ -3588,6 +3675,93 @@ describe('TypedDataUtils.eip712Hash', function () {
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
+    });
+
+    it('should ignore message if the primary type is EIP712Domain', function () {
+      const hashWithMessage = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [
+              {
+                name: 'name',
+                type: 'string',
+              },
+              {
+                name: 'version',
+                type: 'string',
+              },
+              {
+                name: 'chainId',
+                type: 'uint256',
+              },
+              {
+                name: 'verifyingContract',
+                type: 'address',
+              },
+              {
+                name: 'salt',
+                type: 'bytes32',
+              },
+            ],
+            Message: [{ name: 'data', type: 'string' }],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {
+            name: 'example.metamask.io',
+            version: '1',
+            chainId: 1,
+            verifyingContract: '0x0000000000000000000000000000000000000000',
+            salt: Buffer.from(new Int32Array([1, 2, 3])),
+          },
+          message: {
+            data: 'Hello!',
+          },
+        },
+        'V4',
+      );
+      const hashWithoutMessage = sigUtil.TypedDataUtils.eip712Hash(
+        {
+          types: {
+            EIP712Domain: [
+              {
+                name: 'name',
+                type: 'string',
+              },
+              {
+                name: 'version',
+                type: 'string',
+              },
+              {
+                name: 'chainId',
+                type: 'uint256',
+              },
+              {
+                name: 'verifyingContract',
+                type: 'address',
+              },
+              {
+                name: 'salt',
+                type: 'bytes32',
+              },
+            ],
+            Message: [{ name: 'data', type: 'string' }],
+          },
+          primaryType: 'EIP712Domain',
+          domain: {
+            name: 'example.metamask.io',
+            version: '1',
+            chainId: 1,
+            verifyingContract: '0x0000000000000000000000000000000000000000',
+            salt: Buffer.from(new Int32Array([1, 2, 3])),
+          },
+          message: {},
+        },
+        'V4',
+      );
+
+      expect(hashWithMessage.toString('hex')).toBe(
+        hashWithoutMessage.toString('hex'),
+      );
     });
   });
 });
