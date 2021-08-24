@@ -60,13 +60,13 @@ const encodeDataErrorExamples = {
   address: [
     {
       input: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB0',
-      errorMessage: 'Supplied uint exceeds width: 160 vs 164',
+      errorMessage: 'value out-of-bounds',
     },
   ],
-  int8: [{ input: '256', errorMessage: 'Supplied int exceeds width: 8 vs 9' }],
-  uint: [{ input: -1, errorMessage: 'Supplied uint is negative' }],
-  uint8: [{ input: -1, errorMessage: 'Supplied uint is negative' }],
-  uint256: [{ input: -1, errorMessage: 'Supplied uint is negative' }],
+  int8: [{ input: '256', errorMessage: 'Supplied int exceeds width' }],
+  uint: [{ input: -1, errorMessage: 'value out-of-bounds' }],
+  uint8: [{ input: -1, errorMessage: 'value out-of-bounds' }],
+  uint256: [{ input: -1, errorMessage: 'value out-of-bounds' }],
   bytes1: [
     { input: 'a', errorMessage: 'Cannot convert string to buffer' },
     { input: 'test', errorMessage: 'Cannot convert string to buffer' },
@@ -569,7 +569,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           Version.V3,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('invalid type');
     });
 
     it('should throw an error when trying to encode with a missing primary type definition', function () {
@@ -599,7 +599,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           Version.V3,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('invalid type');
     });
 
     it('should encode data when given extraneous types', function () {
@@ -1091,7 +1091,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           Version.V4,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('invalid type');
     });
 
     it('should throw an error when trying to encode with a missing primary type definition', function () {
@@ -1121,7 +1121,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           Version.V4,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('invalid type');
     });
 
     it('should encode data when given extraneous types', function () {
@@ -1933,7 +1933,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           Version.V3,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('invalid type');
     });
 
     it('should throw an error when trying to hash with a missing primary type definition', function () {
@@ -1963,7 +1963,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           Version.V3,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('invalid type');
     });
 
     it('should hash data when given extraneous types', function () {
@@ -2455,7 +2455,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           Version.V4,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('invalid type');
     });
 
     it('should throw an error when trying to hash with a missing primary type definition', function () {
@@ -2485,7 +2485,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           Version.V4,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('invalid type');
     });
 
     it('should hash data when given extraneous types', function () {
@@ -4335,8 +4335,7 @@ const signTypedDataV1ErrorExamples = {
     {
       // V1: Does not accept numbers as strings (arguably correctly).
       input: 10,
-      errorMessage:
-        'The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received type number (10)',
+      errorMessage: 'String values must be passed in as strings or Buffers.',
     },
   ],
   address: [
@@ -4347,7 +4346,9 @@ const signTypedDataV1ErrorExamples = {
         'Cannot convert string to buffer. toBuffer only supports 0x-prefixed hex strings and this string was given:',
     },
   ],
-  int8: [{ input: '256', errorMessage: 'Supplied int exceeds width: 8 vs 9' }],
+  int8: [
+    { input: '256', errorMessage: 'byte array longer than desired length' },
+  ],
   bytes1: [
     { input: 'a', errorMessage: 'Cannot convert string to buffer' },
     { input: 'test', errorMessage: 'Cannot convert string to buffer' },
@@ -4479,9 +4480,7 @@ describe('signTypedData', function () {
           data: [{ name: 'data', type: 'string', value: null }],
           version: Version.V1,
         }),
-      ).toThrow(
-        'The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received null',
-      );
+      ).toThrow(`Cannot read property 'length' of null`);
     });
 
     it('should sign data with a dynamic property set to undefined', function () {
@@ -4507,7 +4506,7 @@ describe('signTypedData', function () {
           ],
           version: Version.V1,
         }),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('invalid type');
     });
 
     it('should throw an error when trying to sign an unrecognized type', function () {
@@ -4517,7 +4516,7 @@ describe('signTypedData', function () {
           data: [{ name: 'data', type: 'foo', value: 'test' }],
           version: Version.V1,
         }),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('invalid type');
     });
   });
 
@@ -5308,7 +5307,7 @@ describe('signTypedData', function () {
           },
           version: Version.V3,
         }),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('invalid type');
     });
 
     it('should throw an error when trying to sign with a missing primary type definition', function () {
@@ -5351,7 +5350,7 @@ describe('signTypedData', function () {
           },
           version: Version.V3,
         }),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('invalid type');
     });
 
     it('should sign data when given extraneous types', function () {
@@ -6187,7 +6186,7 @@ describe('signTypedData', function () {
           },
           version: Version.V4,
         }),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('invalid type');
     });
 
     it('should throw an error when trying to sign with a missing primary type definition', function () {
@@ -6230,7 +6229,7 @@ describe('signTypedData', function () {
           },
           version: Version.V4,
         }),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('invalid type');
     });
 
     it('should sign data when given extraneous types', function () {
@@ -6522,7 +6521,7 @@ describe('typedSignatureHash', function () {
           value: 'Hi, Alice!',
         },
       ],
-      errorMessage: 'Unsupported or invalid type: jocker',
+      errorMessage: 'invalid type - jocker',
       label: 'an unrecognized type',
     },
     {
@@ -6532,7 +6531,7 @@ describe('typedSignatureHash', function () {
           value: 'Hi, Alice!',
         },
       ],
-      errorMessage: "Cannot read property 'startsWith' of undefined",
+      errorMessage: "Cannot read property 'endsWith' of undefined",
       label: 'no type',
     },
     {
