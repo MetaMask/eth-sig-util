@@ -2,6 +2,8 @@
 
 exports[`TypedDataUtils.eip712Hash V3 should hash a minimal valid typed message 1`] = `"8d4a3f4082945b7879e2b55f181c31a77c8c0a464b70669458abbaaf99de4c38"`;
 
+exports[`TypedDataUtils.eip712Hash V3 should hash a minimal valid typed message when called unbound 1`] = `"8d4a3f4082945b7879e2b55f181c31a77c8c0a464b70669458abbaaf99de4c38"`;
+
 exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with a domain separator that uses all fields 1`] = `"54ffed5209a17ac210ef3823740b3852ee9cd518b84ee39f0a3fa7f2f9b4205b"`;
 
 exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with data 1`] = `"d2669f23b7849020ad41bcbff5b51372793f91320e0f901641945568ed7322be"`;
@@ -11,6 +13,8 @@ exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with extra dom
 exports[`TypedDataUtils.eip712Hash V3 should hash a typed message with only custom domain seperator fields 1`] = `"3efa3ef0305f56ba5bba62000500e29fe82c5314bca2f958c64e31b2498560f8"`;
 
 exports[`TypedDataUtils.eip712Hash V4 should hash a minimal valid typed message 1`] = `"8d4a3f4082945b7879e2b55f181c31a77c8c0a464b70669458abbaaf99de4c38"`;
+
+exports[`TypedDataUtils.eip712Hash V4 should hash a minimal valid typed message when called unbound 1`] = `"8d4a3f4082945b7879e2b55f181c31a77c8c0a464b70669458abbaaf99de4c38"`;
 
 exports[`TypedDataUtils.eip712Hash V4 should hash a typed message with a domain separator that uses all fields. 1`] = `"54ffed5209a17ac210ef3823740b3852ee9cd518b84ee39f0a3fa7f2f9b4205b"`;
 
@@ -145,6 +149,8 @@ exports[`TypedDataUtils.encodeData V3 example data type "uint256" should encode 
 exports[`TypedDataUtils.encodeData V3 example data type "uint256" should encode "0x0" (type "string") 1`] = `"313eafedfe20c8366f87086b9ac5b8b0ad47b49842a8eb76a8a746dfea3ff8d10000000000000000000000000000000000000000000000000000000000000000"`;
 
 exports[`TypedDataUtils.encodeData V3 example data type "uint256" should encode "9007199254740991" (type "number") 1`] = `"313eafedfe20c8366f87086b9ac5b8b0ad47b49842a8eb76a8a746dfea3ff8d1000000000000000000000000000000000000000000000000001fffffffffffff"`;
+
+exports[`TypedDataUtils.encodeData V3 should encode data when called unbound 1`] = `"15d2c54cdaa22a6a3a8dbd89086b2ffcf0853857db9bcf1541765a8f769a63ba"`;
 
 exports[`TypedDataUtils.encodeData V3 should encode data when given extraneous types 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd6cdba77591a790691c694fa0be937f835b8a589095e427022aa1035e579ee596"`;
 
@@ -310,6 +316,8 @@ exports[`TypedDataUtils.encodeData V4 example data type "uint256" should encode 
 
 exports[`TypedDataUtils.encodeData V4 example data type "uint256" should encode array of all uint256 example data 1`] = `"cdf19ca88de01fa689a36bc72e26bca5dcb8b87b50500b28ff442503c5dff8eb466f8762ff33f5d78b80f620538cd343b1823cc87cd806412f5d280cfad3b799"`;
 
+exports[`TypedDataUtils.encodeData V4 should encode data when called unbound 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd6cdba77591a790691c694fa0be937f835b8a589095e427022aa1035e579ee596"`;
+
 exports[`TypedDataUtils.encodeData V4 should encode data when given extraneous types 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd6cdba77591a790691c694fa0be937f835b8a589095e427022aa1035e579ee596"`;
 
 exports[`TypedDataUtils.encodeData V4 should encode data with a custom data type array 1`] = `"077b2e5169bfc57ed1b6acf858d27ae9b8311db1ccf71df99dfcf9efe8eec43856cacfdc07c6f697bc1bc978cf38559d5c729ed1cd1177e047df929e19dc2a2e8548546251a0cc6d0005e1a792e00f85feed5056e580102ed1afa615f87bb130b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8"`;
@@ -449,6 +457,8 @@ exports[`TypedDataUtils.hashStruct V3 example data type "uint256" should hash "0
 exports[`TypedDataUtils.hashStruct V3 example data type "uint256" should hash "0x0" (type "string") 1`] = `"c4adc42f66c4586eb979042b897a75bc2bd4c8fb866531c44100a22168cdcdbc"`;
 
 exports[`TypedDataUtils.hashStruct V3 example data type "uint256" should hash "9007199254740991" (type "number") 1`] = `"3cfc99947ae18942816da1e3a94b479043b95f4de5851660ce9d53fe5f29b686"`;
+
+exports[`TypedDataUtils.hashStruct V3 should hash data when called unbound 1`] = `"15d2c54cdaa22a6a3a8dbd89086b2ffcf0853857db9bcf1541765a8f769a63ba"`;
 
 exports[`TypedDataUtils.hashStruct V3 should hash data when given extraneous types 1`] = `"15d2c54cdaa22a6a3a8dbd89086b2ffcf0853857db9bcf1541765a8f769a63ba"`;
 
@@ -613,6 +623,8 @@ exports[`TypedDataUtils.hashStruct V4 example data type "uint256" should hash "0
 exports[`TypedDataUtils.hashStruct V4 example data type "uint256" should hash "9007199254740991" (type "number") 1`] = `"3cfc99947ae18942816da1e3a94b479043b95f4de5851660ce9d53fe5f29b686"`;
 
 exports[`TypedDataUtils.hashStruct V4 example data type "uint256" should hash array of all uint256 example data 1`] = `"f44a78e7f58e62916b00244626970fb046c4e6495bd453c83298686c00d8e9f0"`;
+
+exports[`TypedDataUtils.hashStruct V4 should hash data when called unbound 1`] = `"15d2c54cdaa22a6a3a8dbd89086b2ffcf0853857db9bcf1541765a8f769a63ba"`;
 
 exports[`TypedDataUtils.hashStruct V4 should hash data when given extraneous types 1`] = `"15d2c54cdaa22a6a3a8dbd89086b2ffcf0853857db9bcf1541765a8f769a63ba"`;
 
