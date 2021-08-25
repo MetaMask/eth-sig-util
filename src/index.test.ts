@@ -4117,6 +4117,7 @@ describe('personalSign', function () {
 
 describe('signTypedData', function () {
   describe('V1', function () {
+    // Comments starting with "V1:" highlight differences relative to V3 and 4.
     const signTypedDataV1Examples = {
       // dynamic types supported by EIP-712:
       bytes: [10, '10', '0x10', Buffer.from('10', 'utf8')],
@@ -4129,7 +4130,8 @@ describe('signTypedData', function () {
       // atomic types supported by EIP-712:
       address: [
         '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-        '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbBbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB', // no apparent maximum length
+        // V1: No apparent maximum address length
+        '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbBbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
         '0x0',
         10,
         Number.MAX_SAFE_INTEGER,
@@ -4161,6 +4163,7 @@ describe('signTypedData', function () {
         '0',
         '0x0',
         Number.MAX_SAFE_INTEGER,
+        // V1: Negative unsigned integers
         Number.MIN_SAFE_INTEGER,
       ],
       // atomic types not supported by EIP-712:
@@ -4173,6 +4176,7 @@ describe('signTypedData', function () {
     const signTypedDataV1ErrorExamples = {
       string: [
         {
+          // V1: Does not accept numbers as strings (arguably correctly).
           input: 10,
           errorMessage:
             'The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received type number (10)',
@@ -4180,6 +4184,7 @@ describe('signTypedData', function () {
       ],
       address: [
         {
+          // V1: Unprefixed addresses are not accepted.
           input: 'bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
           errorMessage:
             'Cannot convert string to buffer. toBuffer only supports 0x-prefixed hex strings and this string was given:',
@@ -4221,8 +4226,9 @@ describe('signTypedData', function () {
 
     describe('example data', function () {
       // Reassigned to silence "no-loop-func" ESLint rule
-      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
-      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
+      // It was complaining because it saw that `it` and `expect` as "modified
+      // variables from the outer scope" which can be dangerous to reference in
+      // a loop. But they aren't modified in this case, just invoked.
       const _expect = expect;
       const _it = it;
 
