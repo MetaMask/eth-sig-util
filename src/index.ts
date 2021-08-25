@@ -376,10 +376,10 @@ export const TypedDataUtils = {
  * @param s - The 's' portion of the signature
  * @returns The concatenated ECDSA signature
  */
-export function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
+export function concatSig(v: number | Buffer, r: Buffer, s: Buffer): string {
   const rSig = ethUtil.fromSigned(r);
   const sSig = ethUtil.fromSigned(s);
-  const vSig = ethUtil.bufferToInt(v);
+  const vSig = typeof v === 'number' ? v : ethUtil.bufferToInt(v);
   const rStr = padWithZeroes(ethUtil.toUnsigned(rSig).toString('hex'), 64);
   const sStr = padWithZeroes(ethUtil.toUnsigned(sSig).toString('hex'), 64);
   const vStr = ethUtil.stripHexPrefix(ethUtil.intToHex(vSig));
