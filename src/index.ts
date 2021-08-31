@@ -2,6 +2,7 @@ import * as ethUtil from 'ethereumjs-util';
 import * as ethAbi from 'ethereumjs-abi';
 import * as nacl from 'tweetnacl';
 import * as naclUtil from 'tweetnacl-util';
+import { intToHex, isHexString, stripHexPrefix } from 'ethjs-util';
 
 import { padWithZeroes } from './utils';
 
@@ -382,8 +383,8 @@ export function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
   const vSig = ethUtil.bufferToInt(v);
   const rStr = padWithZeroes(ethUtil.toUnsigned(rSig).toString('hex'), 64);
   const sStr = padWithZeroes(ethUtil.toUnsigned(sSig).toString('hex'), 64);
-  const vStr = ethUtil.stripHexPrefix(ethUtil.intToHex(vSig));
-  return ethUtil.addHexPrefix(rStr.concat(sStr, vStr)).toString('hex');
+  const vStr = stripHexPrefix(intToHex(vSig));
+  return ethUtil.addHexPrefix(rStr.concat(sStr, vStr));
 }
 
 /**
@@ -425,7 +426,7 @@ export function personalSign<T extends MessageTypes>(
   privateKey: Buffer,
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
 ): string {
-  const message = ethUtil.toBuffer(msgParams.data);
+  const message = legacyToBuffer(msgParams.data);
   const msgHash = ethUtil.hashPersonalMessage(message);
   const sig = ethUtil.ecsign(msgHash, privateKey);
   const serialized = concatSig(ethUtil.toBuffer(sig.v), sig.r, sig.s);
@@ -738,7 +739,11 @@ function _typedSignatureHash<T extends MessageTypes>(
   }
 
   const data = typedData.map(function (e) {
-    return e.type === 'bytes' ? ethUtil.toBuffer(e.value) : e.value;
+    if (e.type !== 'bytes') {
+      return e.value;
+    }
+
+    return legacyToBuffer(e.value);
   });
   const types = typedData.map(function (e) {
     return e.type;
@@ -760,15 +765,14 @@ function _typedSignatureHash<T extends MessageTypes>(
 }
 
 function recoverPublicKey(hash: Buffer, sig: string): Buffer {
-  const signature = ethUtil.toBuffer(sig);
-  const sigParams = ethUtil.fromRpcSig(signature);
+  const sigParams = ethUtil.fromRpcSig(sig);
   return ethUtil.ecrecover(hash, sigParams.v, sigParams.r, sigParams.s);
 }
 
 function getPublicKeyFor<T extends MessageTypes>(
   msgParams: MsgParams<TypedData | TypedMessage<T>>,
 ): Buffer {
-  const message = ethUtil.toBuffer(msgParams.data);
+  const message = legacyToBuffer(msgParams.data);
   const msgHash = ethUtil.hashPersonalMessage(message);
   return recoverPublicKey(msgHash, msgParams.sig);
 }
@@ -777,4 +781,17 @@ function getPublicKeyFor<T extends MessageTypes>(
 function nacl_decodeHex(msgHex: string): Uint8Array {
   const msgBase64 = Buffer.from(msgHex, 'hex').toString('base64');
   return naclUtil.decodeBase64(msgBase64);
+}
+
+/**
+ * Convert a value to a Buffer. This function should be equivalent to the `toBuffer` function in
+ * `ethereumjs-util@5.2.1`.
+ *
+ * @param value - The value to convert to a Buffer.
+ * @returns The given value as a Buffer.
+ */
+function legacyToBuffer(value: unknown) {
+  return typeof value === 'string' && !isHexString(value)
+    ? Buffer.from(value)
+    : ethUtil.toBuffer(value);
 }
