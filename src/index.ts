@@ -428,7 +428,7 @@ export function personalSign<T extends MessageTypes>(
   const message = ethUtil.toBuffer(msgParams.data);
   const msgHash = ethUtil.hashPersonalMessage(message);
   const sig = ethUtil.ecsign(msgHash, privateKey);
-  const serialized = ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s));
+  const serialized = concatSig(ethUtil.toBuffer(sig.v), sig.r, sig.s);
   return serialized;
 }
 
@@ -699,7 +699,7 @@ export function signTypedData<T extends MessageTypes>(
       ? _typedSignatureHash(msgParams.data)
       : TypedDataUtils.eip712Hash(msgParams.data, version);
   const sig = ethUtil.ecsign(messageHash, privateKey);
-  return ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s));
+  return concatSig(ethUtil.toBuffer(sig.v), sig.r, sig.s);
 }
 
 /**
