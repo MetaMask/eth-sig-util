@@ -93,6 +93,72 @@ function getSolidityTypes() {
 }
 
 /**
+ * Encode a single field.
+ *
+ * @param types - All type definitions.
+ * @param name - The name of the field to encode.
+ * @param type - The type of the field being encoded.
+ * @param value - The value to encode.
+ * @param version - The EIP-712 version the encoding should comply with.
+ * @returns Encoded representation of the field.
+ */
+function encodeField(
+  types: Record<string, MessageTypeProperty[]>,
+  name: string,
+  type: string,
+  value: any,
+  version: Version,
+): [type: string, value: any] {
+  if (types[type] !== undefined) {
+    return [
+      'bytes32',
+      version === 'V4' && value == null // eslint-disable-line no-eq-null
+        ? '0x0000000000000000000000000000000000000000000000000000000000000000'
+        : ethUtil.keccak(encodeData(type, value, types, version)),
+    ];
+  }
+
+  if (value === undefined) {
+    throw new Error(`missing value for field ${name} of type ${type}`);
+  }
+
+  if (type === 'bytes') {
+    return ['bytes32', ethUtil.keccak(value)];
+  }
+
+  if (type === 'string') {
+    // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
+    if (typeof value === 'string') {
+      value = Buffer.from(value, 'utf8');
+    }
+    return ['bytes32', ethUtil.keccak(value)];
+  }
+
+  if (type.lastIndexOf(']') === type.length - 1) {
+    if (version === 'V3') {
+      throw new Error(
+        'Arrays are unimplemented in encodeData; use V4 extension',
+      );
+    }
+    const parsedType = type.slice(0, type.lastIndexOf('['));
+    const typeValuePairs = value.map((item) =>
+      encodeField(types, name, parsedType, item, version),
+    );
+    return [
+      'bytes32',
+      ethUtil.keccak(
+        ethAbi.rawEncode(
+          typeValuePairs.map(([t]) => t),
+          typeValuePairs.map(([, v]) => v),
+        ),
+      ),
+    ];
+  }
+
+  return [type, value];
+}
+
+/**
  * Encodes an object by encoding and concatenating each of its members
  *
  * @param {string} primaryType - Root type
@@ -110,100 +176,19 @@ function encodeData(
   const encodedTypes = ['bytes32'];
   const encodedValues: unknown[] = [hashType(primaryType, types)];
 
-  if (version === 'V4') {
-    const encodeField = (name, type, value) => {
-      if (types[type] !== undefined) {
-        return [
-          'bytes32',
-          value == null // eslint-disable-line no-eq-null
-            ? '0x0000000000000000000000000000000000000000000000000000000000000000'
-            : ethUtil.keccak(encodeData(type, value, types, version)),
-        ];
-      }
-
-      if (value === undefined) {
-        throw new Error(`missing value for field ${name} of type ${type}`);
-      }
-
-      if (type === 'bytes') {
-        return ['bytes32', ethUtil.keccak(value)];
-      }
-
-      if (type === 'string') {
-        // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
-        if (typeof value === 'string') {
-          value = Buffer.from(value, 'utf8');
-        }
-        return ['bytes32', ethUtil.keccak(value)];
-      }
-
-      if (type.lastIndexOf(']') === type.length - 1) {
-        const parsedType = type.slice(0, type.lastIndexOf('['));
-        const typeValuePairs = value.map((item) =>
-          encodeField(name, parsedType, item),
-        );
-        return [
-          'bytes32',
-          ethUtil.keccak(
-            ethAbi.rawEncode(
-              typeValuePairs.map(([t]) => t),
-              typeValuePairs.map(([, v]) => v),
-            ),
-          ),
-        ];
-      }
-
-      return [type, value];
-    };
-
-    for (const field of types[primaryType]) {
-      const [type, value] = encodeField(
-        field.name,
-        field.type,
-        data[field.name],
-      );
-      encodedTypes.push(type);
-      encodedValues.push(value);
+  for (const field of types[primaryType]) {
+    if (version === 'V3' && data[field.name] === undefined) {
+      continue;
     }
-  } else {
-    for (const field of types[primaryType]) {
-      let value = data[field.name];
-      if (value !== undefined) {
-        if (field.type === 'bytes') {
-          encodedTypes.push('bytes32');
-          value = ethUtil.keccak(value);
-          encodedValues.push(value);
-        } else if (field.type === 'string') {
-          encodedTypes.push('bytes32');
-          // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
-          if (typeof value === 'string') {
-            value = Buffer.from(value, 'utf8');
-          }
-          value = ethUtil.keccak(value);
-          encodedValues.push(value);
-        } else if (types[field.type] !== undefined) {
-          encodedTypes.push('bytes32');
-          value = ethUtil.keccak(
-            encodeData(
-              field.type,
-              // TODO: Add validation to ensure this is a string-indexed
-              // object, so that this type cast can be removed
-              value as Record<string, unknown>,
-              types,
-              version,
-            ),
-          );
-          encodedValues.push(value);
-        } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
-          throw new Error(
-            'Arrays are unimplemented in encodeData; use V4 extension',
-          );
-        } else {
-          encodedTypes.push(field.type);
-          encodedValues.push(value);
-        }
-      }
-    }
+    const [type, value] = encodeField(
+      types,
+      field.name,
+      field.type,
+      data[field.name],
+      version,
+    );
+    encodedTypes.push(type);
+    encodedValues.push(value);
   }
 
   return ethAbi.rawEncode(encodedTypes, encodedValues);
