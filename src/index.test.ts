@@ -4113,6 +4113,72 @@ describe('personalSign', function () {
       }),
     ).toBe(publicKey);
   });
+
+  // personal_sign was declared without an explicit set of test data
+  // so I made a script out of geth's internals to create this test data
+  // https://gist.github.com/kumavis/461d2c0e9a04ea0818e423bb77e3d260
+  const testCases = [
+    {
+      testLabel: 'personalSign - kumavis fml manual test I',
+      // "hello world"
+      message: '0x68656c6c6f20776f726c64',
+      signature:
+        '0xce909e8ea6851bc36c007a0072d0524b07a3ff8d4e623aca4c71ca8e57250c4d0a3fc38fa8fbaaa81ead4b9f6bd03356b6f8bf18bccad167d78891636e1d69561b',
+      addressHex: '0xbe93f9bacbcffc8ee6663f2647917ed7a20a57bb',
+      key: Buffer.from(
+        '6969696969696969696969696969696969696969696969696969696969696969',
+        'hex',
+      ),
+    },
+    {
+      testLabel: 'personalSign - kumavis fml manual test II',
+      // some random binary message from parity's test
+      message:
+        '0x0cc175b9c0f1b6a831c399e26977266192eb5ffee6ae2fec3ad71c777531578f',
+      signature:
+        '0x9ff8350cc7354b80740a3580d0e0fd4f1f02062040bc06b893d70906f8728bb5163837fd376bf77ce03b55e9bd092b32af60e86abce48f7b8d3539988ee5a9be1c',
+      addressHex: '0xbe93f9bacbcffc8ee6663f2647917ed7a20a57bb',
+      key: Buffer.from(
+        '6969696969696969696969696969696969696969696969696969696969696969',
+        'hex',
+      ),
+    },
+    {
+      testLabel: 'personalSign - kumavis fml manual test III',
+      // random binary message data and pk from parity's test
+      // https://github.com/ethcore/parity/blob/5369a129ae276d38f3490abb18c5093b338246e0/rpc/src/v1/tests/mocked/eth.rs#L301-L317
+      // note: their signature result is incorrect (last byte moved to front) due to a parity bug
+      message:
+        '0x0cc175b9c0f1b6a831c399e26977266192eb5ffee6ae2fec3ad71c777531578f',
+      signature:
+        '0xa2870db1d0c26ef93c7b72d2a0830fa6b841e0593f7186bc6c7cc317af8cf3a42fda03bd589a49949aa05db83300cdb553116274518dbe9d90c65d0213f4af491b',
+      addressHex: '0xe0da1edcea030875cd0f199d96eb70f6ab78faf2',
+      key: Buffer.from(
+        '4545454545454545454545454545454545454545454545454545454545454545',
+        'hex',
+      ),
+    },
+  ];
+
+  for (const { testLabel, message, signature, addressHex, key } of testCases) {
+    // Reassigned to silence "no-loop-func" ESLint rule
+    // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
+    // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
+    const _expect = expect;
+    it(testLabel, function () {
+      const msgParams: sigUtil.MsgParams<string> = { data: message };
+
+      const signed = sigUtil.personalSign(key, msgParams);
+      _expect(signed).toBe(signature);
+
+      msgParams.sig = signed;
+      const recovered = sigUtil.recoverPersonalSignature(
+        msgParams as sigUtil.SignedMsgParams<string>,
+      );
+
+      _expect(recovered).toBe(addressHex);
+    });
+  }
 });
 
 // Comments starting with "V1:" highlight differences relative to V3 and 4.
@@ -6535,190 +6601,128 @@ describe('typedSignatureHash', function () {
   });
 });
 
-// personal_sign was declared without an explicit set of test data
-// so I made a script out of geth's internals to create this test data
-// https://gist.github.com/kumavis/461d2c0e9a04ea0818e423bb77e3d260
+describe('encryption', function () {
+  const bob = {
+    ethereumPrivateKey:
+      '7e5374ec2ef0d91761a6e72fdf8f6ac665519bfdf6da0a2329cf0d804514b816',
+    encryptionPrivateKey: 'flN07C7w2Rdhpucv349qxmVRm/322gojKc8NgEUUuBY=',
+    encryptionPublicKey: 'C5YMNdqE4kLgxQhJO1MfuQcHP5hjVSXzamzd/TxlR0U=',
+  };
 
-signatureTest({
-  testLabel: 'personalSign - kumavis fml manual test I',
-  // "hello world"
-  message: '0x68656c6c6f20776f726c64',
-  signature:
-    '0xce909e8ea6851bc36c007a0072d0524b07a3ff8d4e623aca4c71ca8e57250c4d0a3fc38fa8fbaaa81ead4b9f6bd03356b6f8bf18bccad167d78891636e1d69561b',
-  addressHex: '0xbe93f9bacbcffc8ee6663f2647917ed7a20a57bb',
-  privateKey: Buffer.from(
-    '6969696969696969696969696969696969696969696969696969696969696969',
-    'hex',
-  ),
-});
+  const secretMessage = { data: 'My name is Satoshi Buterin' };
 
-signatureTest({
-  testLabel: 'personalSign - kumavis fml manual test II',
-  // some random binary message from parity's test
-  message: '0x0cc175b9c0f1b6a831c399e26977266192eb5ffee6ae2fec3ad71c777531578f',
-  signature:
-    '0x9ff8350cc7354b80740a3580d0e0fd4f1f02062040bc06b893d70906f8728bb5163837fd376bf77ce03b55e9bd092b32af60e86abce48f7b8d3539988ee5a9be1c',
-  addressHex: '0xbe93f9bacbcffc8ee6663f2647917ed7a20a57bb',
-  privateKey: Buffer.from(
-    '6969696969696969696969696969696969696969696969696969696969696969',
-    'hex',
-  ),
-});
+  const encryptedData = {
+    version: 'x25519-xsalsa20-poly1305',
+    nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
+    ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+    ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
+  };
 
-signatureTest({
-  testLabel: 'personalSign - kumavis fml manual test III',
-  // random binary message data and pk from parity's test
-  // https://github.com/ethcore/parity/blob/5369a129ae276d38f3490abb18c5093b338246e0/rpc/src/v1/tests/mocked/eth.rs#L301-L317
-  // note: their signature result is incorrect (last byte moved to front) due to a parity bug
-  message: '0x0cc175b9c0f1b6a831c399e26977266192eb5ffee6ae2fec3ad71c777531578f',
-  signature:
-    '0xa2870db1d0c26ef93c7b72d2a0830fa6b841e0593f7186bc6c7cc317af8cf3a42fda03bd589a49949aa05db83300cdb553116274518dbe9d90c65d0213f4af491b',
-  addressHex: '0xe0da1edcea030875cd0f199d96eb70f6ab78faf2',
-  privateKey: Buffer.from(
-    '4545454545454545454545454545454545454545454545454545454545454545',
-    'hex',
-  ),
-});
+  it("Getting bob's encryptionPublicKey", async function () {
+    const result = await sigUtil.getEncryptionPublicKey(bob.ethereumPrivateKey);
+    expect(result).toBe(bob.encryptionPublicKey);
+  });
 
-function signatureTest(opts) {
-  it(opts.testLabel, function () {
-    const address = opts.addressHex;
-    const privKey = opts.privateKey;
-    const { message } = opts;
-    const msgParams: sigUtil.MsgParams<string> = { data: message };
-
-    const signed = sigUtil.personalSign(privKey, msgParams);
-    expect(signed).toBe(opts.signature);
-
-    msgParams.sig = signed;
-    const recovered = sigUtil.recoverPersonalSignature(
-      msgParams as sigUtil.SignedMsgParams<string>,
+  // encryption test
+  it("Alice encrypts message with bob's encryptionPublicKey", async function () {
+    const result = await sigUtil.encrypt(
+      bob.encryptionPublicKey,
+      secretMessage,
+      'x25519-xsalsa20-poly1305',
     );
 
-    expect(recovered).toBe(address);
+    expect(result.ciphertext).toHaveLength(56);
+    expect(result.ephemPublicKey).toHaveLength(44);
+    expect(result.nonce).toHaveLength(32);
+    expect(result.version).toBe('x25519-xsalsa20-poly1305');
   });
-}
 
-const bob = {
-  ethereumPrivateKey:
-    '7e5374ec2ef0d91761a6e72fdf8f6ac665519bfdf6da0a2329cf0d804514b816',
-  encryptionPrivateKey: 'flN07C7w2Rdhpucv349qxmVRm/322gojKc8NgEUUuBY=',
-  encryptionPublicKey: 'C5YMNdqE4kLgxQhJO1MfuQcHP5hjVSXzamzd/TxlR0U=',
-};
+  // safe encryption test
+  it("Alice encryptsSafely message with bob's encryptionPublicKey", async function () {
+    const VERSION = 'x25519-xsalsa20-poly1305';
+    const result = await sigUtil.encryptSafely(
+      bob.encryptionPublicKey,
+      secretMessage,
+      VERSION,
+    );
 
-const secretMessage = { data: 'My name is Satoshi Buterin' };
+    expect(result.ciphertext).toHaveLength(2732);
+    expect(result.ephemPublicKey).toHaveLength(44);
+    expect(result.nonce).toHaveLength(32);
+    expect(result.version).toBe('x25519-xsalsa20-poly1305');
+  });
 
-const encryptedData = {
-  version: 'x25519-xsalsa20-poly1305',
-  nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
-  ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
-  ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
-};
+  // safe decryption test
+  it('Bob decryptSafely message that Alice encryptSafely for him', async function () {
+    const VERSION = 'x25519-xsalsa20-poly1305';
+    const result = await sigUtil.encryptSafely(
+      bob.encryptionPublicKey,
+      secretMessage,
+      VERSION,
+    );
 
-it("Getting bob's encryptionPublicKey", async function () {
-  const result = await sigUtil.getEncryptionPublicKey(bob.ethereumPrivateKey);
-  expect(result).toBe(bob.encryptionPublicKey);
-});
+    const plaintext = sigUtil.decryptSafely(result, bob.ethereumPrivateKey);
+    expect(plaintext).toBe(secretMessage.data);
+  });
 
-// encryption test
-it("Alice encrypts message with bob's encryptionPublicKey", async function () {
-  const result = await sigUtil.encrypt(
-    bob.encryptionPublicKey,
-    secretMessage,
-    'x25519-xsalsa20-poly1305',
-  );
+  // decryption test
+  it('Bob decrypts message that Alice sent to him', function () {
+    const result = sigUtil.decrypt(encryptedData, bob.ethereumPrivateKey);
+    expect(result).toBe(secretMessage.data);
+  });
 
-  expect(result.ciphertext).toHaveLength(56);
-  expect(result.ephemPublicKey).toHaveLength(44);
-  expect(result.nonce).toHaveLength(32);
-  expect(result.version).toBe('x25519-xsalsa20-poly1305');
-});
+  it('Decryption failed because version is wrong or missing', function () {
+    const badVersionData = {
+      version: 'x256k1-aes256cbc',
+      nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
+      ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+      ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
+    };
 
-// safe encryption test
-it("Alice encryptsSafely message with bob's encryptionPublicKey", async function () {
-  const VERSION = 'x25519-xsalsa20-poly1305';
-  const result = await sigUtil.encryptSafely(
-    bob.encryptionPublicKey,
-    secretMessage,
-    VERSION,
-  );
+    expect(() =>
+      sigUtil.decrypt(badVersionData, bob.ethereumPrivateKey),
+    ).toThrow('Encryption type/version not supported.');
+  });
 
-  expect(result.ciphertext).toHaveLength(2732);
-  expect(result.ephemPublicKey).toHaveLength(44);
-  expect(result.nonce).toHaveLength(32);
-  expect(result.version).toBe('x25519-xsalsa20-poly1305');
-});
+  it('Decryption failed because nonce is wrong or missing', function () {
+    // encrypted data
+    const badNonceData = {
+      version: 'x25519-xsalsa20-poly1305',
+      nonce: '',
+      ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+      ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
+    };
 
-// safe decryption test
-it('Bob decryptSafely message that Alice encryptSafely for him', async function () {
-  const VERSION = 'x25519-xsalsa20-poly1305';
-  const result = await sigUtil.encryptSafely(
-    bob.encryptionPublicKey,
-    secretMessage,
-    VERSION,
-  );
+    expect(() => sigUtil.decrypt(badNonceData, bob.ethereumPrivateKey)).toThrow(
+      'bad nonce size',
+    );
+  });
 
-  const plaintext = sigUtil.decryptSafely(result, bob.ethereumPrivateKey);
-  expect(plaintext).toBe(secretMessage.data);
-});
+  it('Decryption failed because ephemPublicKey is wrong or missing', function () {
+    // encrypted data
+    const badEphemData = {
+      version: 'x25519-xsalsa20-poly1305',
+      nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
+      ephemPublicKey: 'FFFF/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+      ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
+    };
 
-// decryption test
-it('Bob decrypts message that Alice sent to him', function () {
-  const result = sigUtil.decrypt(encryptedData, bob.ethereumPrivateKey);
-  expect(result).toBe(secretMessage.data);
-});
+    expect(() => sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)).toThrow(
+      'Decryption failed.',
+    );
+  });
 
-it('Decryption failed because version is wrong or missing', function () {
-  const badVersionData = {
-    version: 'x256k1-aes256cbc',
-    nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
-    ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
-    ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
-  };
+  it('Decryption failed because cyphertext is wrong or missing', function () {
+    // encrypted data
+    const badEphemData = {
+      version: 'x25519-xsalsa20-poly1305',
+      nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
+      ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
+      ciphertext: 'ffffff/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
+    };
 
-  expect(() => sigUtil.decrypt(badVersionData, bob.ethereumPrivateKey)).toThrow(
-    'Encryption type/version not supported.',
-  );
-});
-
-it('Decryption failed because nonce is wrong or missing', function () {
-  // encrypted data
-  const badNonceData = {
-    version: 'x25519-xsalsa20-poly1305',
-    nonce: '',
-    ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
-    ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
-  };
-
-  expect(() => sigUtil.decrypt(badNonceData, bob.ethereumPrivateKey)).toThrow(
-    'bad nonce size',
-  );
-});
-
-it('Decryption failed because ephemPublicKey is wrong or missing', function () {
-  // encrypted data
-  const badEphemData = {
-    version: 'x25519-xsalsa20-poly1305',
-    nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
-    ephemPublicKey: 'FFFF/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
-    ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
-  };
-
-  expect(() => sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)).toThrow(
-    'Decryption failed.',
-  );
-});
-
-it('Decryption failed because cyphertext is wrong or missing', function () {
-  // encrypted data
-  const badEphemData = {
-    version: 'x25519-xsalsa20-poly1305',
-    nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
-    ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
-    ciphertext: 'ffffff/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
-  };
-
-  expect(() => sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)).toThrow(
-    'Decryption failed.',
-  );
+    expect(() => sigUtil.decrypt(badEphemData, bob.ethereumPrivateKey)).toThrow(
+      'Decryption failed.',
+    );
+  });
 });
