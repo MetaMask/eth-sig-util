@@ -24,7 +24,11 @@ interface EIP712TypedData {
   value: any;
 }
 
-export type Version = 'V1' | 'V3' | 'V4';
+export enum Version {
+  V1 = 'V1',
+  V3 = 'V3',
+  V4 = 'V4',
+}
 
 export interface EthEncryptedData {
   version: string;
@@ -119,6 +123,18 @@ function getSolidityTypes() {
   return [...types, ...ints, ...uints, ...bytes];
 }
 
+function validateVersion(version: Version, allowedVersions?: Version[]) {
+  if (!Object.keys(Version).includes(version)) {
+    throw new Error(`Invalid version: '${version}'`);
+  } else if (allowedVersions && !allowedVersions.includes(version)) {
+    throw new Error(
+      `Version not allowed: '${version}'. Allowed versions are: ${allowedVersions.join(
+        ', ',
+      )}`,
+    );
+  }
+}
+
 /**
  * Encode a single field.
  *
@@ -134,12 +150,14 @@ function encodeField(
   name: string,
   type: string,
   value: any,
-  version: Version,
+  version: Version.V3 | Version.V4,
 ): [type: string, value: any] {
+  validateVersion(version, [Version.V3, Version.V4]);
+
   if (types[type] !== undefined) {
     return [
       'bytes32',
-      version === 'V4' && value == null // eslint-disable-line no-eq-null
+      version === Version.V4 && value == null // eslint-disable-line no-eq-null
         ? '0x0000000000000000000000000000000000000000000000000000000000000000'
         : ethUtil.keccak(encodeData(type, value, types, version)),
     ];
@@ -162,7 +180,7 @@ function encodeField(
   }
 
   if (type.lastIndexOf(']') === type.length - 1) {
-    if (version === 'V3') {
+    if (version === Version.V3) {
       throw new Error(
         'Arrays are unimplemented in encodeData; use V4 extension',
       );
@@ -198,13 +216,15 @@ function encodeData(
   primaryType: string,
   data: Record<string, unknown>,
   types: Record<string, MessageTypeProperty[]>,
-  version: Version,
+  version: Version.V3 | Version.V4,
 ): Buffer {
+  validateVersion(version, [Version.V3, Version.V4]);
+
   const encodedTypes = ['bytes32'];
   const encodedValues: unknown[] = [hashType(primaryType, types)];
 
   for (const field of types[primaryType]) {
-    if (version === 'V3' && data[field.name] === undefined) {
+    if (version === Version.V3 && data[field.name] === undefined) {
       continue;
     }
     const [type, value] = encodeField(
@@ -289,8 +309,10 @@ function hashStruct(
   primaryType: string,
   data: Record<string, unknown>,
   types: Record<string, MessageTypeProperty[]>,
-  version: Version,
+  version: Version.V3 | Version.V4,
 ): Buffer {
+  validateVersion(version, [Version.V3, Version.V4]);
+
   return ethUtil.keccak(encodeData(primaryType, data, types, version));
 }
 
@@ -342,8 +364,10 @@ function sanitizeData<T extends MessageTypes>(
  */
 function eip712Hash<T extends MessageTypes>(
   typedData: TypedMessage<T>,
-  version: Version,
+  version: Version.V3 | Version.V4,
 ): Buffer {
+  validateVersion(version, [Version.V3, Version.V4]);
+
   const sanitizedData = sanitizeData(typedData);
   const parts = [Buffer.from('1901', 'hex')];
   parts.push(
@@ -707,10 +731,15 @@ export function signTypedData<V extends Version, T extends MessageTypes>(
     : MsgParams<TypedMessage<T>>,
   version: V,
 ): string {
+  validateVersion(version);
+
   const messageHash =
-    version === 'V1'
+    version === Version.V1
       ? _typedSignatureHash(msgParams.data as TypedDataV1)
-      : TypedDataUtils.eip712Hash(msgParams.data as TypedMessage<T>, version);
+      : TypedDataUtils.eip712Hash(
+          msgParams.data as TypedMessage<T>,
+          version as Version.V3 | Version.V4,
+        );
   const sig = ethUtil.ecsign(messageHash, privateKey);
   return concatSig(ethUtil.toBuffer(sig.v), sig.r, sig.s);
 }
@@ -734,10 +763,15 @@ export function recoverTypedSignature<
     : SignedMsgParams<TypedMessage<T>>,
   version: V,
 ): string {
+  validateVersion(version);
+
   const messageHash =
-    version === 'V1'
+    version === Version.V1
       ? _typedSignatureHash(msgParams.data as TypedDataV1)
-      : TypedDataUtils.eip712Hash(msgParams.data as TypedMessage<T>, version);
+      : TypedDataUtils.eip712Hash(
+          msgParams.data as TypedMessage<T>,
+          version as Version.V3 | Version.V4,
+        );
   const publicKey = recoverPublicKey(messageHash, msgParams.sig);
   const sender = ethUtil.publicToAddress(publicKey);
   return ethUtil.bufferToHex(sender);
