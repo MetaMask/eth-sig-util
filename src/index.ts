@@ -6,7 +6,7 @@ import { intToHex, isHexString, stripHexPrefix } from 'ethjs-util';
 
 import { padWithZeroes } from './utils';
 
-export type TypedData = string | EIP712TypedData | EIP712TypedData[];
+export type TypedData = EIP712TypedData[];
 
 interface EIP712TypedData {
   name: string;
@@ -288,7 +288,7 @@ function hashType(
  * @returns {Object} - typed message object with only allowed fields
  */
 function sanitizeData<T extends MessageTypes>(
-  data: TypedData | TypedMessage<T>,
+  data: TypedMessage<T>,
 ): TypedMessage<T> {
   const sanitizedData: Partial<TypedMessage<T>> = {};
   for (const key in TYPED_MESSAGE_SCHEMA.properties) {
@@ -314,7 +314,7 @@ function sanitizeData<T extends MessageTypes>(
  * @returns {Buffer} - The hash of the typed message.
  */
 function eip712Hash<T extends MessageTypes>(
-  typedData: TypedData | TypedMessage<T>,
+  typedData: TypedMessage<T>,
   version: Version,
 ): Buffer {
   const sanitizedData = sanitizeData(typedData);
@@ -407,9 +407,9 @@ export function normalize(input: number | string): string {
  * @param msgParams - The message parameters. Currently includes just the message data.
  * @param msgParams.data - The data to sign.
  */
-export function personalSign<T extends MessageTypes>(
+export function personalSign(
   privateKey: Buffer,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>,
+  msgParams: MsgParams<unknown>,
 ): string {
   const message = legacyToBuffer(msgParams.data);
   const msgHash = ethUtil.hashPersonalMessage(message);
@@ -427,8 +427,8 @@ export function personalSign<T extends MessageTypes>(
  * @param msgParams.sig - The signature for the message.
  * @returns The address of the message signer.
  */
-export function recoverPersonalSignature<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
+export function recoverPersonalSignature(
+  msgParams: SignedMsgParams<unknown>,
 ): string {
   const publicKey = getPublicKeyFor(msgParams);
   const sender = ethUtil.publicToAddress(publicKey);
@@ -445,9 +445,7 @@ export function recoverPersonalSignature<T extends MessageTypes>(
  * @param msgParams.sig - The signature for the message.
  * @returns The public key of the message signer.
  */
-export function extractPublicKey<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
-): string {
+export function extractPublicKey(msgParams: SignedMsgParams<unknown>): string {
   const publicKey = getPublicKeyFor(msgParams);
   return `0x${publicKey.toString('hex')}`;
 }
@@ -474,9 +472,9 @@ export function typedSignatureHash(typedData: EIP712TypedData[]): string {
  * @param version - The type of encryption to use.
  * @returns The encrypted data.
  */
-export function encrypt<T extends MessageTypes>(
+export function encrypt(
   receiverPublicKey: string,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>,
+  msgParams: MsgParams<unknown>,
   version: string,
 ): EthEncryptedData {
   switch (version) {
@@ -535,9 +533,9 @@ export function encrypt<T extends MessageTypes>(
  * @param version - The type of encryption to use.
  * @returns The encrypted data.
  */
-export function encryptSafely<T extends MessageTypes>(
+export function encryptSafely(
   receiverPublicKey: string,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>,
+  msgParams: MsgParams<unknown>,
   version: string,
 ): EthEncryptedData {
   const DEFAULT_PADDING_LENGTH = 2 ** 11;
@@ -675,15 +673,15 @@ export function getEncryptionPublicKey(privateKey: string): string {
  * @param version - The signing version to use.
  * @returns The signature
  */
-export function signTypedData<T extends MessageTypes>(
+export function signTypedData<V extends Version, T extends MessageTypes>(
   privateKey: Buffer,
-  msgParams: MsgParams<TypedData | TypedMessage<T>>,
-  version: Version,
+  msgParams: V extends 'V1' ? MsgParams<TypedData> : MsgParams<TypedMessage<T>>,
+  version: V,
 ): string {
   const messageHash =
     version === 'V1'
-      ? _typedSignatureHash(msgParams.data)
-      : TypedDataUtils.eip712Hash(msgParams.data, version);
+      ? _typedSignatureHash(msgParams.data as TypedData)
+      : TypedDataUtils.eip712Hash(msgParams.data as TypedMessage<T>, version);
   const sig = ethUtil.ecsign(messageHash, privateKey);
   return concatSig(ethUtil.toBuffer(sig.v), sig.r, sig.s);
 }
@@ -698,22 +696,25 @@ export function signTypedData<T extends MessageTypes>(
  * @param version - The signing version to use.
  * @returns The address of the signer.
  */
-export function recoverTypedSignature<T extends MessageTypes>(
-  msgParams: SignedMsgParams<TypedData | TypedMessage<T>>,
-  version: Version,
+export function recoverTypedSignature<
+  V extends Version,
+  T extends MessageTypes,
+>(
+  msgParams: V extends 'V1'
+    ? SignedMsgParams<TypedData>
+    : SignedMsgParams<TypedMessage<T>>,
+  version: V,
 ): string {
   const messageHash =
     version === 'V1'
-      ? _typedSignatureHash(msgParams.data)
-      : TypedDataUtils.eip712Hash(msgParams.data, version);
+      ? _typedSignatureHash(msgParams.data as TypedData)
+      : TypedDataUtils.eip712Hash(msgParams.data as TypedMessage<T>, version);
   const publicKey = recoverPublicKey(messageHash, msgParams.sig);
   const sender = ethUtil.publicToAddress(publicKey);
   return ethUtil.bufferToHex(sender);
 }
 
-function _typedSignatureHash<T extends MessageTypes>(
-  typedData: TypedData | TypedMessage<T>,
-): Buffer {
+function _typedSignatureHash(typedData: TypedData): Buffer {
   const error = new Error('Expect argument to be non-empty array');
   if (
     typeof typedData !== 'object' ||
@@ -754,9 +755,7 @@ function recoverPublicKey(hash: Buffer, sig: string): Buffer {
   return ethUtil.ecrecover(hash, sigParams.v, sigParams.r, sigParams.s);
 }
 
-function getPublicKeyFor<T extends MessageTypes>(
-  msgParams: MsgParams<TypedData | TypedMessage<T>>,
-): Buffer {
+function getPublicKeyFor(msgParams: MsgParams<unknown>): Buffer {
   const message = legacyToBuffer(msgParams.data);
   const msgHash = ethUtil.hashPersonalMessage(message);
   return recoverPublicKey(msgHash, msgParams.sig);
