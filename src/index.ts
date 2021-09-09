@@ -14,7 +14,7 @@ interface EIP712TypedData {
   value: any;
 }
 
-export type Version = 'V1' | 'V2' | 'V3' | 'V4';
+export type Version = 'V1' | 'V3' | 'V4';
 
 export interface EthEncryptedData {
   version: string;
