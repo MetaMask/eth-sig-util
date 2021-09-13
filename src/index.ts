@@ -37,13 +37,6 @@ export interface EthEncryptedData {
   ciphertext: string;
 }
 
-export type SignedMsgParams<D> = Required<MsgParams<D>>;
-
-export interface MsgParams<D> {
-  data: D;
-  sig?: string;
-}
-
 interface MessageTypeProperty {
   name: string;
   type: string;
@@ -454,15 +447,17 @@ export function normalize(input: number | string): string {
  * This function is equivalent to the `eth_sign` Ethereum JSON-RPC method as specified in EIP-1417,
  * as well as the MetaMask's `personal_sign` method.
  *
- * @param privateKey - The key to sign with.
- * @param msgParams - The message parameters. Currently includes just the message data.
- * @param msgParams.data - The data to sign.
+ * @param options.privateKey - The key to sign with.
+ * @param options.data - The data to sign.
  */
-export function personalSign(
-  privateKey: Buffer,
-  msgParams: MsgParams<unknown>,
-): string {
-  const message = legacyToBuffer(msgParams.data);
+export function personalSign({
+  privateKey,
+  data,
+}: {
+  privateKey: Buffer;
+  data: unknown;
+}): string {
+  const message = legacyToBuffer(data);
   const msgHash = ethUtil.hashPersonalMessage(message);
   const sig = ethUtil.ecsign(msgHash, privateKey);
   const serialized = concatSig(ethUtil.toBuffer(sig.v), sig.r, sig.s);
@@ -473,15 +468,18 @@ export function personalSign(
  * Recover the address of the account used to create the given Ethereum signature. The message
  * must have been signed using the `personalSign` function, or an equivalent function.
  *
- * @param msgParams - The message parameters, which includes both the message and the signature.
- * @param msgParams.data - The message that was signed.
- * @param msgParams.sig - The signature for the message.
+ * @param options.data - The message that was signed.
+ * @param options.signature - The signature for the message.
  * @returns The address of the message signer.
  */
-export function recoverPersonalSignature(
-  msgParams: SignedMsgParams<unknown>,
-): string {
-  const publicKey = getPublicKeyFor(msgParams);
+export function recoverPersonalSignature({
+  data,
+  signature,
+}: {
+  data: unknown;
+  signature: string;
+}): string {
+  const publicKey = getPublicKeyFor(data, signature);
   const sender = ethUtil.publicToAddress(publicKey);
   const senderHex = ethUtil.bufferToHex(sender);
   return senderHex;
@@ -491,13 +489,18 @@ export function recoverPersonalSignature(
  * Recover the public key of the account used to create the given Ethereum signature. The message
  * must have been signed using the `personalSign` function, or an equivalent function.
  *
- * @param msgParams - The message parameters, which includes both the message and the signature.
- * @param msgParams.data - The message that was signed.
- * @param msgParams.sig - The signature for the message.
+ * @param options.data - The message that was signed.
+ * @param options.signature - The signature for the message.
  * @returns The public key of the message signer.
  */
-export function extractPublicKey(msgParams: SignedMsgParams<unknown>): string {
-  const publicKey = getPublicKeyFor(msgParams);
+export function extractPublicKey({
+  data,
+  signature,
+}: {
+  data: unknown;
+  signature: string;
+}): string {
+  const publicKey = getPublicKeyFor(data, signature);
   return `0x${publicKey.toString('hex')}`;
 }
 
@@ -518,22 +521,24 @@ export function typedSignatureHash(typedData: EIP712TypedData[]): string {
 /**
  * Encrypt a message.
  *
- * @param receiverPublicKey - The public key of the message recipient.
- * @param msgParams - The message parameters. Currently includes just the message data.
- * @param version - The type of encryption to use.
+ * @param options.publicKey - The public key of the message recipient.
+ * @param options.data - The message data.
+ * @param options.version - The type of encryption to use.
  * @returns The encrypted data.
  */
-export function encrypt(
-  receiverPublicKey: string,
-  msgParams: MsgParams<unknown>,
-  version: string,
-): EthEncryptedData {
+export function encrypt({
+  publicKey,
+  data,
+  version,
+}: {
+  publicKey: string;
+  data: unknown;
+  version: string;
+}): EthEncryptedData {
   switch (version) {
     case 'x25519-xsalsa20-poly1305': {
-      if (typeof msgParams.data !== 'string') {
-        throw new Error(
-          'Cannot detect secret message, message params should be of the form {data: "secret message"} ',
-        );
+      if (typeof data !== 'string') {
+        throw new Error('Message data must be given as a string');
       }
       // generate ephemeral keypair
       const ephemeralKeyPair = nacl.box.keyPair();
@@ -541,12 +546,12 @@ export function encrypt(
       // assemble encryption parameters - from string to UInt8
       let pubKeyUInt8Array;
       try {
-        pubKeyUInt8Array = naclUtil.decodeBase64(receiverPublicKey);
+        pubKeyUInt8Array = naclUtil.decodeBase64(publicKey);
       } catch (err) {
         throw new Error('Bad public key');
       }
 
-      const msgParamsUInt8Array = naclUtil.decodeUTF8(msgParams.data);
+      const msgParamsUInt8Array = naclUtil.decodeUTF8(data);
       const nonce = nacl.randomBytes(nacl.box.nonceLength);
 
       // encrypt
@@ -579,22 +584,25 @@ export function encrypt(
  * The message is padded to a multiple of 2048 before being encrypted so that the length of the
  * resulting encrypted message can't be used to guess the exact length of the original message.
  *
- * @param receiverPublicKey - The public key of the message recipient.
- * @param msgParams - The message parameters. Currently includes just the message data.
- * @param version - The type of encryption to use.
+ * @param options.publicKey - The public key of the message recipient.
+ * @param options.data - The message data.
+ * @param options.version - The type of encryption to use.
  * @returns The encrypted data.
  */
-export function encryptSafely(
-  receiverPublicKey: string,
-  msgParams: MsgParams<unknown>,
-  version: string,
-): EthEncryptedData {
+export function encryptSafely({
+  publicKey,
+  data,
+  version,
+}: {
+  publicKey: string;
+  data: unknown;
+  version: string;
+}): EthEncryptedData {
   const DEFAULT_PADDING_LENGTH = 2 ** 11;
   const NACL_EXTRA_BYTES = 16;
 
-  const { data } = msgParams;
   if (!data) {
-    throw new Error('Cannot encrypt empty msg.data');
+    throw new Error('Cannot encrypt empty data');
   }
 
   if (typeof data === 'object' && 'toJSON' in data) {
@@ -624,25 +632,28 @@ export function encryptSafely(
   }
   dataWithPadding.padding = '0'.repeat(padLength);
 
-  const paddedMsgParams = { data: JSON.stringify(dataWithPadding) };
-  return encrypt(receiverPublicKey, paddedMsgParams, version);
+  const paddedMessage = JSON.stringify(dataWithPadding);
+  return encrypt({ publicKey, data: paddedMessage, version });
 }
 
 /**
  * Decrypt a message.
  *
- * @param encryptedData - The encrypted data.
- * @param receiverPrivateKey - The private key to decrypt with.
+ * @param options.encryptedData - The encrypted data.
+ * @param options.privateKey - The private key to decrypt with.
  * @returns The decrypted message.
  */
-export function decrypt(
-  encryptedData: EthEncryptedData,
-  receiverPrivateKey: string,
-): string {
+export function decrypt({
+  encryptedData,
+  privateKey,
+}: {
+  encryptedData: EthEncryptedData;
+  privateKey: string;
+}): string {
   switch (encryptedData.version) {
     case 'x25519-xsalsa20-poly1305': {
       // string to buffer to UInt8Array
-      const recieverPrivateKeyUint8Array = nacl_decodeHex(receiverPrivateKey);
+      const recieverPrivateKeyUint8Array = nacl_decodeHex(privateKey);
       const recieverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(
         recieverPrivateKeyUint8Array,
       ).secretKey;
@@ -684,17 +695,18 @@ export function decrypt(
 /**
  * Decrypt a message that has been encrypted using `encryptSafely`.
  *
- * @param encryptedData - The encrypted data.
- * @param receiverPrivateKey - The private key to decrypt with.
+ * @param options.encryptedData - The encrypted data.
+ * @param options.privateKey - The private key to decrypt with.
  * @returns The decrypted message.
  */
-export function decryptSafely(
-  encryptedData: EthEncryptedData,
-  receiverPrivateKey: string,
-): string {
-  const dataWithPadding = JSON.parse(
-    decrypt(encryptedData, receiverPrivateKey),
-  );
+export function decryptSafely({
+  encryptedData,
+  privateKey,
+}: {
+  encryptedData: EthEncryptedData;
+  privateKey: string;
+}): string {
+  const dataWithPadding = JSON.parse(decrypt({ encryptedData, privateKey }));
   return dataWithPadding.data;
 }
 
@@ -718,26 +730,27 @@ export function getEncryptionPublicKey(privateKey: string): string {
  * V4 is based on EIP-712, and includes full support of arrays and recursive
  * data structures.
  *
- * @param privateKey - The private key to sign with.
- * @param msgParams - Signing parameters.
- * @param msgParams.data - The typed data to sign.
- * @param version - The signing version to use.
+ * @param options.privateKey - The private key to sign with.
+ * @param options.data - The typed data to sign.
+ * @param options.version - The signing version to use.
  * @returns The signature
  */
-export function signTypedData<V extends Version, T extends MessageTypes>(
-  privateKey: Buffer,
-  msgParams: V extends 'V1'
-    ? MsgParams<TypedDataV1>
-    : MsgParams<TypedMessage<T>>,
-  version: V,
-): string {
+export function signTypedData<V extends Version, T extends MessageTypes>({
+  privateKey,
+  data,
+  version,
+}: {
+  privateKey: Buffer;
+  data: V extends 'V1' ? TypedDataV1 : TypedMessage<T>;
+  version: V;
+}): string {
   validateVersion(version);
 
   const messageHash =
     version === Version.V1
-      ? _typedSignatureHash(msgParams.data as TypedDataV1)
+      ? _typedSignatureHash(data as TypedDataV1)
       : TypedDataUtils.eip712Hash(
-          msgParams.data as TypedMessage<T>,
+          data as TypedMessage<T>,
           version as Version.V3 | Version.V4,
         );
   const sig = ethUtil.ecsign(messageHash, privateKey);
@@ -749,30 +762,33 @@ export function signTypedData<V extends Version, T extends MessageTypes>(
  * signature. The version provided must match the version used to
  * create the signature.
  *
- * @param msgParams - Signing parameters.
- * @param msgParams.data - The data that was signed.
- * @param version - The signing version to use.
+ * @param options.data - The data that was signed.
+ * @param options.signature - The message signature.
+ * @param options.version - The signing version to use.
  * @returns The address of the signer.
  */
 export function recoverTypedSignature<
   V extends Version,
   T extends MessageTypes,
->(
-  msgParams: V extends 'V1'
-    ? SignedMsgParams<TypedDataV1>
-    : SignedMsgParams<TypedMessage<T>>,
-  version: V,
-): string {
+>({
+  data,
+  signature,
+  version,
+}: {
+  data: V extends 'V1' ? TypedDataV1 : TypedMessage<T>;
+  signature: string;
+  version: V;
+}): string {
   validateVersion(version);
 
   const messageHash =
     version === Version.V1
-      ? _typedSignatureHash(msgParams.data as TypedDataV1)
+      ? _typedSignatureHash(data as TypedDataV1)
       : TypedDataUtils.eip712Hash(
-          msgParams.data as TypedMessage<T>,
+          data as TypedMessage<T>,
           version as Version.V3 | Version.V4,
         );
-  const publicKey = recoverPublicKey(messageHash, msgParams.sig);
+  const publicKey = recoverPublicKey(messageHash, signature);
   const sender = ethUtil.publicToAddress(publicKey);
   return ethUtil.bufferToHex(sender);
 }
@@ -818,10 +834,10 @@ function recoverPublicKey(hash: Buffer, sig: string): Buffer {
   return ethUtil.ecrecover(hash, sigParams.v, sigParams.r, sigParams.s);
 }
 
-function getPublicKeyFor(msgParams: MsgParams<unknown>): Buffer {
-  const message = legacyToBuffer(msgParams.data);
+function getPublicKeyFor(data: unknown, signature: string): Buffer {
+  const message = legacyToBuffer(data);
   const msgHash = ethUtil.hashPersonalMessage(message);
-  return recoverPublicKey(msgHash, msgParams.sig);
+  return recoverPublicKey(msgHash, signature);
 }
 
 // converts hex strings to the Uint8Array format used by nacl
