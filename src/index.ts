@@ -55,8 +55,8 @@ interface MessageTypes {
  * @property types - The custom types used by this message.
  * @property primaryType - The type of the message.
  * @property domain - Signing domain metadata. The signing domain is the intended context for the
- *   signature (e.g. the dapp, protocol, etc. that it's intended for). This data is used to
- *   construct the domain seperator of the message.
+ * signature (e.g. the dapp, protocol, etc. that it's intended for). This data is used to
+ * construct the domain seperator of the message.
  * @property domain.name - The name of the signing domain.
  * @property domain.version - The current major version of the signing domain.
  * @property domain.chainId - The chain ID of the signing domain.
@@ -101,6 +101,11 @@ export const TYPED_MESSAGE_SCHEMA = {
   required: ['types', 'primaryType', 'domain', 'message'],
 };
 
+/**
+ * Get a list of all Solidity types.
+ *
+ * @returns A list of all Solidity types.
+ */
 function getSolidityTypes() {
   const types = ['bool', 'address', 'string', 'bytes'];
   const ints = Array.from(new Array(32)).map(
@@ -116,6 +121,13 @@ function getSolidityTypes() {
   return [...types, ...ints, ...uints, ...bytes];
 }
 
+/**
+ * Validate that the given value is a valid version string.
+ *
+ * @param version - The version value to validate.
+ * @param allowedVersions - A list of allowed versions. If omitted, all versions are assumed to be
+ * allowed.
+ */
 function validateVersion(version: Version, allowedVersions?: Version[]) {
   if (!Object.keys(Version).includes(version)) {
     throw new Error(`Invalid version: '${version}'`);
@@ -197,13 +209,13 @@ function encodeField(
 }
 
 /**
- * Encodes an object by encoding and concatenating each of its members
+ * Encodes an object by encoding and concatenating each of its members.
  *
- * @param {string} primaryType - Root type
- * @param {Object} data - Object to encode
- * @param {Object} types - Type definitions
- * @param {Version} version - The EIP-712 version the encoding should comply with
- * @returns {Buffer} - Encoded representation of an object
+ * @param primaryType - The root type.
+ * @param data - The object to encode.
+ * @param types - Type definitions for all types included in the message.
+ * @param version - The EIP-712 version the encoding should comply with.
+ * @returns An encoded representation of an object.
  */
 function encodeData(
   primaryType: string,
@@ -235,11 +247,11 @@ function encodeData(
 }
 
 /**
- * Encodes the type of an object by encoding a comma delimited list of its members
+ * Encodes the type of an object by encoding a comma delimited list of its members.
  *
- * @param {string} primaryType - Root type to encode
- * @param {Object} types - Type definitions
- * @returns {string} - Encoded representation of the type of an object
+ * @param primaryType - The root type to encode.
+ * @param types - Type definitions for all types included in the message.
+ * @returns An encoded representation of the primary type.
  */
 function encodeType(
   primaryType: string,
@@ -265,12 +277,12 @@ function encodeType(
 }
 
 /**
- * Finds all types within a type definition object
+ * Finds all types within a type definition object.
  *
- * @param {string} primaryType - Root type
- * @param {Object} types - Type definitions
- * @param {Array} results - current set of accumulated types
- * @returns {Array} - Set of all types found in the type definition
+ * @param primaryType - The root type.
+ * @param types - Type definitions for all types included in the message.
+ * @param results - The current set of accumulated types.
+ * @returns The set of all types found in the type definition.
  */
 function findTypeDependencies(
   primaryType: string,
@@ -291,12 +303,13 @@ function findTypeDependencies(
 }
 
 /**
- * Hashes an object
+ * Hashes an object.
  *
- * @param {string} primaryType - Root type
- * @param {Object} data - Object to hash
- * @param {Object} types - Type definitions
- * @returns {Buffer} - Hash of an object
+ * @param primaryType - The root type.
+ * @param data - The object to hash.
+ * @param types - Type definitions for all types included in the message.
+ * @param version - The EIP-712 version the encoding should comply with.
+ * @returns The hash of the object.
  */
 function hashStruct(
   primaryType: string,
@@ -310,11 +323,11 @@ function hashStruct(
 }
 
 /**
- * Hashes the type of an object
+ * Hashes the type of an object.
  *
- * @param {string} primaryType - Root type to hash
- * @param {Object} types - Type definitions
- * @returns {Buffer} - Hash of an object
+ * @param primaryType - The root type to hash.
+ * @param types - Type definitions for all types included in the message.
+ * @returns The hash of the object type.
  */
 function hashType(
   primaryType: string,
@@ -324,10 +337,10 @@ function hashType(
 }
 
 /**
- * Removes properties from a message object that are not defined per EIP-712
+ * Removes properties from a message object that are not defined per EIP-712.
  *
- * @param {Object} data - typed message object
- * @returns {Object} - typed message object with only allowed fields
+ * @param data - The typed message object.
+ * @returns The typed message object with only allowed fields.
  */
 function sanitizeData<T extends MessageTypes>(
   data: TypedMessage<T>,
@@ -352,8 +365,9 @@ function sanitizeData<T extends MessageTypes>(
  * This function does not sign the message. The resulting hash must still be signed to create an
  * EIP-712 signature.
  *
- * @param {Object} typedData - The typed message to hash.
- * @returns {Buffer} - The hash of the typed message.
+ * @param typedData - The typed message to hash.
+ * @param version - The EIP-712 version the encoding should comply with.
+ * @returns The hash of the typed message.
  */
 function eip712Hash<T extends MessageTypes>(
   typedData: TypedMessage<T>,
@@ -399,12 +413,12 @@ export const TypedDataUtils = {
 };
 
 /**
- * Concatenate an extended ECDSA signature into a hex string
+ * Concatenate an extended ECDSA signature into a hex string.
  *
- * @param v - The 'v' portion of the signature
- * @param r - The 'r' portion of the signature
- * @param s - The 's' portion of the signature
- * @returns The concatenated ECDSA signature
+ * @param v - The 'v' portion of the signature.
+ * @param r - The 'r' portion of the signature.
+ * @param s - The 's' portion of the signature.
+ * @returns The concatenated ECDSA signature.
  */
 export function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
   const rSig = ethUtil.fromSigned(r);
@@ -447,8 +461,10 @@ export function normalize(input: number | string): string {
  * This function is equivalent to the `eth_sign` Ethereum JSON-RPC method as specified in EIP-1417,
  * as well as the MetaMask's `personal_sign` method.
  *
+ * @param options - The personal sign options.
  * @param options.privateKey - The key to sign with.
  * @param options.data - The data to sign.
+ * @returns The signature.
  */
 export function personalSign({
   privateKey,
@@ -468,6 +484,7 @@ export function personalSign({
  * Recover the address of the account used to create the given Ethereum signature. The message
  * must have been signed using the `personalSign` function, or an equivalent function.
  *
+ * @param options - The signature recovery options.
  * @param options.data - The message that was signed.
  * @param options.signature - The signature for the message.
  * @returns The address of the message signer.
@@ -489,6 +506,7 @@ export function recoverPersonalSignature({
  * Recover the public key of the account used to create the given Ethereum signature. The message
  * must have been signed using the `personalSign` function, or an equivalent function.
  *
+ * @param options - The public key recovery options.
  * @param options.data - The message that was signed.
  * @param options.signature - The signature for the message.
  * @returns The public key of the message signer.
@@ -521,6 +539,7 @@ export function typedSignatureHash(typedData: EIP712TypedData[]): string {
 /**
  * Encrypt a message.
  *
+ * @param options - The encryption options.
  * @param options.publicKey - The public key of the message recipient.
  * @param options.data - The message data.
  * @param options.version - The type of encryption to use.
@@ -584,6 +603,7 @@ export function encrypt({
  * The message is padded to a multiple of 2048 before being encrypted so that the length of the
  * resulting encrypted message can't be used to guess the exact length of the original message.
  *
+ * @param options - The encryption options.
  * @param options.publicKey - The public key of the message recipient.
  * @param options.data - The message data.
  * @param options.version - The type of encryption to use.
@@ -639,6 +659,7 @@ export function encryptSafely({
 /**
  * Decrypt a message.
  *
+ * @param options - The decryption options.
  * @param options.encryptedData - The encrypted data.
  * @param options.privateKey - The private key to decrypt with.
  * @returns The decrypted message.
@@ -695,6 +716,7 @@ export function decrypt({
 /**
  * Decrypt a message that has been encrypted using `encryptSafely`.
  *
+ * @param options - The decryption options.
  * @param options.encryptedData - The encrypted data.
  * @param options.privateKey - The private key to decrypt with.
  * @returns The decrypted message.
@@ -710,6 +732,12 @@ export function decryptSafely({
   return dataWithPadding.data;
 }
 
+/**
+ * Get the encryption public key for the given key.
+ *
+ * @param privateKey - The private key to generate the encryption public key with.
+ * @returns The encryption public key.
+ */
 export function getEncryptionPublicKey(privateKey: string): string {
   const privateKeyUint8Array = nacl_decodeHex(privateKey);
   const encryptionPublicKey =
@@ -730,10 +758,11 @@ export function getEncryptionPublicKey(privateKey: string): string {
  * V4 is based on EIP-712, and includes full support of arrays and recursive
  * data structures.
  *
+ * @param options - The signing options.
  * @param options.privateKey - The private key to sign with.
  * @param options.data - The typed data to sign.
  * @param options.version - The signing version to use.
- * @returns The signature
+ * @returns The signature.
  */
 export function signTypedData<V extends Version, T extends MessageTypes>({
   privateKey,
@@ -762,6 +791,7 @@ export function signTypedData<V extends Version, T extends MessageTypes>({
  * signature. The version provided must match the version used to
  * create the signature.
  *
+ * @param options - The signature recovery options.
  * @param options.data - The data that was signed.
  * @param options.signature - The message signature.
  * @param options.version - The signing version to use.
@@ -793,6 +823,15 @@ export function recoverTypedSignature<
   return ethUtil.bufferToHex(sender);
 }
 
+/**
+ * Generate the "V1" hash for the provided typed message.
+ *
+ * The hash will be generated in accordance with an earlier version of the EIP-712
+ * specification. This hash is used in `signTypedData_v1`.
+ *
+ * @param typedData - The typed message.
+ * @returns The type hash for the provided message.
+ */
 function _typedSignatureHash(typedData: TypedDataV1): Buffer {
   const error = new Error('Expect argument to be non-empty array');
   if (
@@ -829,18 +868,36 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
   );
 }
 
-function recoverPublicKey(hash: Buffer, sig: string): Buffer {
-  const sigParams = ethUtil.fromRpcSig(sig);
-  return ethUtil.ecrecover(hash, sigParams.v, sigParams.r, sigParams.s);
+/**
+ * Recover the public key from the given signature and message hash.
+ *
+ * @param messageHash - The hash of the signed message.
+ * @param signature - The signature.
+ * @returns The public key of the signer.
+ */
+function recoverPublicKey(messageHash: Buffer, signature: string): Buffer {
+  const sigParams = ethUtil.fromRpcSig(signature);
+  return ethUtil.ecrecover(messageHash, sigParams.v, sigParams.r, sigParams.s);
 }
 
-function getPublicKeyFor(data: unknown, signature: string): Buffer {
-  const message = legacyToBuffer(data);
-  const msgHash = ethUtil.hashPersonalMessage(message);
-  return recoverPublicKey(msgHash, signature);
+/**
+ * Get the public key for the given signature and message.
+ *
+ * @param message - The message that was signed.
+ * @param signature - The signature.
+ * @returns The public key of the signer.
+ */
+function getPublicKeyFor(message: unknown, signature: string): Buffer {
+  const messageHash = ethUtil.hashPersonalMessage(legacyToBuffer(message));
+  return recoverPublicKey(messageHash, signature);
 }
 
-// converts hex strings to the Uint8Array format used by nacl
+/**
+ * Convert a hex string to the UInt8Array format used by nacl.
+ *
+ * @param msgHex - The string to convert.
+ * @returns The converted string.
+ */
 function nacl_decodeHex(msgHex: string): Uint8Array {
   const msgBase64 = Buffer.from(msgHex, 'hex').toString('base64');
   return naclUtil.decodeBase64(msgBase64);
