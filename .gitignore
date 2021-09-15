@@ -14,3 +14,5 @@ test/*.js
 # Jest
 /coverage
 
+# TypeDoc
+/docs
