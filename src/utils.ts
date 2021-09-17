@@ -1,3 +1,15 @@
+import {
+  addHexPrefix,
+  bufferToHex,
+  bufferToInt,
+  ecrecover,
+  fromRpcSig,
+  fromSigned,
+  toBuffer,
+  toUnsigned,
+} from 'ethereumjs-util';
+import { intToHex, isHexString, stripHexPrefix } from 'ethjs-util';
+
 /**
  * Pads the front of the given hex string with zeroes until it reaches the
  * target length. If the input string is already longer than or equal to the
@@ -25,4 +37,85 @@ export function padWithZeroes(hexString: string, targetLength: number): string {
   }
 
   return String.prototype.padStart.call(hexString, targetLength, '0');
+}
+
+/**
+ * Returns `true` if the given value is nullish.
+ *
+ * @param value - The value being checked.
+ * @returns Whether the value is nullish.
+ */
+export function isNullish(value) {
+  return value === null || value === undefined;
+}
+
+/**
+ * Convert a value to a Buffer. This function should be equivalent to the `toBuffer` function in
+ * `ethereumjs-util@5.2.1`.
+ *
+ * @param value - The value to convert to a Buffer.
+ * @returns The given value as a Buffer.
+ */
+export function legacyToBuffer(value: unknown) {
+  return typeof value === 'string' && !isHexString(value)
+    ? Buffer.from(value)
+    : toBuffer(value);
+}
+
+/**
+ * Concatenate an extended ECDSA signature into a hex string.
+ *
+ * @param v - The 'v' portion of the signature.
+ * @param r - The 'r' portion of the signature.
+ * @param s - The 's' portion of the signature.
+ * @returns The concatenated ECDSA signature.
+ */
+export function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
+  const rSig = fromSigned(r);
+  const sSig = fromSigned(s);
+  const vSig = bufferToInt(v);
+  const rStr = padWithZeroes(toUnsigned(rSig).toString('hex'), 64);
+  const sStr = padWithZeroes(toUnsigned(sSig).toString('hex'), 64);
+  const vStr = stripHexPrefix(intToHex(vSig));
+  return addHexPrefix(rStr.concat(sStr, vStr));
+}
+
+/**
+ * Recover the public key from the given signature and message hash.
+ *
+ * @param messageHash - The hash of the signed message.
+ * @param signature - The signature.
+ * @returns The public key of the signer.
+ */
+export function recoverPublicKey(
+  messageHash: Buffer,
+  signature: string,
+): Buffer {
+  const sigParams = fromRpcSig(signature);
+  return ecrecover(messageHash, sigParams.v, sigParams.r, sigParams.s);
+}
+
+/**
+ * Normalize the input to a 0x-prefixed hex string.
+ *
+ * @param input - The value to normalize.
+ * @returns The normalized 0x-prefixed hex string.
+ */
+export function normalize(input: number | string): string {
+  if (!input) {
+    return undefined;
+  }
+
+  if (typeof input === 'number') {
+    const buffer = toBuffer(input);
+    input = bufferToHex(buffer);
+  }
+
+  if (typeof input !== 'string') {
+    let msg = 'eth-sig-util.normalize() requires hex string or integer input.';
+    msg += ` received ${typeof input}: ${input}`;
+    throw new Error(msg);
+  }
+
+  return addHexPrefix(input.toLowerCase());
 }
