@@ -18,7 +18,7 @@ export type TypedDataV1 = EIP712TypedData[];
  * @property type - The type of a field (must be a supported Solidity type).
  * @property value - The value of the field.
  */
-interface EIP712TypedData {
+export interface EIP712TypedData {
   name: string;
   type: string;
   value: any;
@@ -37,12 +37,12 @@ export interface EthEncryptedData {
   ciphertext: string;
 }
 
-interface MessageTypeProperty {
+export interface MessageTypeProperty {
   name: string;
   type: string;
 }
 
-interface MessageTypes {
+export interface MessageTypes {
   EIP712Domain: MessageTypeProperty[];
   [additionalProperties: string]: MessageTypeProperty[];
 }
