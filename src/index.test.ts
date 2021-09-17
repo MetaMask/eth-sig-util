@@ -4272,6 +4272,122 @@ describe('personalSign', function () {
       _expect(recovered).toBe(addressHex);
     });
   }
+
+  describe('validation', function () {
+    describe('personalSign', function () {
+      it('should throw if passed null data', function () {
+        expect(() =>
+          sigUtil.personalSign({
+            privateKey,
+            data: null,
+          }),
+        ).toThrow('Missing data parameter');
+      });
+
+      it('should throw if passed undefined data', function () {
+        expect(() =>
+          sigUtil.personalSign({
+            privateKey,
+            data: undefined,
+          }),
+        ).toThrow('Missing data parameter');
+      });
+
+      it('should throw if passed a null private key', function () {
+        expect(() =>
+          sigUtil.personalSign({
+            privateKey: null,
+            data: helloWorldMessage,
+          }),
+        ).toThrow('Missing privateKey parameter');
+      });
+
+      it('should throw if passed an undefined private key', function () {
+        expect(() =>
+          sigUtil.personalSign({
+            privateKey: undefined,
+            data: helloWorldMessage,
+          }),
+        ).toThrow('Missing privateKey parameter');
+      });
+    });
+
+    describe('recoverPersonalSignature', function () {
+      it('should throw if passed null data', function () {
+        expect(() =>
+          sigUtil.recoverPersonalSignature({
+            data: null,
+            signature: helloWorldSignature,
+          }),
+        ).toThrow('Missing data parameter');
+      });
+
+      it('should throw if passed undefined data', function () {
+        expect(() =>
+          sigUtil.recoverPersonalSignature({
+            data: undefined,
+            signature: helloWorldSignature,
+          }),
+        ).toThrow('Missing data parameter');
+      });
+
+      it('should throw if passed a null signature', function () {
+        expect(() =>
+          sigUtil.recoverPersonalSignature({
+            data: helloWorldMessage,
+            signature: null,
+          }),
+        ).toThrow('Missing signature parameter');
+      });
+
+      it('should throw if passed an undefined signature', function () {
+        expect(() =>
+          sigUtil.recoverPersonalSignature({
+            data: helloWorldMessage,
+            signature: undefined,
+          }),
+        ).toThrow('Missing signature parameter');
+      });
+    });
+
+    describe('extractPublicKey', function () {
+      it('should throw if passed null data', function () {
+        expect(() =>
+          sigUtil.extractPublicKey({
+            data: null,
+            signature: helloWorldSignature,
+          }),
+        ).toThrow('Missing data parameter');
+      });
+
+      it('should throw if passed undefined data', function () {
+        expect(() =>
+          sigUtil.extractPublicKey({
+            data: undefined,
+            signature: helloWorldSignature,
+          }),
+        ).toThrow('Missing data parameter');
+      });
+
+      it('should throw if passed a null signature', function () {
+        expect(() =>
+          sigUtil.extractPublicKey({
+            data: helloWorldMessage,
+            signature: null,
+          }),
+        ).toThrow('Missing signature parameter');
+      });
+
+      it('should throw if passed an undefined signature', function () {
+        expect(() =>
+          sigUtil.extractPublicKey({
+            data: helloWorldMessage,
+            signature: undefined,
+          }),
+        ).toThrow('Missing signature parameter');
+      });
+    });
+  });
 });
 
 // Comments starting with "V1:" highlight differences relative to V3 and 4.
@@ -6257,14 +6373,56 @@ describe('signTypedData', function () {
     });
   });
 
-  it('should throw if passed an invalid version', () => {
-    expect(() =>
-      sigUtil.signTypedData({
-        privateKey,
-        data: [{ name: 'data', type: 'string', value: 'Hello!' }],
-        version: 'V0' as any,
-      }),
-    ).toThrow('Invalid version');
+  describe('validation', () => {
+    it('should throw if passed an invalid version', () => {
+      expect(() =>
+        sigUtil.signTypedData({
+          privateKey,
+          data: [{ name: 'data', type: 'string', value: 'Hello!' }],
+          version: 'V0' as any,
+        }),
+      ).toThrow('Invalid version');
+    });
+
+    it('should throw if passed null data', () => {
+      expect(() =>
+        sigUtil.signTypedData({
+          privateKey,
+          data: null,
+          version: Version.V1,
+        }),
+      ).toThrow('Missing data parameter');
+    });
+
+    it('should throw if passed undefined data', () => {
+      expect(() =>
+        sigUtil.signTypedData({
+          privateKey,
+          data: undefined,
+          version: Version.V1,
+        }),
+      ).toThrow('Missing data parameter');
+    });
+
+    it('should throw if passed a null private key', () => {
+      expect(() =>
+        sigUtil.signTypedData({
+          privateKey: null,
+          data: [{ name: 'data', type: 'string', value: 'Hello!' }],
+          version: Version.V1,
+        }),
+      ).toThrow('Missing private key parameter');
+    });
+
+    it('should throw if passed an undefined private key', () => {
+      expect(() =>
+        sigUtil.signTypedData({
+          privateKey: undefined,
+          data: [{ name: 'data', type: 'string', value: 'Hello!' }],
+          version: Version.V1,
+        }),
+      ).toThrow('Missing private key parameter');
+    });
   });
 });
 
@@ -6440,19 +6598,61 @@ describe('recoverTypedSignature', function () {
     });
   });
 
-  it('should throw if passed an invalid version', () => {
+  describe('validation', () => {
     // This is a signature of the message "[{ name: 'message', type: 'string', value: 'Hi, Alice!' }]"
     // that was created using the private key in the top-level `privateKey` variable.
     const exampleSignature =
       '0x49e75d475d767de7fcc67f521e0d86590723d872e6111e51c393e8c1e2f21d032dfaf5833af158915f035db6af4f37bf2d5d29781cd81f28a44c5cb4b9d241531b';
 
-    expect(() =>
-      sigUtil.recoverTypedSignature({
-        data: [{ name: 'message', type: 'string', value: 'Hi, Alice!' }],
-        signature: exampleSignature,
-        version: 'V0' as any,
-      }),
-    ).toThrow('Invalid version');
+    it('should throw if passed an invalid version', () => {
+      expect(() =>
+        sigUtil.recoverTypedSignature({
+          data: [{ name: 'message', type: 'string', value: 'Hi, Alice!' }],
+          signature: exampleSignature,
+          version: 'V0' as any,
+        }),
+      ).toThrow('Invalid version');
+    });
+
+    it('should throw if passed null data', () => {
+      expect(() =>
+        sigUtil.recoverTypedSignature({
+          data: null,
+          signature: exampleSignature,
+          version: Version.V1,
+        }),
+      ).toThrow('Missing data parameter');
+    });
+
+    it('should throw if passed undefined data', () => {
+      expect(() =>
+        sigUtil.recoverTypedSignature({
+          data: undefined,
+          signature: exampleSignature,
+          version: Version.V1,
+        }),
+      ).toThrow('Missing data parameter');
+    });
+
+    it('should throw if passed a null signature', () => {
+      expect(() =>
+        sigUtil.recoverTypedSignature({
+          data: [{ name: 'message', type: 'string', value: 'Hi, Alice!' }],
+          signature: null,
+          version: Version.V1,
+        }),
+      ).toThrow('Missing signature parameter');
+    });
+
+    it('should throw if passed a null signature', () => {
+      expect(() =>
+        sigUtil.recoverTypedSignature({
+          data: [{ name: 'message', type: 'string', value: 'Hi, Alice!' }],
+          signature: undefined,
+          version: Version.V1,
+        }),
+      ).toThrow('Missing signature parameter');
+    });
   });
 });
 
@@ -6716,5 +6916,207 @@ describe('encryption', function () {
         privateKey: bob.ethereumPrivateKey,
       }),
     ).toThrow('Decryption failed.');
+  });
+
+  describe('validation', function () {
+    describe('encrypt', function () {
+      it('should throw if passed null public key', function () {
+        expect(() =>
+          sigUtil.encrypt({
+            publicKey: null,
+            data: secretMessage,
+            version: 'x25519-xsalsa20-poly1305',
+          }),
+        ).toThrow('Missing publicKey parameter');
+      });
+
+      it('should throw if passed undefined public key', function () {
+        expect(() =>
+          sigUtil.encrypt({
+            publicKey: undefined,
+            data: secretMessage,
+            version: 'x25519-xsalsa20-poly1305',
+          }),
+        ).toThrow('Missing publicKey parameter');
+      });
+
+      it('should throw if passed null data', function () {
+        expect(() =>
+          sigUtil.encrypt({
+            publicKey: bob.encryptionPublicKey,
+            data: null,
+            version: 'x25519-xsalsa20-poly1305',
+          }),
+        ).toThrow('Missing data parameter');
+      });
+
+      it('should throw if passed undefined data', function () {
+        expect(() =>
+          sigUtil.encrypt({
+            publicKey: bob.encryptionPublicKey,
+            data: undefined,
+            version: 'x25519-xsalsa20-poly1305',
+          }),
+        ).toThrow('Missing data parameter');
+      });
+
+      it('should throw if passed null version', function () {
+        expect(() =>
+          sigUtil.encrypt({
+            publicKey: bob.encryptionPublicKey,
+            data: secretMessage,
+            version: null,
+          }),
+        ).toThrow('Missing version parameter');
+      });
+
+      it('should throw if passed undefined version', function () {
+        expect(() =>
+          sigUtil.encrypt({
+            publicKey: bob.encryptionPublicKey,
+            data: secretMessage,
+            version: undefined,
+          }),
+        ).toThrow('Missing version parameter');
+      });
+    });
+
+    describe('encryptSafely', function () {
+      it('should throw if passed null public key', function () {
+        expect(() =>
+          sigUtil.encryptSafely({
+            publicKey: null,
+            data: secretMessage,
+            version: 'x25519-xsalsa20-poly1305',
+          }),
+        ).toThrow('Missing publicKey parameter');
+      });
+
+      it('should throw if passed undefined public key', function () {
+        expect(() =>
+          sigUtil.encryptSafely({
+            publicKey: undefined,
+            data: secretMessage,
+            version: 'x25519-xsalsa20-poly1305',
+          }),
+        ).toThrow('Missing publicKey parameter');
+      });
+
+      it('should throw if passed null data', function () {
+        expect(() =>
+          sigUtil.encryptSafely({
+            publicKey: bob.encryptionPublicKey,
+            data: null,
+            version: 'x25519-xsalsa20-poly1305',
+          }),
+        ).toThrow('Missing data parameter');
+      });
+
+      it('should throw if passed undefined data', function () {
+        expect(() =>
+          sigUtil.encryptSafely({
+            publicKey: bob.encryptionPublicKey,
+            data: undefined,
+            version: 'x25519-xsalsa20-poly1305',
+          }),
+        ).toThrow('Missing data parameter');
+      });
+
+      it('should throw if passed null version', function () {
+        expect(() =>
+          sigUtil.encryptSafely({
+            publicKey: bob.encryptionPublicKey,
+            data: secretMessage,
+            version: null,
+          }),
+        ).toThrow('Missing version parameter');
+      });
+
+      it('should throw if passed undefined version', function () {
+        expect(() =>
+          sigUtil.encryptSafely({
+            publicKey: bob.encryptionPublicKey,
+            data: secretMessage,
+            version: undefined,
+          }),
+        ).toThrow('Missing version parameter');
+      });
+    });
+
+    describe('decrypt', function () {
+      it('should throw if passed null encrypted data', function () {
+        expect(() =>
+          sigUtil.decrypt({
+            encryptedData: null,
+            privateKey: bob.ethereumPrivateKey,
+          }),
+        ).toThrow('Missing encryptedData parameter');
+      });
+
+      it('should throw if passed undefined encrypted data', function () {
+        expect(() =>
+          sigUtil.decrypt({
+            encryptedData: undefined,
+            privateKey: bob.ethereumPrivateKey,
+          }),
+        ).toThrow('Missing encryptedData parameter');
+      });
+
+      it('should throw if passed null private key', function () {
+        expect(() =>
+          sigUtil.decrypt({
+            encryptedData,
+            privateKey: null,
+          }),
+        ).toThrow('Missing privateKey parameter');
+      });
+
+      it('should throw if passed undefined private key', function () {
+        expect(() =>
+          sigUtil.decrypt({
+            encryptedData,
+            privateKey: undefined,
+          }),
+        ).toThrow('Missing privateKey parameter');
+      });
+    });
+
+    describe('decryptSafely', function () {
+      it('should throw if passed null encrypted data', function () {
+        expect(() =>
+          sigUtil.decryptSafely({
+            encryptedData: null,
+            privateKey: bob.ethereumPrivateKey,
+          }),
+        ).toThrow('Missing encryptedData parameter');
+      });
+
+      it('should throw if passed undefined encrypted data', function () {
+        expect(() =>
+          sigUtil.decryptSafely({
+            encryptedData: undefined,
+            privateKey: bob.ethereumPrivateKey,
+          }),
+        ).toThrow('Missing encryptedData parameter');
+      });
+
+      it('should throw if passed null private key', function () {
+        expect(() =>
+          sigUtil.decryptSafely({
+            encryptedData,
+            privateKey: null,
+          }),
+        ).toThrow('Missing privateKey parameter');
+      });
+
+      it('should throw if passed undefined private key', function () {
+        expect(() =>
+          sigUtil.decryptSafely({
+            encryptedData,
+            privateKey: undefined,
+          }),
+        ).toThrow('Missing privateKey parameter');
+      });
+    });
   });
 });
