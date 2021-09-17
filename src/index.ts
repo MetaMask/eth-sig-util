@@ -141,6 +141,16 @@ function validateVersion(version: Version, allowedVersions?: Version[]) {
 }
 
 /**
+ * Returns `true` if the given value is nullish.
+ *
+ * @param value - The value being checked.
+ * @returns Whether the value is nullish.
+ */
+function isNullish(value) {
+  return value === null || value === undefined;
+}
+
+/**
  * Encode a single field.
  *
  * @param types - All type definitions.
@@ -473,6 +483,12 @@ export function personalSign({
   privateKey: Buffer;
   data: unknown;
 }): string {
+  if (isNullish(data)) {
+    throw new Error('Missing data parameter');
+  } else if (isNullish(privateKey)) {
+    throw new Error('Missing privateKey parameter');
+  }
+
   const message = legacyToBuffer(data);
   const msgHash = ethUtil.hashPersonalMessage(message);
   const sig = ethUtil.ecsign(msgHash, privateKey);
@@ -496,6 +512,12 @@ export function recoverPersonalSignature({
   data: unknown;
   signature: string;
 }): string {
+  if (isNullish(data)) {
+    throw new Error('Missing data parameter');
+  } else if (isNullish(signature)) {
+    throw new Error('Missing signature parameter');
+  }
+
   const publicKey = getPublicKeyFor(data, signature);
   const sender = ethUtil.publicToAddress(publicKey);
   const senderHex = ethUtil.bufferToHex(sender);
@@ -518,6 +540,12 @@ export function extractPublicKey({
   data: unknown;
   signature: string;
 }): string {
+  if (isNullish(data)) {
+    throw new Error('Missing data parameter');
+  } else if (isNullish(signature)) {
+    throw new Error('Missing signature parameter');
+  }
+
   const publicKey = getPublicKeyFor(data, signature);
   return `0x${publicKey.toString('hex')}`;
 }
@@ -554,6 +582,14 @@ export function encrypt({
   data: unknown;
   version: string;
 }): EthEncryptedData {
+  if (isNullish(publicKey)) {
+    throw new Error('Missing publicKey parameter');
+  } else if (isNullish(data)) {
+    throw new Error('Missing data parameter');
+  } else if (isNullish(version)) {
+    throw new Error('Missing version parameter');
+  }
+
   switch (version) {
     case 'x25519-xsalsa20-poly1305': {
       if (typeof data !== 'string') {
@@ -618,12 +654,16 @@ export function encryptSafely({
   data: unknown;
   version: string;
 }): EthEncryptedData {
+  if (isNullish(publicKey)) {
+    throw new Error('Missing publicKey parameter');
+  } else if (isNullish(data)) {
+    throw new Error('Missing data parameter');
+  } else if (isNullish(version)) {
+    throw new Error('Missing version parameter');
+  }
+
   const DEFAULT_PADDING_LENGTH = 2 ** 11;
   const NACL_EXTRA_BYTES = 16;
-
-  if (!data) {
-    throw new Error('Cannot encrypt empty data');
-  }
 
   if (typeof data === 'object' && 'toJSON' in data) {
     // remove toJSON attack vector
@@ -671,6 +711,12 @@ export function decrypt({
   encryptedData: EthEncryptedData;
   privateKey: string;
 }): string {
+  if (isNullish(encryptedData)) {
+    throw new Error('Missing encryptedData parameter');
+  } else if (isNullish(privateKey)) {
+    throw new Error('Missing privateKey parameter');
+  }
+
   switch (encryptedData.version) {
     case 'x25519-xsalsa20-poly1305': {
       // string to buffer to UInt8Array
@@ -728,6 +774,12 @@ export function decryptSafely({
   encryptedData: EthEncryptedData;
   privateKey: string;
 }): string {
+  if (isNullish(encryptedData)) {
+    throw new Error('Missing encryptedData parameter');
+  } else if (isNullish(privateKey)) {
+    throw new Error('Missing privateKey parameter');
+  }
+
   const dataWithPadding = JSON.parse(decrypt({ encryptedData, privateKey }));
   return dataWithPadding.data;
 }
@@ -774,6 +826,11 @@ export function signTypedData<V extends Version, T extends MessageTypes>({
   version: V;
 }): string {
   validateVersion(version);
+  if (isNullish(data)) {
+    throw new Error('Missing data parameter');
+  } else if (isNullish(privateKey)) {
+    throw new Error('Missing private key parameter');
+  }
 
   const messageHash =
     version === Version.V1
@@ -810,6 +867,11 @@ export function recoverTypedSignature<
   version: V;
 }): string {
   validateVersion(version);
+  if (isNullish(data)) {
+    throw new Error('Missing data parameter');
+  } else if (isNullish(signature)) {
+    throw new Error('Missing signature parameter');
+  }
 
   const messageHash =
     version === Version.V1
