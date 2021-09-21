@@ -17,7 +17,7 @@ import {
 /**
  * This is the message format used for `V1` of `signTypedData`.
  */
-export type TypedDataV1 = EIP712TypedData[];
+export type TypedDataV1 = TypedDataV1Field[];
 
 /**
  * This represents a single field in a `V1` `signTypedData` message.
@@ -26,7 +26,7 @@ export type TypedDataV1 = EIP712TypedData[];
  * @property type - The type of a field (must be a supported Solidity type).
  * @property value - The value of the field.
  */
-export interface EIP712TypedData {
+export interface TypedDataV1Field {
   name: string;
   type: string;
   value: any;
@@ -43,7 +43,7 @@ export interface EIP712TypedData {
  *
  * V4 is based on EIP-712, and includes full support of arrays and recursive data structures.
  */
-export enum Version {
+export enum SignTypedDataVersion {
   V1 = 'V1',
   V3 = 'V3',
   V4 = 'V4',
@@ -140,12 +140,15 @@ function getSolidityTypes() {
  * @param allowedVersions - A list of allowed versions. If omitted, all versions are assumed to be
  * allowed.
  */
-function validateVersion(version: Version, allowedVersions?: Version[]) {
-  if (!Object.keys(Version).includes(version)) {
+function validateVersion(
+  version: SignTypedDataVersion,
+  allowedVersions?: SignTypedDataVersion[],
+) {
+  if (!Object.keys(SignTypedDataVersion).includes(version)) {
     throw new Error(`Invalid version: '${version}'`);
   } else if (allowedVersions && !allowedVersions.includes(version)) {
     throw new Error(
-      `Version not allowed: '${version}'. Allowed versions are: ${allowedVersions.join(
+      `SignTypedDataVersion not allowed: '${version}'. Allowed versions are: ${allowedVersions.join(
         ', ',
       )}`,
     );
@@ -167,14 +170,14 @@ function encodeField(
   name: string,
   type: string,
   value: any,
-  version: Version.V3 | Version.V4,
+  version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
 ): [type: string, value: any] {
-  validateVersion(version, [Version.V3, Version.V4]);
+  validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
   if (types[type] !== undefined) {
     return [
       'bytes32',
-      version === Version.V4 && value == null // eslint-disable-line no-eq-null
+      version === SignTypedDataVersion.V4 && value == null // eslint-disable-line no-eq-null
         ? '0x0000000000000000000000000000000000000000000000000000000000000000'
         : keccak(encodeData(type, value, types, version)),
     ];
@@ -197,7 +200,7 @@ function encodeField(
   }
 
   if (type.lastIndexOf(']') === type.length - 1) {
-    if (version === Version.V3) {
+    if (version === SignTypedDataVersion.V3) {
       throw new Error(
         'Arrays are unimplemented in encodeData; use V4 extension',
       );
@@ -233,15 +236,15 @@ function encodeData(
   primaryType: string,
   data: Record<string, unknown>,
   types: Record<string, MessageTypeProperty[]>,
-  version: Version.V3 | Version.V4,
+  version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
 ): Buffer {
-  validateVersion(version, [Version.V3, Version.V4]);
+  validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
   const encodedTypes = ['bytes32'];
   const encodedValues: unknown[] = [hashType(primaryType, types)];
 
   for (const field of types[primaryType]) {
-    if (version === Version.V3 && data[field.name] === undefined) {
+    if (version === SignTypedDataVersion.V3 && data[field.name] === undefined) {
       continue;
     }
     const [type, value] = encodeField(
@@ -327,9 +330,9 @@ function hashStruct(
   primaryType: string,
   data: Record<string, unknown>,
   types: Record<string, MessageTypeProperty[]>,
-  version: Version.V3 | Version.V4,
+  version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
 ): Buffer {
-  validateVersion(version, [Version.V3, Version.V4]);
+  validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
   return keccak(encodeData(primaryType, data, types, version));
 }
@@ -383,9 +386,9 @@ function sanitizeData<T extends MessageTypes>(
  */
 function eip712Hash<T extends MessageTypes>(
   typedData: TypedMessage<T>,
-  version: Version.V3 | Version.V4,
+  version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
 ): Buffer {
-  validateVersion(version, [Version.V3, Version.V4]);
+  validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
   const sanitizedData = sanitizeData(typedData);
   const parts = [Buffer.from('1901', 'hex')];
@@ -433,7 +436,7 @@ export const TypedDataUtils = {
  * @param typedData - The typed message.
  * @returns The '0x'-prefixed hex encoded hash representing the type of the provided message.
  */
-export function typedSignatureHash(typedData: EIP712TypedData[]): string {
+export function typedSignatureHash(typedData: TypedDataV1Field[]): string {
   const hashBuffer = _typedSignatureHash(typedData);
   return bufferToHex(hashBuffer);
 }
@@ -502,7 +505,10 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
  * @param options.version - The signing version to use.
  * @returns The '0x'-prefixed hex encoded signature.
  */
-export function signTypedData<V extends Version, T extends MessageTypes>({
+export function signTypedData<
+  V extends SignTypedDataVersion,
+  T extends MessageTypes,
+>({
   privateKey,
   data,
   version,
@@ -519,11 +525,11 @@ export function signTypedData<V extends Version, T extends MessageTypes>({
   }
 
   const messageHash =
-    version === Version.V1
+    version === SignTypedDataVersion.V1
       ? _typedSignatureHash(data as TypedDataV1)
       : TypedDataUtils.eip712Hash(
           data as TypedMessage<T>,
-          version as Version.V3 | Version.V4,
+          version as SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
         );
   const sig = ecsign(messageHash, privateKey);
   return concatSig(toBuffer(sig.v), sig.r, sig.s);
@@ -541,7 +547,7 @@ export function signTypedData<V extends Version, T extends MessageTypes>({
  * @returns The '0x'-prefixed hex address of the signer.
  */
 export function recoverTypedSignature<
-  V extends Version,
+  V extends SignTypedDataVersion,
   T extends MessageTypes,
 >({
   data,
@@ -560,11 +566,11 @@ export function recoverTypedSignature<
   }
 
   const messageHash =
-    version === Version.V1
+    version === SignTypedDataVersion.V1
       ? _typedSignatureHash(data as TypedDataV1)
       : TypedDataUtils.eip712Hash(
           data as TypedMessage<T>,
-          version as Version.V3 | Version.V4,
+          version as SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
         );
   const publicKey = recoverPublicKey(messageHash, signature);
   const sender = publicToAddress(publicKey);

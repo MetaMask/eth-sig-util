@@ -10,7 +10,7 @@ Array [
   "personalSign",
   "recoverPersonalSignature",
   "extractPublicKey",
-  "Version",
+  "SignTypedDataVersion",
   "TYPED_MESSAGE_SCHEMA",
   "TypedDataUtils",
   "typedSignatureHash",

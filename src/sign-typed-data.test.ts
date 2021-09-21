@@ -4,7 +4,7 @@ import {
   signTypedData,
   TypedDataUtils,
   typedSignatureHash,
-  Version,
+  SignTypedDataVersion,
 } from './sign-typed-data';
 
 const privateKey = Buffer.from(
@@ -159,7 +159,7 @@ describe('TypedDataUtils.encodeData', function () {
                   'Message',
                   message,
                   types,
-                  Version.V3,
+                  SignTypedDataVersion.V3,
                 ).toString('hex'),
               ).toMatchSnapshot();
             });
@@ -182,7 +182,7 @@ describe('TypedDataUtils.encodeData', function () {
                     'Message',
                     message,
                     types,
-                    Version.V3,
+                    SignTypedDataVersion.V3,
                   ).toString('hex'),
                 ).toThrow(errorMessage);
               },
@@ -201,7 +201,7 @@ describe('TypedDataUtils.encodeData', function () {
                   'Message',
                   message,
                   types,
-                  Version.V3,
+                  SignTypedDataVersion.V3,
                 ).toString('hex'),
               ).toThrow(
                 'Arrays are unimplemented in encodeData; use V4 extension',
@@ -242,7 +242,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -289,7 +289,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -305,7 +305,7 @@ describe('TypedDataUtils.encodeData', function () {
           'Message',
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toThrow('Arrays are unimplemented in encodeData; use V4 extension');
     });
@@ -339,14 +339,14 @@ describe('TypedDataUtils.encodeData', function () {
         primaryType,
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const messageWithExtraProperties = { ...message, foo: 'bar' };
       const signatureWithExtraProperties = TypedDataUtils.encodeData(
         primaryType,
         messageWithExtraProperties,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
 
       expect(originalSignature).toBe(signatureWithExtraProperties);
@@ -384,7 +384,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toThrow(`Cannot read property 'toArray' of null`);
     });
@@ -421,7 +421,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -456,7 +456,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -491,7 +491,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -523,7 +523,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toThrow(`Cannot read property 'name' of null`);
     });
@@ -555,7 +555,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -571,7 +571,7 @@ describe('TypedDataUtils.encodeData', function () {
           'Message',
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toThrow('Unsupported or invalid type: function');
     });
@@ -585,7 +585,7 @@ describe('TypedDataUtils.encodeData', function () {
           'Message',
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toThrow('No type definition specified: Message');
     });
@@ -601,7 +601,7 @@ describe('TypedDataUtils.encodeData', function () {
           'Message',
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toThrow('Unsupported or invalid type: foo');
     });
@@ -618,7 +618,7 @@ describe('TypedDataUtils.encodeData', function () {
           'Message',
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -632,7 +632,12 @@ describe('TypedDataUtils.encodeData', function () {
       const { hashStruct } = TypedDataUtils;
 
       expect(
-        hashStruct(primaryType, message, types, Version.V3).toString('hex'),
+        hashStruct(
+          primaryType,
+          message,
+          types,
+          SignTypedDataVersion.V3,
+        ).toString('hex'),
       ).toMatchSnapshot();
     });
   });
@@ -662,7 +667,7 @@ describe('TypedDataUtils.encodeData', function () {
                   'Message',
                   message,
                   types,
-                  Version.V4,
+                  SignTypedDataVersion.V4,
                 ).toString('hex'),
               ).toMatchSnapshot();
             });
@@ -685,7 +690,7 @@ describe('TypedDataUtils.encodeData', function () {
                     'Message',
                     message,
                     types,
-                    Version.V4,
+                    SignTypedDataVersion.V4,
                   ).toString('hex'),
                 ).toThrow(errorMessage);
               },
@@ -702,7 +707,7 @@ describe('TypedDataUtils.encodeData', function () {
                 'Message',
                 message,
                 types,
-                Version.V4,
+                SignTypedDataVersion.V4,
               ).toString('hex'),
             ).toMatchSnapshot();
           });
@@ -740,7 +745,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -787,7 +792,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -827,7 +832,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -861,14 +866,14 @@ describe('TypedDataUtils.encodeData', function () {
         primaryType,
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
       const messageWithExtraProperties = { ...message, foo: 'bar' };
       const signatureWithExtraProperties = TypedDataUtils.encodeData(
         primaryType,
         messageWithExtraProperties,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(originalSignature).toBe(signatureWithExtraProperties);
@@ -906,7 +911,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toThrow(`Cannot read property 'toArray' of null`);
     });
@@ -943,7 +948,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toThrow('missing value for field length of type int32');
     });
@@ -978,7 +983,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -1013,7 +1018,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toThrow('missing value for field contents of type string');
     });
@@ -1045,7 +1050,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -1077,7 +1082,7 @@ describe('TypedDataUtils.encodeData', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -1093,7 +1098,7 @@ describe('TypedDataUtils.encodeData', function () {
           'Message',
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toThrow('Unsupported or invalid type: function');
     });
@@ -1107,7 +1112,7 @@ describe('TypedDataUtils.encodeData', function () {
           'Message',
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toThrow('No type definition specified: Message');
     });
@@ -1123,7 +1128,7 @@ describe('TypedDataUtils.encodeData', function () {
           'Message',
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toThrow('Unsupported or invalid type: foo');
     });
@@ -1140,7 +1145,7 @@ describe('TypedDataUtils.encodeData', function () {
           'Message',
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -1154,7 +1159,12 @@ describe('TypedDataUtils.encodeData', function () {
       const { encodeData } = TypedDataUtils;
 
       expect(
-        encodeData(primaryType, message, types, Version.V4).toString('hex'),
+        encodeData(
+          primaryType,
+          message,
+          types,
+          SignTypedDataVersion.V4,
+        ).toString('hex'),
       ).toMatchSnapshot();
     });
   });
@@ -1185,13 +1195,13 @@ describe('TypedDataUtils.encodeData', function () {
                 'Message',
                 message,
                 types,
-                Version.V3,
+                SignTypedDataVersion.V3,
               ).toString('hex');
               const v4Signature = TypedDataUtils.encodeData(
                 'Message',
                 message,
                 types,
-                Version.V4,
+                SignTypedDataVersion.V4,
               ).toString('hex');
 
               _expect(v3Signature).toBe(v4Signature);
@@ -1230,13 +1240,13 @@ describe('TypedDataUtils.encodeData', function () {
         primaryType,
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const v4Signature = TypedDataUtils.encodeData(
         primaryType,
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(v3Signature).toBe(v4Signature);
@@ -1271,26 +1281,26 @@ describe('TypedDataUtils.encodeData', function () {
         primaryType,
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const originalV4Signature = TypedDataUtils.encodeData(
         primaryType,
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
       const messageWithExtraProperties = { ...message, foo: 'bar' };
       const v3signatureWithExtraProperties = TypedDataUtils.encodeData(
         primaryType,
         messageWithExtraProperties,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const v4signatureWithExtraProperties = TypedDataUtils.encodeData(
         primaryType,
         messageWithExtraProperties,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(originalV3Signature).toBe(originalV4Signature);
@@ -1328,13 +1338,13 @@ describe('TypedDataUtils.encodeData', function () {
         primaryType,
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const v4Signature = TypedDataUtils.encodeData(
         primaryType,
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(v3Signature).toBe(v4Signature);
@@ -1351,13 +1361,13 @@ describe('TypedDataUtils.encodeData', function () {
         'Message',
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const v4Signature = TypedDataUtils.encodeData(
         'Message',
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(v3Signature).toBe(v4Signature);
@@ -1413,13 +1423,13 @@ describe('TypedDataUtils.encodeData', function () {
         primaryType,
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const v4Signature = TypedDataUtils.encodeData(
         primaryType,
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(v3Signature).not.toBe(v4Signature);
@@ -1451,13 +1461,13 @@ describe('TypedDataUtils.encodeData', function () {
         primaryType,
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const v4Signature = TypedDataUtils.encodeData(
         primaryType,
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(v3Signature).not.toBe(v4Signature);
@@ -1489,9 +1499,9 @@ describe('TypedDataUtils.encodeData', function () {
         'Message',
         message,
         types,
-        Version.V1 as any,
+        SignTypedDataVersion.V1 as any,
       ).toString('hex'),
-    ).toThrow('Version not allowed');
+    ).toThrow('SignTypedDataVersion not allowed');
   });
 });
 
@@ -1523,7 +1533,7 @@ describe('TypedDataUtils.hashStruct', function () {
                   'Message',
                   message,
                   types,
-                  Version.V3,
+                  SignTypedDataVersion.V3,
                 ).toString('hex'),
               ).toMatchSnapshot();
             });
@@ -1546,7 +1556,7 @@ describe('TypedDataUtils.hashStruct', function () {
                     'Message',
                     message,
                     types,
-                    Version.V3,
+                    SignTypedDataVersion.V3,
                   ).toString('hex'),
                 ).toThrow(errorMessage);
               },
@@ -1565,7 +1575,7 @@ describe('TypedDataUtils.hashStruct', function () {
                   'Message',
                   message,
                   types,
-                  Version.V3,
+                  SignTypedDataVersion.V3,
                 ).toString('hex'),
               ).toThrow(
                 'Arrays are unimplemented in encodeData; use V4 extension',
@@ -1606,7 +1616,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -1653,7 +1663,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -1669,7 +1679,7 @@ describe('TypedDataUtils.hashStruct', function () {
           'Message',
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toThrow('Arrays are unimplemented in encodeData; use V4 extension');
     });
@@ -1703,14 +1713,14 @@ describe('TypedDataUtils.hashStruct', function () {
         primaryType,
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const messageWithExtraProperties = { ...message, foo: 'bar' };
       const signatureWithExtraProperties = TypedDataUtils.hashStruct(
         primaryType,
         messageWithExtraProperties,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
 
       expect(originalSignature).toBe(signatureWithExtraProperties);
@@ -1748,7 +1758,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toThrow(`Cannot read property 'toArray' of null`);
     });
@@ -1785,7 +1795,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -1820,7 +1830,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -1855,7 +1865,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -1887,7 +1897,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toThrow(`Cannot read property 'name' of null`);
     });
@@ -1919,7 +1929,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -1935,7 +1945,7 @@ describe('TypedDataUtils.hashStruct', function () {
           'Message',
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toThrow('Unsupported or invalid type: function');
     });
@@ -1949,7 +1959,7 @@ describe('TypedDataUtils.hashStruct', function () {
           'Message',
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toThrow('No type definition specified: Message');
     });
@@ -1965,7 +1975,7 @@ describe('TypedDataUtils.hashStruct', function () {
           'Message',
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toThrow('Unsupported or invalid type: foo');
     });
@@ -1982,7 +1992,7 @@ describe('TypedDataUtils.hashStruct', function () {
           'Message',
           message,
           types,
-          Version.V3,
+          SignTypedDataVersion.V3,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -1996,7 +2006,12 @@ describe('TypedDataUtils.hashStruct', function () {
       const { hashStruct } = TypedDataUtils;
 
       expect(
-        hashStruct(primaryType, message, types, Version.V3).toString('hex'),
+        hashStruct(
+          primaryType,
+          message,
+          types,
+          SignTypedDataVersion.V3,
+        ).toString('hex'),
       ).toMatchSnapshot();
     });
   });
@@ -2026,7 +2041,7 @@ describe('TypedDataUtils.hashStruct', function () {
                   'Message',
                   message,
                   types,
-                  Version.V4,
+                  SignTypedDataVersion.V4,
                 ).toString('hex'),
               ).toMatchSnapshot();
             });
@@ -2049,7 +2064,7 @@ describe('TypedDataUtils.hashStruct', function () {
                     'Message',
                     message,
                     types,
-                    Version.V4,
+                    SignTypedDataVersion.V4,
                   ).toString('hex'),
                 ).toThrow(errorMessage);
               },
@@ -2066,7 +2081,7 @@ describe('TypedDataUtils.hashStruct', function () {
                 'Message',
                 message,
                 types,
-                Version.V4,
+                SignTypedDataVersion.V4,
               ).toString('hex'),
             ).toMatchSnapshot();
           });
@@ -2104,7 +2119,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -2151,7 +2166,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -2191,7 +2206,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -2225,14 +2240,14 @@ describe('TypedDataUtils.hashStruct', function () {
         primaryType,
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
       const messageWithExtraProperties = { ...message, foo: 'bar' };
       const signatureWithExtraProperties = TypedDataUtils.hashStruct(
         primaryType,
         messageWithExtraProperties,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(originalSignature).toBe(signatureWithExtraProperties);
@@ -2270,7 +2285,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toThrow(`Cannot read property 'toArray' of null`);
     });
@@ -2307,7 +2322,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toThrow('missing value for field length of type int32');
     });
@@ -2342,7 +2357,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -2377,7 +2392,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toThrow('missing value for field contents of type string');
     });
@@ -2409,7 +2424,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -2441,7 +2456,7 @@ describe('TypedDataUtils.hashStruct', function () {
           primaryType,
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -2457,7 +2472,7 @@ describe('TypedDataUtils.hashStruct', function () {
           'Message',
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toThrow('Unsupported or invalid type: function');
     });
@@ -2471,7 +2486,7 @@ describe('TypedDataUtils.hashStruct', function () {
           'Message',
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toThrow('No type definition specified: Message');
     });
@@ -2487,7 +2502,7 @@ describe('TypedDataUtils.hashStruct', function () {
           'Message',
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toThrow('Unsupported or invalid type: foo');
     });
@@ -2504,7 +2519,7 @@ describe('TypedDataUtils.hashStruct', function () {
           'Message',
           message,
           types,
-          Version.V4,
+          SignTypedDataVersion.V4,
         ).toString('hex'),
       ).toMatchSnapshot();
     });
@@ -2518,7 +2533,12 @@ describe('TypedDataUtils.hashStruct', function () {
       const { hashStruct } = TypedDataUtils;
 
       expect(
-        hashStruct(primaryType, message, types, Version.V4).toString('hex'),
+        hashStruct(
+          primaryType,
+          message,
+          types,
+          SignTypedDataVersion.V4,
+        ).toString('hex'),
       ).toMatchSnapshot();
     });
   });
@@ -2549,13 +2569,13 @@ describe('TypedDataUtils.hashStruct', function () {
                 'Message',
                 message,
                 types,
-                Version.V3,
+                SignTypedDataVersion.V3,
               ).toString('hex');
               const v4Signature = TypedDataUtils.hashStruct(
                 'Message',
                 message,
                 types,
-                Version.V4,
+                SignTypedDataVersion.V4,
               ).toString('hex');
 
               _expect(v3Signature).toBe(v4Signature);
@@ -2594,13 +2614,13 @@ describe('TypedDataUtils.hashStruct', function () {
         primaryType,
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const v4Signature = TypedDataUtils.hashStruct(
         primaryType,
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(v3Signature).toBe(v4Signature);
@@ -2635,26 +2655,26 @@ describe('TypedDataUtils.hashStruct', function () {
         primaryType,
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const originalV4Signature = TypedDataUtils.hashStruct(
         primaryType,
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
       const messageWithExtraProperties = { ...message, foo: 'bar' };
       const v3signatureWithExtraProperties = TypedDataUtils.hashStruct(
         primaryType,
         messageWithExtraProperties,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const v4signatureWithExtraProperties = TypedDataUtils.hashStruct(
         primaryType,
         messageWithExtraProperties,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(originalV3Signature).toBe(originalV4Signature);
@@ -2692,13 +2712,13 @@ describe('TypedDataUtils.hashStruct', function () {
         primaryType,
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const v4Signature = TypedDataUtils.hashStruct(
         primaryType,
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(v3Signature).toBe(v4Signature);
@@ -2715,13 +2735,13 @@ describe('TypedDataUtils.hashStruct', function () {
         'Message',
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const v4Signature = TypedDataUtils.hashStruct(
         'Message',
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(v3Signature).toBe(v4Signature);
@@ -2777,13 +2797,13 @@ describe('TypedDataUtils.hashStruct', function () {
         primaryType,
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const v4Signature = TypedDataUtils.hashStruct(
         primaryType,
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(v3Signature).not.toBe(v4Signature);
@@ -2815,13 +2835,13 @@ describe('TypedDataUtils.hashStruct', function () {
         primaryType,
         message,
         types,
-        Version.V3,
+        SignTypedDataVersion.V3,
       ).toString('hex');
       const v4Signature = TypedDataUtils.hashStruct(
         primaryType,
         message,
         types,
-        Version.V4,
+        SignTypedDataVersion.V4,
       ).toString('hex');
 
       expect(v3Signature).not.toBe(v4Signature);
@@ -2853,9 +2873,9 @@ describe('TypedDataUtils.hashStruct', function () {
         'Message',
         message,
         types,
-        Version.V1 as any,
+        SignTypedDataVersion.V1 as any,
       ).toString('hex'),
-    ).toThrow('Version not allowed');
+    ).toThrow('SignTypedDataVersion not allowed');
   });
 });
 
@@ -3248,7 +3268,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           domain: {},
           message: {},
         },
-        Version.V3,
+        SignTypedDataVersion.V3,
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
@@ -3262,7 +3282,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           types: {},
           primaryType: 'EIP712Domain',
         } as any,
-        Version.V3,
+        SignTypedDataVersion.V3,
       );
       const minimalValidHash = TypedDataUtils.eip712Hash(
         {
@@ -3273,7 +3293,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           domain: {},
           message: {},
         },
-        Version.V3,
+        SignTypedDataVersion.V3,
       );
 
       expect(minimalHash.toString('hex')).toBe(
@@ -3291,7 +3311,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           domain: {},
           message: {},
         },
-        Version.V3,
+        SignTypedDataVersion.V3,
       );
       const extraPropertiesHash = TypedDataUtils.eip712Hash(
         {
@@ -3304,7 +3324,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           extra: 'stuff',
           moreExtra: 1,
         } as any,
-        Version.V3,
+        SignTypedDataVersion.V3,
       );
 
       expect(minimalValidHash.toString('hex')).toBe(
@@ -3349,7 +3369,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           },
           message: {},
         },
-        Version.V3,
+        SignTypedDataVersion.V3,
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
@@ -3397,7 +3417,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           },
           message: {},
         } as any,
-        Version.V3,
+        SignTypedDataVersion.V3,
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
@@ -3446,7 +3466,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           },
           message: {},
         } as any,
-        Version.V3,
+        SignTypedDataVersion.V3,
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
@@ -3492,7 +3512,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             data: 'Hello!',
           },
         },
-        Version.V3,
+        SignTypedDataVersion.V3,
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
@@ -3538,7 +3558,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             data: 'Hello!',
           },
         },
-        Version.V3,
+        SignTypedDataVersion.V3,
       );
       const hashWithoutMessage = TypedDataUtils.eip712Hash(
         {
@@ -3577,7 +3597,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           },
           message: {},
         },
-        Version.V3,
+        SignTypedDataVersion.V3,
       );
 
       expect(hashWithMessage.toString('hex')).toBe(
@@ -3600,7 +3620,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           domain: {},
           message: {},
         },
-        Version.V3,
+        SignTypedDataVersion.V3,
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
@@ -3621,7 +3641,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           domain: {},
           message: {},
         },
-        Version.V4,
+        SignTypedDataVersion.V4,
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
@@ -3635,7 +3655,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           types: {},
           primaryType: 'EIP712Domain',
         } as any,
-        Version.V4,
+        SignTypedDataVersion.V4,
       );
       const minimalValidHash = TypedDataUtils.eip712Hash(
         {
@@ -3646,7 +3666,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           domain: {},
           message: {},
         },
-        Version.V4,
+        SignTypedDataVersion.V4,
       );
 
       expect(minimalHash.toString('hex')).toBe(
@@ -3664,7 +3684,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           domain: {},
           message: {},
         },
-        Version.V4,
+        SignTypedDataVersion.V4,
       );
       const extraPropertiesHash = TypedDataUtils.eip712Hash(
         {
@@ -3677,7 +3697,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           extra: 'stuff',
           moreExtra: 1,
         } as any,
-        Version.V4,
+        SignTypedDataVersion.V4,
       );
 
       expect(minimalValidHash.toString('hex')).toBe(
@@ -3722,7 +3742,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           },
           message: {},
         },
-        Version.V4,
+        SignTypedDataVersion.V4,
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
@@ -3770,7 +3790,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           },
           message: {},
         } as any,
-        Version.V4,
+        SignTypedDataVersion.V4,
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
@@ -3819,7 +3839,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           },
           message: {},
         } as any,
-        Version.V4,
+        SignTypedDataVersion.V4,
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
@@ -3865,7 +3885,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             data: 'Hello!',
           },
         },
-        Version.V4,
+        SignTypedDataVersion.V4,
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
@@ -3911,7 +3931,7 @@ describe('TypedDataUtils.eip712Hash', function () {
             data: 'Hello!',
           },
         },
-        Version.V4,
+        SignTypedDataVersion.V4,
       );
       const hashWithoutMessage = TypedDataUtils.eip712Hash(
         {
@@ -3950,7 +3970,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           },
           message: {},
         },
-        Version.V4,
+        SignTypedDataVersion.V4,
       );
 
       expect(hashWithMessage.toString('hex')).toBe(
@@ -3973,7 +3993,7 @@ describe('TypedDataUtils.eip712Hash', function () {
           domain: {},
           message: {},
         },
-        Version.V4,
+        SignTypedDataVersion.V4,
       );
 
       expect(hash.toString('hex')).toMatchSnapshot();
@@ -4007,9 +4027,9 @@ describe('TypedDataUtils.eip712Hash', function () {
           domain: {},
           message: {},
         },
-        Version.V1 as any,
+        SignTypedDataVersion.V1 as any,
       ),
-    ).toThrow('Version not allowed');
+    ).toThrow('SignTypedDataVersion not allowed');
   });
 });
 
@@ -4228,7 +4248,7 @@ describe('signTypedData', function () {
         signTypedData({
           privateKey,
           data: [],
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Expect argument to be non-empty array');
     });
@@ -4252,7 +4272,7 @@ describe('signTypedData', function () {
                 signTypedData({
                   privateKey,
                   data: [{ name: 'data', type, value: input }],
-                  version: Version.V1,
+                  version: SignTypedDataVersion.V1,
                 }),
               ).toMatchSnapshot();
             });
@@ -4269,7 +4289,7 @@ describe('signTypedData', function () {
                   signTypedData({
                     privateKey,
                     data: [{ name: 'data', type, value: input }],
-                    version: Version.V1,
+                    version: SignTypedDataVersion.V1,
                   }),
                 ).toThrow(errorMessage);
               },
@@ -4284,7 +4304,7 @@ describe('signTypedData', function () {
                   signTypedData({
                     privateKey,
                     data: [{ name: 'data', type: `${type}[]`, value: inputs }],
-                    version: Version.V1,
+                    version: SignTypedDataVersion.V1,
                   }),
                 ).toThrow(
                   'The "list[0]" argument must be an instance of Buffer or Uint8Array. Received type number (10)',
@@ -4297,7 +4317,7 @@ describe('signTypedData', function () {
                 signTypedData({
                   privateKey,
                   data: [{ name: 'data', type: `${type}[]`, value: inputs }],
-                  version: Version.V1,
+                  version: SignTypedDataVersion.V1,
                 }),
               ).toMatchSnapshot();
             });
@@ -4311,7 +4331,7 @@ describe('signTypedData', function () {
         signTypedData({
           privateKey,
           data: [{ name: 'data', type: 'int32', value: null }],
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toThrow(`Cannot read property 'toArray' of null`);
     });
@@ -4321,7 +4341,7 @@ describe('signTypedData', function () {
         signTypedData({
           privateKey,
           data: [{ name: 'data', type: 'int32', value: undefined }],
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toMatchSnapshot();
     });
@@ -4331,7 +4351,7 @@ describe('signTypedData', function () {
         signTypedData({
           privateKey,
           data: [{ name: 'data', type: 'string', value: null }],
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toThrow(
         'The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received null',
@@ -4343,7 +4363,7 @@ describe('signTypedData', function () {
         signTypedData({
           privateKey,
           data: [{ name: 'data', type: 'string', value: undefined }],
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toMatchSnapshot();
     });
@@ -4359,7 +4379,7 @@ describe('signTypedData', function () {
               value: () => console.log(test),
             },
           ],
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Unsupported or invalid type: function');
     });
@@ -4369,7 +4389,7 @@ describe('signTypedData', function () {
         signTypedData({
           privateKey,
           data: [{ name: 'data', type: 'foo', value: 'test' }],
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Unsupported or invalid type: foo');
     });
@@ -4393,7 +4413,7 @@ describe('signTypedData', function () {
           domain: {},
           message: {},
         },
-        version: Version.V3,
+        version: SignTypedDataVersion.V3,
       });
 
       expect(signature).toMatchSnapshot();
@@ -4408,7 +4428,7 @@ describe('signTypedData', function () {
           types: {},
           primaryType: 'EIP712Domain',
         } as any,
-        version: Version.V3,
+        version: SignTypedDataVersion.V3,
       });
       const minimalValidSignature = signTypedData({
         privateKey,
@@ -4420,7 +4440,7 @@ describe('signTypedData', function () {
           domain: {},
           message: {},
         },
-        version: Version.V3,
+        version: SignTypedDataVersion.V3,
       });
 
       expect(minimalSignature).toBe(minimalValidSignature);
@@ -4437,7 +4457,7 @@ describe('signTypedData', function () {
           domain: {},
           message: {},
         },
-        version: Version.V3,
+        version: SignTypedDataVersion.V3,
       });
       const extraPropertiesSignature = signTypedData({
         privateKey,
@@ -4451,7 +4471,7 @@ describe('signTypedData', function () {
           extra: 'stuff',
           moreExtra: 1,
         } as any,
-        version: Version.V3,
+        version: SignTypedDataVersion.V3,
       });
 
       expect(minimalValidSignature).toBe(extraPropertiesSignature);
@@ -4495,7 +4515,7 @@ describe('signTypedData', function () {
           },
           message: {},
         },
-        version: Version.V3,
+        version: SignTypedDataVersion.V3,
       });
 
       expect(signature).toMatchSnapshot();
@@ -4544,7 +4564,7 @@ describe('signTypedData', function () {
           },
           message: {},
         } as any,
-        version: Version.V3,
+        version: SignTypedDataVersion.V3,
       });
 
       expect(signature).toMatchSnapshot();
@@ -4594,7 +4614,7 @@ describe('signTypedData', function () {
           },
           message: {},
         } as any,
-        version: Version.V3,
+        version: SignTypedDataVersion.V3,
       });
 
       expect(signature).toMatchSnapshot();
@@ -4641,7 +4661,7 @@ describe('signTypedData', function () {
             data: 'Hello!',
           },
         },
-        version: Version.V3,
+        version: SignTypedDataVersion.V3,
       });
 
       expect(signature).toMatchSnapshot();
@@ -4678,7 +4698,7 @@ describe('signTypedData', function () {
                       data: input,
                     },
                   },
-                  version: Version.V3,
+                  version: SignTypedDataVersion.V3,
                 }),
               ).toMatchSnapshot();
             });
@@ -4705,7 +4725,7 @@ describe('signTypedData', function () {
                         data: input,
                       },
                     },
-                    version: Version.V3,
+                    version: SignTypedDataVersion.V3,
                   }),
                 ).toThrow(errorMessage);
               },
@@ -4729,7 +4749,7 @@ describe('signTypedData', function () {
                       data: inputs,
                     },
                   },
-                  version: Version.V3,
+                  version: SignTypedDataVersion.V3,
                 }),
               ).toThrow(
                 'Arrays are unimplemented in encodeData; use V4 extension',
@@ -4775,7 +4795,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toMatchSnapshot();
     });
@@ -4827,7 +4847,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toMatchSnapshot();
     });
@@ -4849,7 +4869,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toThrow('Arrays are unimplemented in encodeData; use V4 extension');
     });
@@ -4888,7 +4908,7 @@ describe('signTypedData', function () {
           domain: {},
           message,
         },
-        version: Version.V3,
+        version: SignTypedDataVersion.V3,
       });
       const messageWithExtraProperties = { ...message, foo: 'bar' };
       const signatureWithExtraProperties = signTypedData({
@@ -4899,7 +4919,7 @@ describe('signTypedData', function () {
           domain: {},
           message: messageWithExtraProperties,
         },
-        version: Version.V3,
+        version: SignTypedDataVersion.V3,
       });
 
       expect(originalSignature).toBe(signatureWithExtraProperties);
@@ -4942,7 +4962,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toThrow(`Cannot read property 'toArray' of null`);
     });
@@ -4984,7 +5004,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toMatchSnapshot();
     });
@@ -5024,7 +5044,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toMatchSnapshot();
     });
@@ -5064,7 +5084,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toMatchSnapshot();
     });
@@ -5101,7 +5121,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toThrow(`Cannot read property 'name' of null`);
     });
@@ -5138,7 +5158,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toMatchSnapshot();
     });
@@ -5160,7 +5180,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toThrow('Unsupported or invalid type: function');
     });
@@ -5181,7 +5201,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           } as any,
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toThrow('No type definition specified: Message');
     });
@@ -5203,7 +5223,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toThrow('Unsupported or invalid type: foo');
     });
@@ -5226,7 +5246,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toMatchSnapshot();
     });
@@ -5250,7 +5270,7 @@ describe('signTypedData', function () {
           domain: {},
           message: {},
         },
-        version: Version.V4,
+        version: SignTypedDataVersion.V4,
       });
 
       expect(signature).toMatchSnapshot();
@@ -5265,7 +5285,7 @@ describe('signTypedData', function () {
           types: {},
           primaryType: 'EIP712Domain',
         } as any,
-        version: Version.V4,
+        version: SignTypedDataVersion.V4,
       });
       const minimalValidSignature = signTypedData({
         privateKey,
@@ -5277,7 +5297,7 @@ describe('signTypedData', function () {
           domain: {},
           message: {},
         },
-        version: Version.V4,
+        version: SignTypedDataVersion.V4,
       });
 
       expect(minimalSignature).toBe(minimalValidSignature);
@@ -5294,7 +5314,7 @@ describe('signTypedData', function () {
           domain: {},
           message: {},
         },
-        version: Version.V4,
+        version: SignTypedDataVersion.V4,
       });
       const extraPropertiesSignature = signTypedData({
         privateKey,
@@ -5308,7 +5328,7 @@ describe('signTypedData', function () {
           extra: 'stuff',
           moreExtra: 1,
         } as any,
-        version: Version.V4,
+        version: SignTypedDataVersion.V4,
       });
 
       expect(minimalValidSignature).toBe(extraPropertiesSignature);
@@ -5352,7 +5372,7 @@ describe('signTypedData', function () {
           },
           message: {},
         },
-        version: Version.V4,
+        version: SignTypedDataVersion.V4,
       });
 
       expect(signature).toMatchSnapshot();
@@ -5401,7 +5421,7 @@ describe('signTypedData', function () {
           },
           message: {},
         } as any,
-        version: Version.V4,
+        version: SignTypedDataVersion.V4,
       });
 
       expect(signature).toMatchSnapshot();
@@ -5451,7 +5471,7 @@ describe('signTypedData', function () {
           },
           message: {},
         } as any,
-        version: Version.V4,
+        version: SignTypedDataVersion.V4,
       });
 
       expect(signature).toMatchSnapshot();
@@ -5498,7 +5518,7 @@ describe('signTypedData', function () {
             data: 'Hello!',
           },
         },
-        version: Version.V4,
+        version: SignTypedDataVersion.V4,
       });
 
       expect(signature).toMatchSnapshot();
@@ -5536,7 +5556,7 @@ describe('signTypedData', function () {
                     domain: {},
                     message,
                   },
-                  version: Version.V4,
+                  version: SignTypedDataVersion.V4,
                 }),
               ).toMatchSnapshot();
             });
@@ -5565,7 +5585,7 @@ describe('signTypedData', function () {
                       domain: {},
                       message,
                     },
-                    version: Version.V4,
+                    version: SignTypedDataVersion.V4,
                   }),
                 ).toThrow(errorMessage);
               },
@@ -5588,7 +5608,7 @@ describe('signTypedData', function () {
                   domain: {},
                   message,
                 },
-                version: Version.V4,
+                version: SignTypedDataVersion.V4,
               }),
             ).toMatchSnapshot();
           });
@@ -5631,7 +5651,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toMatchSnapshot();
     });
@@ -5683,7 +5703,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toMatchSnapshot();
     });
@@ -5728,7 +5748,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toMatchSnapshot();
     });
@@ -5767,7 +5787,7 @@ describe('signTypedData', function () {
           domain: {},
           message,
         },
-        version: Version.V4,
+        version: SignTypedDataVersion.V4,
       });
       const messageWithExtraProperties = { ...message, foo: 'bar' };
       const signatureWithExtraProperties = signTypedData({
@@ -5778,7 +5798,7 @@ describe('signTypedData', function () {
           domain: {},
           message: messageWithExtraProperties,
         },
-        version: Version.V4,
+        version: SignTypedDataVersion.V4,
       });
 
       expect(originalSignature).toBe(signatureWithExtraProperties);
@@ -5821,7 +5841,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toThrow(`Cannot read property 'toArray' of null`);
     });
@@ -5863,7 +5883,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toThrow('missing value for field length of type int32');
     });
@@ -5903,7 +5923,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toMatchSnapshot();
     });
@@ -5943,7 +5963,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toThrow('missing value for field contents of type string');
     });
@@ -5980,7 +6000,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toMatchSnapshot();
     });
@@ -6017,7 +6037,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toMatchSnapshot();
     });
@@ -6039,7 +6059,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toThrow('Unsupported or invalid type: function');
     });
@@ -6060,7 +6080,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           } as any,
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toThrow('No type definition specified: Message');
     });
@@ -6082,7 +6102,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toThrow('Unsupported or invalid type: foo');
     });
@@ -6105,7 +6125,7 @@ describe('signTypedData', function () {
             domain: {},
             message,
           },
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toMatchSnapshot();
     });
@@ -6127,7 +6147,7 @@ describe('signTypedData', function () {
         signTypedData({
           privateKey,
           data: null,
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Missing data parameter');
     });
@@ -6137,7 +6157,7 @@ describe('signTypedData', function () {
         signTypedData({
           privateKey,
           data: undefined,
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Missing data parameter');
     });
@@ -6147,7 +6167,7 @@ describe('signTypedData', function () {
         signTypedData({
           privateKey: null,
           data: [{ name: 'data', type: 'string', value: 'Hello!' }],
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Missing private key parameter');
     });
@@ -6157,7 +6177,7 @@ describe('signTypedData', function () {
         signTypedData({
           privateKey: undefined,
           data: [{ name: 'data', type: 'string', value: 'Hello!' }],
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Missing private key parameter');
     });
@@ -6180,7 +6200,7 @@ describe('recoverTypedSignature', function () {
         recoverTypedSignature({
           data: [{ name: 'message', type: 'string', value: 'Hi, Alice!' }],
           signature: exampleSignature,
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toBe(address);
     });
@@ -6195,14 +6215,14 @@ describe('recoverTypedSignature', function () {
       const signature = signTypedData({
         privateKey,
         data: message,
-        version: Version.V1,
+        version: SignTypedDataVersion.V1,
       });
 
       expect(
         recoverTypedSignature({
           data: message,
           signature,
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toBe(address);
     });
@@ -6235,7 +6255,7 @@ describe('recoverTypedSignature', function () {
         recoverTypedSignature({
           data: typedMessage,
           signature: exampleSignature,
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toBe(address);
     });
@@ -6259,14 +6279,14 @@ describe('recoverTypedSignature', function () {
       const signature = signTypedData({
         privateKey,
         data: typedMessage,
-        version: Version.V3,
+        version: SignTypedDataVersion.V3,
       });
 
       expect(
         recoverTypedSignature({
           data: typedMessage,
           signature,
-          version: Version.V3,
+          version: SignTypedDataVersion.V3,
         }),
       ).toBe(address);
     });
@@ -6299,7 +6319,7 @@ describe('recoverTypedSignature', function () {
         recoverTypedSignature({
           data: typedMessage,
           signature: exampleSignature,
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toBe(address);
     });
@@ -6323,14 +6343,14 @@ describe('recoverTypedSignature', function () {
       const signature = signTypedData({
         privateKey,
         data: typedMessage,
-        version: Version.V4,
+        version: SignTypedDataVersion.V4,
       });
 
       expect(
         recoverTypedSignature({
           data: typedMessage,
           signature,
-          version: Version.V4,
+          version: SignTypedDataVersion.V4,
         }),
       ).toBe(address);
     });
@@ -6357,7 +6377,7 @@ describe('recoverTypedSignature', function () {
         recoverTypedSignature({
           data: null,
           signature: exampleSignature,
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Missing data parameter');
     });
@@ -6367,7 +6387,7 @@ describe('recoverTypedSignature', function () {
         recoverTypedSignature({
           data: undefined,
           signature: exampleSignature,
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Missing data parameter');
     });
@@ -6377,7 +6397,7 @@ describe('recoverTypedSignature', function () {
         recoverTypedSignature({
           data: [{ name: 'message', type: 'string', value: 'Hi, Alice!' }],
           signature: null,
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Missing signature parameter');
     });
@@ -6387,7 +6407,7 @@ describe('recoverTypedSignature', function () {
         recoverTypedSignature({
           data: [{ name: 'message', type: 'string', value: 'Hi, Alice!' }],
           signature: undefined,
-          version: Version.V1,
+          version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Missing signature parameter');
     });
