@@ -53,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update `ethereumjs-util` to v6 ([#138](https://github.com/MetaMask/eth-sig-util/pull/138), [#195](https://github.com/MetaMask/eth-sig-util/pull/195))
 - Allow `TypedDataUtils` functions to be called unbound ([#152](https://github.com/MetaMask/eth-sig-util/pull/152))
 - Update minimum `tweetnacl-util` version ([#155](https://github.com/MetaMask/eth-sig-util/pull/155))
-- Add solidity types to JSON schema for `signTypedData` ([#189](https://github.com/MetaMask/eth-sig-util/pull/189))
+- Add Solidity types to JSON schema for `signTypedData` ([#189](https://github.com/MetaMask/eth-sig-util/pull/189))
 - Replace README API docs with generated docs ([#213](https://github.com/MetaMask/eth-sig-util/pull/213))
 
 ## [3.0.1] - 2021-02-04
