@@ -20,7 +20,7 @@ describe('personalSign', function () {
   // the top-level `privateKey` variable.
   const helloWorldSignature =
     '0x90a938f7457df6e8f741264c32697fc52f9a8f867c52dd70713d9d2d472f2e415d9c94148991bbe1f4a1818d1dff09165782749c877f5cf1eff4ef126e55714d1c';
-  const helloWorldMessage = 'Hello, world!';
+  const helloWorldMessage = `0x${Buffer.from('Hello, world!').toString('hex')}`;
 
   it('should sign a message', function () {
     expect(personalSign({ privateKey, data: helloWorldMessage })).toBe(
