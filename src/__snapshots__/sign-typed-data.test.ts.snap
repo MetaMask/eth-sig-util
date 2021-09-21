@@ -640,12 +640,6 @@ exports[`TypedDataUtils.hashStruct V4 should hash data with a recursive data typ
 
 exports[`TypedDataUtils.hashStruct V4 should hash data with custom type 1`] = `"c52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e"`;
 
-exports[`concatSig should concatenate an all-zero extended ECDSA signature 1`] = `"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"`;
-
-exports[`concatSig should concatenate an extended ECDSA signature 1`] = `"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"`;
-
-exports[`concatSig should encode an impossibly large extended ECDSA signature 1`] = `"0x000000000000000000000000000000000000000000000000001fffffffffffff000000000000000000000000000000000000000000000000001fffffffffffff1fffffffffffff"`;
-
 exports[`signTypedData V1 example data type "address" should sign "0x0" (type "string") 1`] = `"0x1e99abd9e342fecbad308847744c6dbd49f0517c045279a793519c1e44bcd8dd10f9adb0dc64475b47787ffc0d8f007e570072c0bbe88617ed55cea0d9e7f7941b"`;
 
 exports[`signTypedData V1 example data type "address" should sign "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"0xd3cc76bddfcc4dcee4612be739e194a43dc4b42bee8f0e2800b5ac7fe73374c53bada433a92fc483716f54a5f72823da28e874312e616760bb9fd4b38fd75ae01b"`;

@@ -1,4 +1,4 @@
-import { padWithZeroes } from './utils';
+import { concatSig, padWithZeroes, normalize } from './utils';
 
 describe('padWithZeroes', function () {
   it('pads a string shorter than the target length with zeroes', function () {
@@ -33,6 +33,128 @@ describe('padWithZeroes', function () {
   it('throws an error if passed a negative number', function () {
     expect(() => padWithZeroes('abc', -1)).toThrow(
       new Error('Expected a non-negative integer target length. Received: -1'),
+    );
+  });
+});
+
+describe('concatSig', function () {
+  it('should concatenate an extended ECDSA signature', function () {
+    expect(
+      concatSig(
+        Buffer.from('1', 'hex'),
+        Buffer.from('1', 'hex'),
+        Buffer.from('1', 'hex'),
+      ),
+    ).toMatchSnapshot();
+  });
+
+  it('should concatenate an all-zero extended ECDSA signature', function () {
+    expect(
+      concatSig(
+        Buffer.from('0', 'hex'),
+        Buffer.from('0', 'hex'),
+        Buffer.from('0', 'hex'),
+      ),
+    ).toMatchSnapshot();
+  });
+
+  it('should return a hex-prefixed string', function () {
+    const signature = concatSig(
+      Buffer.from('1', 'hex'),
+      Buffer.from('1', 'hex'),
+      Buffer.from('1', 'hex'),
+    );
+
+    expect(typeof signature).toBe('string');
+    expect(signature.slice(0, 2)).toBe('0x');
+  });
+
+  it('should encode an impossibly large extended ECDSA signature', function () {
+    const largeNumber = Number.MAX_SAFE_INTEGER.toString(16);
+    expect(
+      concatSig(
+        Buffer.from(largeNumber, 'hex'),
+        Buffer.from(largeNumber, 'hex'),
+        Buffer.from(largeNumber, 'hex'),
+      ),
+    ).toMatchSnapshot();
+  });
+
+  it('should throw if a portion of the signature is larger than the maximum safe integer', function () {
+    const largeNumber = '20000000000000'; // This is Number.MAX_SAFE_INTEGER + 1, in hex
+    expect(() =>
+      concatSig(
+        Buffer.from(largeNumber, 'hex'),
+        Buffer.from(largeNumber, 'hex'),
+        Buffer.from(largeNumber, 'hex'),
+      ),
+    ).toThrow('Number can only safely store up to 53 bits');
+  });
+});
+
+describe('normalize', function () {
+  it('should normalize an address to lower case', function () {
+    const initial = '0xA06599BD35921CfB5B71B4BE3869740385b0B306';
+    const result = normalize(initial);
+    expect(result).toBe(initial.toLowerCase());
+  });
+
+  it('should normalize address without a 0x prefix', function () {
+    const initial = 'A06599BD35921CfB5B71B4BE3869740385b0B306';
+    const result = normalize(initial);
+    expect(result).toBe(`0x${initial.toLowerCase()}`);
+  });
+
+  it('should normalize an integer to a byte-pair hex string', function () {
+    const initial = 1;
+    const result = normalize(initial);
+    expect(result).toBe('0x01');
+  });
+
+  // TODO: Add validation to disallow negative integers.
+  it('should normalize a negative integer to 0x', function () {
+    const initial = -1;
+    const result = normalize(initial);
+    expect(result).toBe('0x');
+  });
+
+  // TODO: Add validation to disallow null.
+  it('should return undefined if given null', function () {
+    const initial = null;
+    expect(normalize(initial as any)).toBeUndefined();
+  });
+
+  // TODO: Add validation to disallow undefined.
+  it('should return undefined if given undefined', function () {
+    const initial = undefined;
+    expect(normalize(initial as any)).toBeUndefined();
+  });
+
+  it('should throw if given an object', function () {
+    const initial = {};
+    expect(() => normalize(initial as any)).toThrow(
+      'eth-sig-util.normalize() requires hex string or integer input. received object:',
+    );
+  });
+
+  it('should throw if given a boolean', function () {
+    const initial = true;
+    expect(() => normalize(initial as any)).toThrow(
+      'eth-sig-util.normalize() requires hex string or integer input. received boolean: true',
+    );
+  });
+
+  it('should throw if given a bigint', function () {
+    const initial = BigInt(Number.MAX_SAFE_INTEGER);
+    expect(() => normalize(initial as any)).toThrow(
+      'eth-sig-util.normalize() requires hex string or integer input. received bigint: 9007199254740991',
+    );
+  });
+
+  it('should throw if given a symbol', function () {
+    const initial = Symbol('test');
+    expect(() => normalize(initial as any)).toThrow(
+      'Cannot convert a Symbol value to a string',
     );
   });
 });
