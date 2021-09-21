@@ -32,6 +32,17 @@ export interface EIP712TypedData {
   value: any;
 }
 
+/**
+ * Represents the version of `signTypedData` being used.
+ *
+ * V1 is based upon [an early version of EIP-712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca)
+ * that lacked some later security improvements, and should generally be neglected in favor of
+ * later versions.
+ *
+ * V3 is based on EIP-712, except that arrays and recursive data structures are not supported.
+ *
+ * V4 is based on EIP-712, and includes full support of arrays and recursive data structures.
+ */
 export enum Version {
   V1 = 'V1',
   V3 = 'V3',
@@ -401,7 +412,7 @@ function eip712Hash<T extends MessageTypes>(
 }
 
 /**
- * A collection of utility functions used for signing typed data
+ * A collection of utility functions used for signing typed data.
  */
 export const TypedDataUtils = {
   encodeData,
@@ -420,7 +431,7 @@ export const TypedDataUtils = {
  * specification. This hash is used in `signTypedData_v1`.
  *
  * @param typedData - The typed message.
- * @returns The type hash for the provided message.
+ * @returns The '0x'-prefixed hex encoded hash representing the type of the provided message.
  */
 export function typedSignatureHash(typedData: EIP712TypedData[]): string {
   const hashBuffer = _typedSignatureHash(typedData);
@@ -434,7 +445,7 @@ export function typedSignatureHash(typedData: EIP712TypedData[]): string {
  * specification. This hash is used in `signTypedData_v1`.
  *
  * @param typedData - The typed message.
- * @returns The type hash for the provided message.
+ * @returns The hash representing the type of the provided message.
  */
 function _typedSignatureHash(typedData: TypedDataV1): Buffer {
   const error = new Error('Expect argument to be non-empty array');
@@ -476,20 +487,20 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
  * Sign typed data according to EIP-712. The signing differs based upon the `version`.
  *
  * V1 is based upon [an early version of EIP-712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca)
- * that lacked some later security improvements, and should generally be
- * neglected in favor of later versions.
+ * that lacked some later security improvements, and should generally be neglected in favor of
+ * later versions.
  *
- * V3 is based on EIP-712, except that arrays and recursive data structures
- * are not supported.
+ * V3 is based on [EIP-712](https://eips.ethereum.org/EIPS/eip-712), except that arrays and
+ * recursive data structures are not supported.
  *
- * V4 is based on EIP-712, and includes full support of arrays and recursive
- * data structures.
+ * V4 is based on [EIP-712](https://eips.ethereum.org/EIPS/eip-712), and includes full support of
+ * arrays and recursive data structures.
  *
  * @param options - The signing options.
  * @param options.privateKey - The private key to sign with.
  * @param options.data - The typed data to sign.
  * @param options.version - The signing version to use.
- * @returns The signature.
+ * @returns The '0x'-prefixed hex encoded signature.
  */
 export function signTypedData<V extends Version, T extends MessageTypes>({
   privateKey,
@@ -524,10 +535,10 @@ export function signTypedData<V extends Version, T extends MessageTypes>({
  * create the signature.
  *
  * @param options - The signature recovery options.
- * @param options.data - The data that was signed.
- * @param options.signature - The message signature.
+ * @param options.data - The typed data that was signed.
+ * @param options.signature - The '0x-prefixed hex encoded message signature.
  * @param options.version - The signing version to use.
- * @returns The address of the signer.
+ * @returns The '0x'-prefixed hex address of the signer.
  */
 export function recoverTypedSignature<
   V extends Version,

@@ -31,7 +31,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "prepublishOnly": "yarn build:clean",
-    "docs": "typedoc"
+    "docs": "typedoc",
+    "docs:publish": "typedoc --cleanOutputDir false --gitRevision \"v$(jq -r .version < ./package.json)\""
   },
   "resolutions": {
     "airtap/engine.io-client/xmlhttprequest-ssl": "^1.6.2"
