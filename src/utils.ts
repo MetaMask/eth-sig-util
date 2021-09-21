@@ -63,12 +63,12 @@ export function legacyToBuffer(value: unknown) {
 }
 
 /**
- * Concatenate an extended ECDSA signature into a hex string.
+ * Concatenate an extended ECDSA signature into a single '0x'-prefixed hex string.
  *
  * @param v - The 'v' portion of the signature.
  * @param r - The 'r' portion of the signature.
  * @param s - The 's' portion of the signature.
- * @returns The concatenated ECDSA signature.
+ * @returns The concatenated ECDSA signature as a '0x'-prefixed string.
  */
 export function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
   const rSig = fromSigned(r);
@@ -96,10 +96,10 @@ export function recoverPublicKey(
 }
 
 /**
- * Normalize the input to a 0x-prefixed hex string.
+ * Normalize the input to a lower-cased '0x'-prefixed hex string.
  *
  * @param input - The value to normalize.
- * @returns The normalized 0x-prefixed hex string.
+ * @returns The normalized value.
  */
 export function normalize(input: number | string): string {
   if (!input) {

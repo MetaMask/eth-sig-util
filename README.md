@@ -14,57 +14,9 @@ or
 
 `npm install @metamask/eth-sig-util`
 
-## Methods
+## API
 
-### concatSig(v, r, s)
-
-All three arguments should be provided as buffers.
-
-Returns a continuous, hex-prefixed hex value for the signature, suitable for inclusion in a JSON transaction's data field.
-
-### normalize(address)
-
-Takes an address of either upper or lower case, with or without a hex prefix, and returns an all-lowercase, hex-prefixed address, suitable for submitting to an ethereum provider.
-
-### personalSign (privateKeyBuffer, msgParams)
-
-msgParams should have a `data` key that is hex-encoded data to sign.
-
-Returns the prefixed signature expected for calls to `eth.personalSign`.
-
-### recoverPersonalSignature (msgParams)
-
-msgParams should have a `data` key that is hex-encoded data unsigned, and a `sig` key that is hex-encoded and already signed.
-
-Returns a hex-encoded sender address.
-
-### signTypedData (privateKeyBuffer, msgParams, version)
-
-Sign typed data according to EIP-712. The signing differs based upon the `version`, which is explained in the table below.
-
-Data should be under `data` key of `msgParams`. The method returns prefixed signature.
-
-| Version | Description                                                  |
-| ------- | ------------------------------------------------------------ |
-| `V1`    | This is based on [an early version of EIP-712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca) that lacked some later security improvements, and should generally be neglected in favor of `V3`. |
-| `V3`    | Based on [EIP 712](https://eips.ethereum.org/EIPS/eip-712), except that arrays and recursive data structures are not supported |
-| `V4`    | Based on [EIP 712](https://eips.ethereum.org/EIPS/eip-712), including support for arrays and recursive data types. |
-
-### recoverTypedSignature ({data, sig}, version)
-
-Recover the address of the account used to sign the provided signature. The `version` parameter must match the version the signature was created with.
-
-Expects the same data that were used for signing. `sig` is a prefixed signature.
-
-### typedSignatureHash (typedData)
-
-Return hex-encoded hash of typed data params according to [EIP712](https://github.com/ethereum/EIPs/pull/712) schema.
-
-### extractPublicKey (msgParams)
-
-msgParams should have a `data` key that is hex-encoded data unsigned, and a `sig` key that is hex-encoded and already signed.
-
-Returns a hex-encoded public key.
+The full API documentation for the latest published version of this library is [available here](https://metamask.github.io/eth-sig-util/index.html).
 
 ## Contributing
 
@@ -81,6 +33,10 @@ Returns a hex-encoded public key.
 Run `yarn test` to run the tests once. To run tests on file changes, run `yarn test:watch`.
 
 Run `yarn lint` to run the linter, or run `yarn lint:fix` to run the linter and fix any automatically fixable issues.
+
+### Documentation
+
+The API documentation can be generated with the command `yarn docs`, which saves it in the `./docs` directory. Open the `./docs/index.html` file to browse the documentation.
 
 ### Release & Publishing
 

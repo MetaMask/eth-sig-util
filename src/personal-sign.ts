@@ -21,8 +21,8 @@ import {
  *
  * @param options - The personal sign options.
  * @param options.privateKey - The key to sign with.
- * @param options.data - The data to sign.
- * @returns The signature.
+ * @param options.data - The hex data to sign.
+ * @returns The '0x'-prefixed hex encoded signature.
  */
 export function personalSign({
   privateKey,
@@ -49,9 +49,9 @@ export function personalSign({
  * must have been signed using the `personalSign` function, or an equivalent function.
  *
  * @param options - The signature recovery options.
- * @param options.data - The message that was signed.
- * @param options.signature - The signature for the message.
- * @returns The address of the message signer.
+ * @param options.data - The hex data that was signed.
+ * @param options.signature - The '0x'-prefixed hex encoded message signature.
+ * @returns The '0x'-prefixed hex encoded address of the message signer.
  */
 export function recoverPersonalSignature({
   data,
@@ -77,9 +77,9 @@ export function recoverPersonalSignature({
  * must have been signed using the `personalSign` function, or an equivalent function.
  *
  * @param options - The public key recovery options.
- * @param options.data - The message that was signed.
- * @param options.signature - The signature for the message.
- * @returns The public key of the message signer.
+ * @param options.data - The hex data that was signed.
+ * @param options.signature - The '0x'-prefixed hex encoded message signature.
+ * @returns The '0x'-prefixed hex encoded public key of the message signer.
  */
 export function extractPublicKey({
   data,
@@ -102,7 +102,7 @@ export function extractPublicKey({
  * Get the public key for the given signature and message.
  *
  * @param message - The message that was signed.
- * @param signature - The signature.
+ * @param signature - The '0x'-prefixed hex encoded message signature.
  * @returns The public key of the signer.
  */
 function getPublicKeyFor(message: unknown, signature: string): Buffer {
