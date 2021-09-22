@@ -8,9 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.0.0]
 ### Added
-- Add subpath exports ([#214](https://github.com/MetaMask/eth-sig-util/pull/214), [#211](https://github.com/MetaMask/eth-sig-util/pull/211))
-- Add `signTypedData` version validation ([#201](https://github.com/MetaMask/eth-sig-util/pull/201))
-- Add validation to check that parameters aren't nullish ([#205](https://github.com/MetaMask/eth-sig-util/pull/205))
+- **BREAKING**: Add subpath exports ([#214](https://github.com/MetaMask/eth-sig-util/pull/214), [#211](https://github.com/MetaMask/eth-sig-util/pull/211))
+  - This is breaking because it prevents the import of modules that are not exposed as subpath exports.
 - Add `salt` to the EIP-712 `domain` type ([#176](https://github.com/MetaMask/eth-sig-util/pull/176))
 - Add additional unit tests ([#146](https://github.com/MetaMask/eth-sig-util/pull/146), [#164](https://github.com/MetaMask/eth-sig-util/pull/164), [#167](https://github.com/MetaMask/eth-sig-util/pull/167), [#169](https://github.com/MetaMask/eth-sig-util/pull/169), [#172](https://github.com/MetaMask/eth-sig-util/pull/172), [#177](https://github.com/MetaMask/eth-sig-util/pull/177), [#180](https://github.com/MetaMask/eth-sig-util/pull/180), [#170](https://github.com/MetaMask/eth-sig-util/pull/170), [#171](https://github.com/MetaMask/eth-sig-util/pull/171), [#178](https://github.com/MetaMask/eth-sig-util/pull/178), [#173](https://github.com/MetaMask/eth-sig-util/pull/173), [#182](https://github.com/MetaMask/eth-sig-util/pull/182), [#184](https://github.com/MetaMask/eth-sig-util/pull/184), [#185](https://github.com/MetaMask/eth-sig-util/pull/185), [#187](https://github.com/MetaMask/eth-sig-util/pull/187))
 - Improve documentation ([#157](https://github.com/MetaMask/eth-sig-util/pull/157), [#177](https://github.com/MetaMask/eth-sig-util/pull/177), [#174](https://github.com/MetaMask/eth-sig-util/pull/174), [#180](https://github.com/MetaMask/eth-sig-util/pull/180), [#178](https://github.com/MetaMask/eth-sig-util/pull/178), [#181](https://github.com/MetaMask/eth-sig-util/pull/181), [#186](https://github.com/MetaMask/eth-sig-util/pull/186), [#212](https://github.com/MetaMask/eth-sig-util/pull/212), [#207](https://github.com/MetaMask/eth-sig-util/pull/207), [#213](https://github.com/MetaMask/eth-sig-util/pull/213))
@@ -49,6 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Now it is called like this: `personalSign({ privateKey, data })`
 - **BREAKING**: Rename `Version` type to `SignTypedDataVersion` ([#218](https://github.com/MetaMask/eth-sig-util/pull/218))
 - **BREAKING**: Rename `EIP712TypedData` type to `TypedDataV1Field` ([#218](https://github.com/MetaMask/eth-sig-util/pull/218))
+- Add `signTypedData` version validation ([#201](https://github.com/MetaMask/eth-sig-util/pull/201))
+- Add validation to check that parameters aren't nullish ([#205](https://github.com/MetaMask/eth-sig-util/pull/205))
 - Enable inline sourcemaps ([#159](https://github.com/MetaMask/eth-sig-util/pull/159))
 - Update `ethereumjs-util` to v6 ([#138](https://github.com/MetaMask/eth-sig-util/pull/138), [#195](https://github.com/MetaMask/eth-sig-util/pull/195))
 - Allow `TypedDataUtils` functions to be called unbound ([#152](https://github.com/MetaMask/eth-sig-util/pull/152))
