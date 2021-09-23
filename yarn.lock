@@ -582,25 +582,25 @@
     semver "^7.3.5"
     yargs "^17.0.1"
 
-"@metamask/eslint-config-jest@^7.0.0":
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@metamask/eslint-config-jest/-/eslint-config-jest-7.0.0.tgz#81612aaf5307c3d65bb43366000233cd0b6e9db4"
-  integrity sha512-3IBJ985sC7Xfo8NlaUzNbfFDvt0+8YDvbC0yxDoRjPvi/o+bu7O/0SRIq0TDTOTfBZ8aMsxopq5uxVmU6ed21g==
+"@metamask/eslint-config-jest@^9.0.0":
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/@metamask/eslint-config-jest/-/eslint-config-jest-9.0.0.tgz#516fdf1f03f6f006b26ca790bf748e2189d19d17"
+  integrity sha512-tImEEWNRedcIMHZ3pmXDAQ+6xS61G3IEyqKf2+1xSMEMaa94KM+vo6v3GM7YB+M1DsErzgx3g70fEYtPItU4pw==
 
-"@metamask/eslint-config-nodejs@^7.0.0":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@metamask/eslint-config-nodejs/-/eslint-config-nodejs-7.0.1.tgz#7d3214b2c8eccfe2dbc9156b484456dce2dca91c"
-  integrity sha512-V9C1jYuLnhZOhW9dAKB7zMDmDKS1r907rYirUMcoU4mi8ggPTP6JqT87EAEX9bsA2ZpeTYXUXf5bkfLM+BTGyA==
+"@metamask/eslint-config-nodejs@^9.0.0":
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/@metamask/eslint-config-nodejs/-/eslint-config-nodejs-9.0.0.tgz#ec737a47c04febfb921ce844362d875ca2cae9e7"
+  integrity sha512-kPUrMPdpGeapbdG+LxysnDNzM9SlBNUvqVl1XoKnOGjo1pbZXB8hOI36PT3IlR1qa2FJumKYfgDSu7JLmOLxqQ==
 
-"@metamask/eslint-config-typescript@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@metamask/eslint-config-typescript/-/eslint-config-typescript-7.0.1.tgz#e013f7f0505741b9321cab21351136f651abbba6"
-  integrity sha512-nqWivz9XHjiHAE2Aqf/y+p8R3xDoN9ScX2i97vtTxNKjAqkzmUwAd8lEHEibRfPOYaRBQJ0x85wrof++PpLfZg==
+"@metamask/eslint-config-typescript@^9.0.1":
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/@metamask/eslint-config-typescript/-/eslint-config-typescript-9.0.1.tgz#900d53579ce074734ac9bf4e3f66fc20b92bd6af"
+  integrity sha512-+W7MXCoq8Q29wvkAv0ycwKB82xMbl+LfkUoM8oWN4n7vyMDXgcgbNjY7ug+quJPZfDTJJ7fxgPmG8m4LrkEImw==
 
-"@metamask/eslint-config@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@metamask/eslint-config/-/eslint-config-7.0.1.tgz#eeb87baa902965ca7931c26911d7027373706f34"
-  integrity sha512-dMZ+iyZrHdZK0D1uStTx8UN6Q6IK9YGbqPUwxgTj63M0mZOsuqs8qpGf+9Dn7uqS+8Oe9jNqejKxozjTiJvsEw==
+"@metamask/eslint-config@^9.0.0":
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/@metamask/eslint-config/-/eslint-config-9.0.0.tgz#22d4911b705f7e4e566efbdda0e37912da33e30f"
+  integrity sha512-mWlLGQKjXXFOj9EtDClKSoTLeQuPW2kM1w3EpUMf4goYAQ+kLXCCa8pEff6h8ApWAnjhYmXydA1znQ2J4XvD+A==
 
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
