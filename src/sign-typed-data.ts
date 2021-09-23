@@ -366,6 +366,7 @@ function sanitizeData<T extends MessageTypes>(
       sanitizedData[key] = data[key];
     }
   }
+
   if ('types' in sanitizedData) {
     sanitizedData.types = { EIP712Domain: [], ...sanitizedData.types };
   }
@@ -400,6 +401,7 @@ function eip712Hash<T extends MessageTypes>(
       version,
     ),
   );
+
   if (sanitizedData.primaryType !== 'EIP712Domain') {
     parts.push(
       hashStruct(
