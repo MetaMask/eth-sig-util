@@ -100,7 +100,7 @@ export const TYPED_MESSAGE_SCHEMA = {
           type: 'object',
           properties: {
             name: { type: 'string' },
-            type: { type: 'string', enum: getSolidityTypes() },
+            type: { type: 'string' },
           },
           required: ['name', 'type'],
         },
@@ -112,26 +112,6 @@ export const TYPED_MESSAGE_SCHEMA = {
   },
   required: ['types', 'primaryType', 'domain', 'message'],
 };
-
-/**
- * Get a list of all Solidity types.
- *
- * @returns A list of all Solidity types.
- */
-function getSolidityTypes() {
-  const types = ['bool', 'address', 'string', 'bytes'];
-  const ints = Array.from(new Array(32)).map(
-    (_, index) => `int${(index + 1) * 8}`,
-  );
-  const uints = Array.from(new Array(32)).map(
-    (_, index) => `uint${(index + 1) * 8}`,
-  );
-  const bytes = Array.from(new Array(32)).map(
-    (_, index) => `bytes${index + 1}`,
-  );
-
-  return [...types, ...ints, ...uints, ...bytes];
-}
 
 /**
  * Validate that the given value is a valid version string.
