@@ -45,7 +45,9 @@ describe('concatSig', function () {
         Buffer.from('1', 'hex'),
         Buffer.from('1', 'hex'),
       ),
-    ).toMatchSnapshot();
+    ).toMatchInlineSnapshot(
+      `"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"`,
+    );
   });
 
   it('should concatenate an all-zero extended ECDSA signature', function () {
@@ -55,7 +57,9 @@ describe('concatSig', function () {
         Buffer.from('0', 'hex'),
         Buffer.from('0', 'hex'),
       ),
-    ).toMatchSnapshot();
+    ).toMatchInlineSnapshot(
+      `"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"`,
+    );
   });
 
   it('should return a hex-prefixed string', function () {
@@ -77,7 +81,9 @@ describe('concatSig', function () {
         Buffer.from(largeNumber, 'hex'),
         Buffer.from(largeNumber, 'hex'),
       ),
-    ).toMatchSnapshot();
+    ).toMatchInlineSnapshot(
+      `"0x000000000000000000000000000000000000000000000000001fffffffffffff000000000000000000000000000000000000000000000000001fffffffffffff1fffffffffffff"`,
+    );
   });
 
   it('should throw if a portion of the signature is larger than the maximum safe integer', function () {
