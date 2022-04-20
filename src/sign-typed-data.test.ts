@@ -36,10 +36,22 @@ function getEip712SolidityTypes() {
 
 const eip712SolidityTypes = getEip712SolidityTypes();
 
+/**
+ * Validate the given message with the typed message schema.
+ *
+ * @param typedMessage - The typed message to validate.
+ * @returns Whether the message is valid.
+ */
+function validateTypedMessageSchema(
+  typedMessage: Record<string, unknown>,
+): boolean {
+  const ajv = new Ajv();
+  const validate = ajv.compile(TYPED_MESSAGE_SCHEMA);
+  return validate(typedMessage);
+}
+
 describe('TYPED_MESSAGE_SCHEMA', () => {
   it('should match valid typed message', () => {
-    const ajv = new Ajv();
-    const validate = ajv.compile(TYPED_MESSAGE_SCHEMA);
     const typedMessage = {
       domain: {},
       message: {},
@@ -49,12 +61,10 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
       },
     };
 
-    expect(validate(typedMessage)).toBe(true);
+    expect(validateTypedMessageSchema(typedMessage)).toBe(true);
   });
 
   it('should allow custom types in addition to domain', () => {
-    const ajv = new Ajv();
-    const validate = ajv.compile(TYPED_MESSAGE_SCHEMA);
     const typedMessage = {
       domain: {},
       message: {},
@@ -65,14 +75,11 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
       },
     };
 
-    expect(validate(typedMessage)).toBe(true);
+    expect(validateTypedMessageSchema(typedMessage)).toBe(true);
   });
 
-  for (const solidityType of eip712SolidityTypes) {
-    // eslint-disable-next-line no-loop-func
+  eip712SolidityTypes.forEach((solidityType) => {
     it(`should allow custom type to have type of '${solidityType}'`, () => {
-      const ajv = new Ajv();
-      const validate = ajv.compile(TYPED_MESSAGE_SCHEMA);
       const typedMessage = {
         domain: {},
         message: {},
@@ -83,13 +90,11 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
         },
       };
 
-      expect(validate(typedMessage)).toBe(true);
+      expect(validateTypedMessageSchema(typedMessage)).toBe(true);
     });
-  }
+  });
 
   it('should allow custom type to have a custom type', () => {
-    const ajv = new Ajv();
-    const validate = ajv.compile(TYPED_MESSAGE_SCHEMA);
     const typedMessage = {
       domain: {},
       message: {},
@@ -101,7 +106,7 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
       },
     };
 
-    expect(validate(typedMessage)).toBe(true);
+    expect(validateTypedMessageSchema(typedMessage)).toBe(true);
   });
 
   const invalidStrings = [undefined, null, 0, 1, [], {}];
@@ -109,8 +114,6 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
   for (const invalidString of invalidStrings) {
     // eslint-disable-next-line no-loop-func
     it(`should disallow a primary type with value '${invalidString}'`, () => {
-      const ajv = new Ajv();
-      const validate = ajv.compile(TYPED_MESSAGE_SCHEMA);
       const typedMessage = {
         domain: {},
         message: {},
@@ -120,7 +123,7 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
         },
       };
 
-      expect(validate(typedMessage)).toBe(false);
+      expect(validateTypedMessageSchema(typedMessage)).toBe(false);
     });
   }
 
@@ -128,8 +131,6 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
   for (const invalidObject of invalidObjects) {
     // eslint-disable-next-line no-loop-func
     it(`should disallow a domain with value '${invalidObject}'`, () => {
-      const ajv = new Ajv();
-      const validate = ajv.compile(TYPED_MESSAGE_SCHEMA);
       const typedMessage = {
         domain: invalidObject,
         message: {},
@@ -139,13 +140,11 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
         },
       };
 
-      expect(validate(typedMessage)).toBe(false);
+      expect(validateTypedMessageSchema(typedMessage)).toBe(false);
     });
 
     // eslint-disable-next-line no-loop-func
     it(`should disallow a message with value '${invalidObject}'`, () => {
-      const ajv = new Ajv();
-      const validate = ajv.compile(TYPED_MESSAGE_SCHEMA);
       const typedMessage = {
         domain: {},
         message: invalidObject,
@@ -155,13 +154,11 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
         },
       };
 
-      expect(validate(typedMessage)).toBe(false);
+      expect(validateTypedMessageSchema(typedMessage)).toBe(false);
     });
 
     // eslint-disable-next-line no-loop-func
     it(`should disallow types with value '${invalidObject}'`, () => {
-      const ajv = new Ajv();
-      const validate = ajv.compile(TYPED_MESSAGE_SCHEMA);
       const typedMessage = {
         domain: {},
         message: {},
@@ -169,13 +166,11 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
         types: invalidObject,
       };
 
-      expect(validate(typedMessage)).toBe(false);
+      expect(validateTypedMessageSchema(typedMessage)).toBe(false);
     });
   }
 
   it('should require custom type properties to have a name', () => {
-    const ajv = new Ajv();
-    const validate = ajv.compile(TYPED_MESSAGE_SCHEMA);
     const typedMessage = {
       domain: {},
       message: {},
@@ -186,12 +181,10 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
       },
     };
 
-    expect(validate(typedMessage)).toBe(false);
+    expect(validateTypedMessageSchema(typedMessage)).toBe(false);
   });
 
   it('should require custom type properties to have a type', () => {
-    const ajv = new Ajv();
-    const validate = ajv.compile(TYPED_MESSAGE_SCHEMA);
     const typedMessage = {
       domain: {},
       message: {},
@@ -202,7 +195,7 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
       },
     };
 
-    expect(validate(typedMessage)).toBe(false);
+    expect(validateTypedMessageSchema(typedMessage)).toBe(false);
   });
 
   const invalidTypes = [undefined, null, 0, 1, [], {}];
@@ -210,8 +203,6 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
   for (const invalidType of invalidTypes) {
     // eslint-disable-next-line no-loop-func
     it(`should disallow a type of '${invalidType}'`, () => {
-      const ajv = new Ajv();
-      const validate = ajv.compile(TYPED_MESSAGE_SCHEMA);
       const typedMessage = {
         domain: {},
         message: {},
@@ -222,7 +213,7 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
         },
       };
 
-      expect(validate(typedMessage)).toBe(false);
+      expect(validateTypedMessageSchema(typedMessage)).toBe(false);
     });
   }
 });
