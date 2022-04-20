@@ -130,6 +130,11 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
   const invalidObjects = [undefined, null, 0, 1, [], '', 'test'];
   for (const invalidObject of invalidObjects) {
     // eslint-disable-next-line no-loop-func
+    it(`should disallow a typed message with value'${invalidObject}'`, () => {
+      expect(validateTypedMessageSchema(invalidObject as any)).toBe(false);
+    });
+
+    // eslint-disable-next-line no-loop-func
     it(`should disallow a domain with value '${invalidObject}'`, () => {
       const typedMessage = {
         domain: invalidObject,
