@@ -1,4 +1,15 @@
-/* eslint-disable jest/no-restricted-matchers */
+// Allow using snapshots in this file.
+/*
+eslint jest/no-restricted-matchers: [
+  'error',
+  {
+    resolves: 'Use `expect(await promise)` instead.',
+    toBeFalsy: 'Avoid `toBeFalsy`',
+    toBeTruthy: 'Avoid `toBeTruthy`',
+  }
+]
+*/
+
 import * as ethUtil from 'ethereumjs-util';
 import Ajv from 'ajv';
 import {
