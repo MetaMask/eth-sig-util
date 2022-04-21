@@ -7,11 +7,10 @@ module.exports = {
       extends: ['@metamask/eslint-config-typescript'],
     },
     {
-      files: ['*.test.js'],
+      files: ['*.test.ts'],
       extends: ['@metamask/eslint-config-jest'],
     },
   ],
-  plugins: ['jsdoc'],
   rules: {
     camelcase: [
       'error',

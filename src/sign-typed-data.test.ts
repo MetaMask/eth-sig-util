@@ -1,3 +1,15 @@
+// Allow using snapshots in this file.
+/*
+eslint jest/no-restricted-matchers: [
+  'error',
+  {
+    resolves: 'Use `expect(await promise)` instead.',
+    toBeFalsy: 'Avoid `toBeFalsy`',
+    toBeTruthy: 'Avoid `toBeTruthy`',
+  }
+]
+*/
+
 import * as ethUtil from 'ethereumjs-util';
 import Ajv from 'ajv';
 import {
@@ -112,7 +124,6 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
   const invalidStrings = [undefined, null, 0, 1, [], {}];
 
   for (const invalidString of invalidStrings) {
-    // eslint-disable-next-line no-loop-func
     it(`should disallow a primary type with value '${invalidString}'`, () => {
       const typedMessage = {
         domain: {},
@@ -129,12 +140,10 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
 
   const invalidObjects = [undefined, null, 0, 1, [], '', 'test'];
   for (const invalidObject of invalidObjects) {
-    // eslint-disable-next-line no-loop-func
     it(`should disallow a typed message with value'${invalidObject}'`, () => {
       expect(validateTypedMessageSchema(invalidObject as any)).toBe(false);
     });
 
-    // eslint-disable-next-line no-loop-func
     it(`should disallow a domain with value '${invalidObject}'`, () => {
       const typedMessage = {
         domain: invalidObject,
@@ -148,7 +157,6 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
       expect(validateTypedMessageSchema(typedMessage)).toBe(false);
     });
 
-    // eslint-disable-next-line no-loop-func
     it(`should disallow a message with value '${invalidObject}'`, () => {
       const typedMessage = {
         domain: {},
@@ -162,7 +170,6 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
       expect(validateTypedMessageSchema(typedMessage)).toBe(false);
     });
 
-    // eslint-disable-next-line no-loop-func
     it(`should disallow types with value '${invalidObject}'`, () => {
       const typedMessage = {
         domain: {},
@@ -206,7 +213,6 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
   const invalidTypes = [undefined, null, 0, 1, [], {}];
 
   for (const invalidType of invalidTypes) {
-    // eslint-disable-next-line no-loop-func
     it(`should disallow a type of '${invalidType}'`, () => {
       const typedMessage = {
         domain: {},
@@ -347,25 +353,19 @@ describe('TypedDataUtils.encodeData', function () {
 
   describe('V3', function () {
     describe('example data', function () {
-      // Reassigned to silence "no-loop-func" ESLint rule
-      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
-      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
-      const _expect = expect;
-      const _it = it;
-
       for (const type of allExampleTypes) {
         describe(`type "${type}"`, function () {
           // Test all examples that do not crash
           const inputs = encodeDataExamples[type] || [];
           for (const input of inputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(`should encode "${input}" (type "${inputType}")`, function () {
+            it(`should encode "${input}" (type "${inputType}")`, function () {
               const types = {
                 Message: [{ name: 'data', type }],
               };
               const message = { data: input };
 
-              _expect(
+              expect(
                 TypedDataUtils.encodeData(
                   'Message',
                   message,
@@ -380,45 +380,39 @@ describe('TypedDataUtils.encodeData', function () {
           const errorInputs = encodeDataErrorExamples[type] || [];
           for (const { input, errorMessage } of errorInputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(
-              `should fail to encode "${input}" (type "${inputType}")`,
-              function () {
-                const types = {
-                  Message: [{ name: 'data', type }],
-                };
-                const message = { data: input };
-
-                _expect(() =>
-                  TypedDataUtils.encodeData(
-                    'Message',
-                    message,
-                    types,
-                    SignTypedDataVersion.V3,
-                  ).toString('hex'),
-                ).toThrow(errorMessage);
-              },
-            );
-          }
-
-          _it(
-            `should fail to encode array of all ${type} example data`,
-            function () {
+            it(`should fail to encode "${input}" (type "${inputType}")`, function () {
               const types = {
-                Message: [{ name: 'data', type: `${type}[]` }],
+                Message: [{ name: 'data', type }],
               };
-              const message = { data: inputs };
-              _expect(() =>
+              const message = { data: input };
+
+              expect(() =>
                 TypedDataUtils.encodeData(
                   'Message',
                   message,
                   types,
                   SignTypedDataVersion.V3,
                 ).toString('hex'),
-              ).toThrow(
-                'Arrays are unimplemented in encodeData; use V4 extension',
-              );
-            },
-          );
+              ).toThrow(errorMessage);
+            });
+          }
+
+          it(`should fail to encode array of all ${type} example data`, function () {
+            const types = {
+              Message: [{ name: 'data', type: `${type}[]` }],
+            };
+            const message = { data: inputs };
+            expect(() =>
+              TypedDataUtils.encodeData(
+                'Message',
+                message,
+                types,
+                SignTypedDataVersion.V3,
+              ).toString('hex'),
+            ).toThrow(
+              'Arrays are unimplemented in encodeData; use V4 extension',
+            );
+          });
         });
       }
     });
@@ -855,25 +849,19 @@ describe('TypedDataUtils.encodeData', function () {
 
   describe('V4', function () {
     describe('example data', function () {
-      // Reassigned to silence "no-loop-func" ESLint rule
-      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
-      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
-      const _expect = expect;
-      const _it = it;
-
       for (const type of allExampleTypes) {
         describe(`type "${type}"`, function () {
           // Test all examples that do not crash
           const inputs = encodeDataExamples[type] || [];
           for (const input of inputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(`should encode "${input}" (type "${inputType}")`, function () {
+            it(`should encode "${input}" (type "${inputType}")`, function () {
               const types = {
                 Message: [{ name: 'data', type }],
               };
               const message = { data: input };
 
-              _expect(
+              expect(
                 TypedDataUtils.encodeData(
                   'Message',
                   message,
@@ -888,32 +876,29 @@ describe('TypedDataUtils.encodeData', function () {
           const errorInputs = encodeDataErrorExamples[type] || [];
           for (const { input, errorMessage } of errorInputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(
-              `should fail to encode "${input}" (type "${inputType}")`,
-              function () {
-                const types = {
-                  Message: [{ name: 'data', type }],
-                };
-                const message = { data: input };
+            it(`should fail to encode "${input}" (type "${inputType}")`, function () {
+              const types = {
+                Message: [{ name: 'data', type }],
+              };
+              const message = { data: input };
 
-                _expect(() =>
-                  TypedDataUtils.encodeData(
-                    'Message',
-                    message,
-                    types,
-                    SignTypedDataVersion.V4,
-                  ).toString('hex'),
-                ).toThrow(errorMessage);
-              },
-            );
+              expect(() =>
+                TypedDataUtils.encodeData(
+                  'Message',
+                  message,
+                  types,
+                  SignTypedDataVersion.V4,
+                ).toString('hex'),
+              ).toThrow(errorMessage);
+            });
           }
 
-          _it(`should encode array of all ${type} example data`, function () {
+          it(`should encode array of all ${type} example data`, function () {
             const types = {
               Message: [{ name: 'data', type: `${type}[]` }],
             };
             const message = { data: inputs };
-            _expect(
+            expect(
               TypedDataUtils.encodeData(
                 'Message',
                 message,
@@ -1384,19 +1369,13 @@ describe('TypedDataUtils.encodeData', function () {
   // on V3 and V4
   describe('V3/V4 identical encodings', function () {
     describe('example data', function () {
-      // Reassigned to silence "no-loop-func" ESLint rule
-      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
-      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
-      const _expect = expect;
-      const _it = it;
-
       for (const type of allExampleTypes) {
         describe(`type "${type}"`, function () {
           // Test all examples that do not crash
           const inputs = encodeDataExamples[type] || [];
           for (const input of inputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(`should encode "${input}" (type "${inputType}")`, function () {
+            it(`should encode "${input}" (type "${inputType}")`, function () {
               const types = {
                 Message: [{ name: 'data', type }],
               };
@@ -1415,7 +1394,7 @@ describe('TypedDataUtils.encodeData', function () {
                 SignTypedDataVersion.V4,
               ).toString('hex');
 
-              _expect(v3Signature).toBe(v4Signature);
+              expect(v3Signature).toBe(v4Signature);
             });
           }
         });
@@ -1721,25 +1700,19 @@ describe('TypedDataUtils.hashStruct', function () {
   // See the `encodeData` test comments for more information about these test cases.
   describe('V3', function () {
     describe('example data', function () {
-      // Reassigned to silence "no-loop-func" ESLint rule
-      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
-      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
-      const _expect = expect;
-      const _it = it;
-
       for (const type of allExampleTypes) {
         describe(`type "${type}"`, function () {
           // Test all examples that do not crash
           const inputs = encodeDataExamples[type] || [];
           for (const input of inputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(`should hash "${input}" (type "${inputType}")`, function () {
+            it(`should hash "${input}" (type "${inputType}")`, function () {
               const types = {
                 Message: [{ name: 'data', type }],
               };
               const message = { data: input };
 
-              _expect(
+              expect(
                 TypedDataUtils.hashStruct(
                   'Message',
                   message,
@@ -1754,45 +1727,39 @@ describe('TypedDataUtils.hashStruct', function () {
           const errorInputs = encodeDataErrorExamples[type] || [];
           for (const { input, errorMessage } of errorInputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(
-              `should fail to hash "${input}" (type "${inputType}")`,
-              function () {
-                const types = {
-                  Message: [{ name: 'data', type }],
-                };
-                const message = { data: input };
-
-                _expect(() =>
-                  TypedDataUtils.hashStruct(
-                    'Message',
-                    message,
-                    types,
-                    SignTypedDataVersion.V3,
-                  ).toString('hex'),
-                ).toThrow(errorMessage);
-              },
-            );
-          }
-
-          _it(
-            `should fail to hash array of all ${type} example data`,
-            function () {
+            it(`should fail to hash "${input}" (type "${inputType}")`, function () {
               const types = {
-                Message: [{ name: 'data', type: `${type}[]` }],
+                Message: [{ name: 'data', type }],
               };
-              const message = { data: inputs };
-              _expect(() =>
+              const message = { data: input };
+
+              expect(() =>
                 TypedDataUtils.hashStruct(
                   'Message',
                   message,
                   types,
                   SignTypedDataVersion.V3,
                 ).toString('hex'),
-              ).toThrow(
-                'Arrays are unimplemented in encodeData; use V4 extension',
-              );
-            },
-          );
+              ).toThrow(errorMessage);
+            });
+          }
+
+          it(`should fail to hash array of all ${type} example data`, function () {
+            const types = {
+              Message: [{ name: 'data', type: `${type}[]` }],
+            };
+            const message = { data: inputs };
+            expect(() =>
+              TypedDataUtils.hashStruct(
+                'Message',
+                message,
+                types,
+                SignTypedDataVersion.V3,
+              ).toString('hex'),
+            ).toThrow(
+              'Arrays are unimplemented in encodeData; use V4 extension',
+            );
+          });
         });
       }
     });
@@ -2229,25 +2196,19 @@ describe('TypedDataUtils.hashStruct', function () {
 
   describe('V4', function () {
     describe('example data', function () {
-      // Reassigned to silence "no-loop-func" ESLint rule
-      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
-      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
-      const _expect = expect;
-      const _it = it;
-
       for (const type of allExampleTypes) {
         describe(`type "${type}"`, function () {
           // Test all examples that do not crash
           const inputs = encodeDataExamples[type] || [];
           for (const input of inputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(`should hash "${input}" (type "${inputType}")`, function () {
+            it(`should hash "${input}" (type "${inputType}")`, function () {
               const types = {
                 Message: [{ name: 'data', type }],
               };
               const message = { data: input };
 
-              _expect(
+              expect(
                 TypedDataUtils.hashStruct(
                   'Message',
                   message,
@@ -2262,32 +2223,29 @@ describe('TypedDataUtils.hashStruct', function () {
           const errorInputs = encodeDataErrorExamples[type] || [];
           for (const { input, errorMessage } of errorInputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(
-              `should fail to hash "${input}" (type "${inputType}")`,
-              function () {
-                const types = {
-                  Message: [{ name: 'data', type }],
-                };
-                const message = { data: input };
+            it(`should fail to hash "${input}" (type "${inputType}")`, function () {
+              const types = {
+                Message: [{ name: 'data', type }],
+              };
+              const message = { data: input };
 
-                _expect(() =>
-                  TypedDataUtils.hashStruct(
-                    'Message',
-                    message,
-                    types,
-                    SignTypedDataVersion.V4,
-                  ).toString('hex'),
-                ).toThrow(errorMessage);
-              },
-            );
+              expect(() =>
+                TypedDataUtils.hashStruct(
+                  'Message',
+                  message,
+                  types,
+                  SignTypedDataVersion.V4,
+                ).toString('hex'),
+              ).toThrow(errorMessage);
+            });
           }
 
-          _it(`should hash array of all ${type} example data`, function () {
+          it(`should hash array of all ${type} example data`, function () {
             const types = {
               Message: [{ name: 'data', type: `${type}[]` }],
             };
             const message = { data: inputs };
-            _expect(
+            expect(
               TypedDataUtils.hashStruct(
                 'Message',
                 message,
@@ -2758,19 +2716,13 @@ describe('TypedDataUtils.hashStruct', function () {
   // on V3 and V4
   describe('V3/V4 identical encodings', function () {
     describe('example data', function () {
-      // Reassigned to silence "no-loop-func" ESLint rule
-      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
-      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
-      const _expect = expect;
-      const _it = it;
-
       for (const type of allExampleTypes) {
         describe(`type "${type}"`, function () {
           // Test all examples that do not crash
           const inputs = encodeDataExamples[type] || [];
           for (const input of inputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(`should hash "${input}" (type "${inputType}")`, function () {
+            it(`should hash "${input}" (type "${inputType}")`, function () {
               const types = {
                 Message: [{ name: 'data', type }],
               };
@@ -2789,7 +2741,7 @@ describe('TypedDataUtils.hashStruct', function () {
                 SignTypedDataVersion.V4,
               ).toString('hex');
 
-              _expect(v3Signature).toBe(v4Signature);
+              expect(v3Signature).toBe(v4Signature);
             });
           }
         });
@@ -4338,36 +4290,27 @@ const allSignTypedDataV1ExampleTypes = [
 ];
 
 describe('typedSignatureHash', function () {
-  // Reassigned to silence "no-loop-func" ESLint rule
-  // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
-  // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
-  const _expect = expect;
-  const _it = it;
-
   for (const type of allSignTypedDataV1ExampleTypes) {
     describe(`type "${type}"`, function () {
       // Test all examples that do not crash
       const inputs = signTypedDataV1Examples[type] || [];
       for (const input of inputs) {
         const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-        _it(`should hash "${input}" (type "${inputType}")`, function () {
+        it(`should hash "${input}" (type "${inputType}")`, function () {
           const typedData = [{ type, name: 'message', value: input }];
 
-          _expect(typedSignatureHash(typedData)).toMatchSnapshot();
+          expect(typedSignatureHash(typedData)).toMatchSnapshot();
         });
       }
 
       const errorInputs = signTypedDataV1ErrorExamples[type] || [];
       for (const { input, errorMessage } of errorInputs) {
         const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-        _it(
-          `should fail to hash "${input}" (type "${inputType}")`,
-          function () {
-            const typedData = [{ type, name: 'message', value: input }];
+        it(`should fail to hash "${input}" (type "${inputType}")`, function () {
+          const typedData = [{ type, name: 'message', value: input }];
 
-            _expect(() => typedSignatureHash(typedData)).toThrow(errorMessage);
-          },
-        );
+          expect(() => typedSignatureHash(typedData)).toThrow(errorMessage);
+        });
       }
     });
   }
@@ -4427,8 +4370,8 @@ describe('typedSignatureHash', function () {
   ];
 
   for (const { input, errorMessage, label } of invalidTypedMessages) {
-    _it(`should throw when given ${label}`, function () {
-      _expect(() => typedSignatureHash(input as any)).toThrow(errorMessage);
+    it(`should throw when given ${label}`, function () {
+      expect(() => typedSignatureHash(input as any)).toThrow(errorMessage);
     });
   }
 
@@ -4465,21 +4408,14 @@ describe('signTypedData', function () {
     });
 
     describe('example data', function () {
-      // Reassigned to silence "no-loop-func" ESLint rule
-      // It was complaining because it saw that `it` and `expect` as "modified
-      // variables from the outer scope" which can be dangerous to reference in
-      // a loop. But they aren't modified in this case, just invoked.
-      const _expect = expect;
-      const _it = it;
-
       for (const type of allSignTypedDataV1ExampleTypes) {
         describe(`type "${type}"`, function () {
           // Test all examples that do not crash
           const inputs = signTypedDataV1Examples[type] || [];
           for (const input of inputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(`should sign "${input}" (type "${inputType}")`, function () {
-              _expect(
+            it(`should sign "${input}" (type "${inputType}")`, function () {
+              expect(
                 signTypedData({
                   privateKey,
                   data: [{ name: 'data', type, value: input }],
@@ -4493,38 +4429,32 @@ describe('signTypedData', function () {
           const errorInputs = signTypedDataV1ErrorExamples[type] || [];
           for (const { input, errorMessage } of errorInputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(
-              `should fail to sign "${input}" (type "${inputType}")`,
-              function () {
-                _expect(() =>
-                  signTypedData({
-                    privateKey,
-                    data: [{ name: 'data', type, value: input }],
-                    version: SignTypedDataVersion.V1,
-                  }),
-                ).toThrow(errorMessage);
-              },
-            );
+            it(`should fail to sign "${input}" (type "${inputType}")`, function () {
+              expect(() =>
+                signTypedData({
+                  privateKey,
+                  data: [{ name: 'data', type, value: input }],
+                  version: SignTypedDataVersion.V1,
+                }),
+              ).toThrow(errorMessage);
+            });
           }
 
           if (type === 'bytes') {
-            _it(
-              `should fail to sign array of all ${type} example data`,
-              function () {
-                _expect(() =>
-                  signTypedData({
-                    privateKey,
-                    data: [{ name: 'data', type: `${type}[]`, value: inputs }],
-                    version: SignTypedDataVersion.V1,
-                  }),
-                ).toThrow(
-                  'The "list[0]" argument must be an instance of Buffer or Uint8Array. Received type number (10)',
-                );
-              },
-            );
+            it(`should fail to sign array of all ${type} example data`, function () {
+              expect(() =>
+                signTypedData({
+                  privateKey,
+                  data: [{ name: 'data', type: `${type}[]`, value: inputs }],
+                  version: SignTypedDataVersion.V1,
+                }),
+              ).toThrow(
+                'The "list[0]" argument must be an instance of Buffer or Uint8Array. Received type number (10)',
+              );
+            });
           } else {
-            _it(`should sign array of all ${type} example data`, function () {
-              _expect(
+            it(`should sign array of all ${type} example data`, function () {
+              expect(
                 signTypedData({
                   privateKey,
                   data: [{ name: 'data', type: `${type}[]`, value: inputs }],
@@ -4882,20 +4812,14 @@ describe('signTypedData', function () {
     // those test cases are relevant here as well.
 
     describe('example data', function () {
-      // Reassigned to silence "no-loop-func" ESLint rule
-      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
-      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
-      const _expect = expect;
-      const _it = it;
-
       for (const type of allExampleTypes) {
         describe(`type "${type}"`, function () {
           // Test all examples that do not crash
           const inputs = encodeDataExamples[type] || [];
           for (const input of inputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(`should sign "${input}" (type "${inputType}")`, function () {
-              _expect(
+            it(`should sign "${input}" (type "${inputType}")`, function () {
+              expect(
                 signTypedData({
                   privateKey,
                   data: {
@@ -4919,54 +4843,48 @@ describe('signTypedData', function () {
           const errorInputs = encodeDataErrorExamples[type] || [];
           for (const { input, errorMessage } of errorInputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(
-              `should fail to sign "${input}" (type "${inputType}")`,
-              function () {
-                _expect(() =>
-                  signTypedData({
-                    privateKey,
-                    data: {
-                      types: {
-                        EIP712Domain: [],
-                        Message: [{ name: 'data', type }],
-                      },
-                      primaryType: 'Message',
-                      domain: {},
-                      message: {
-                        data: input,
-                      },
-                    },
-                    version: SignTypedDataVersion.V3,
-                  }),
-                ).toThrow(errorMessage);
-              },
-            );
-          }
-
-          _it(
-            `should fail to sign array of all ${type} example data`,
-            function () {
-              _expect(() =>
+            it(`should fail to sign "${input}" (type "${inputType}")`, function () {
+              expect(() =>
                 signTypedData({
                   privateKey,
                   data: {
                     types: {
                       EIP712Domain: [],
-                      Message: [{ name: 'data', type: `${type}[]` }],
+                      Message: [{ name: 'data', type }],
                     },
                     primaryType: 'Message',
                     domain: {},
                     message: {
-                      data: inputs,
+                      data: input,
                     },
                   },
                   version: SignTypedDataVersion.V3,
                 }),
-              ).toThrow(
-                'Arrays are unimplemented in encodeData; use V4 extension',
-              );
-            },
-          );
+              ).toThrow(errorMessage);
+            });
+          }
+
+          it(`should fail to sign array of all ${type} example data`, function () {
+            expect(() =>
+              signTypedData({
+                privateKey,
+                data: {
+                  types: {
+                    EIP712Domain: [],
+                    Message: [{ name: 'data', type: `${type}[]` }],
+                  },
+                  primaryType: 'Message',
+                  domain: {},
+                  message: {
+                    data: inputs,
+                  },
+                },
+                version: SignTypedDataVersion.V3,
+              }),
+            ).toThrow(
+              'Arrays are unimplemented in encodeData; use V4 extension',
+            );
+          });
         });
       }
     });
@@ -5738,19 +5656,13 @@ describe('signTypedData', function () {
     // This second group of tests mirrors the `TypedDataUtils.encodeData` tests, because all of
     // those test cases are relevant here as well.
     describe('example data', function () {
-      // Reassigned to silence "no-loop-func" ESLint rule
-      // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
-      // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
-      const _expect = expect;
-      const _it = it;
-
       for (const type of allExampleTypes) {
         describe(`type "${type}"`, function () {
           // Test all examples that do not crash
           const inputs = encodeDataExamples[type] || [];
           for (const input of inputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(`should sign "${input}" (type "${inputType}")`, function () {
+            it(`should sign "${input}" (type "${inputType}")`, function () {
               const types = {
                 EIP712Domain: [],
                 Message: [{ name: 'data', type }],
@@ -5758,7 +5670,7 @@ describe('signTypedData', function () {
               const message = { data: input };
               const primaryType = 'Message';
 
-              _expect(
+              expect(
                 signTypedData({
                   privateKey,
                   data: {
@@ -5777,40 +5689,37 @@ describe('signTypedData', function () {
           const errorInputs = encodeDataErrorExamples[type] || [];
           for (const { input, errorMessage } of errorInputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            _it(
-              `should fail to sign "${input}" (type "${inputType}")`,
-              function () {
-                const types = {
-                  EIP712Domain: [],
-                  Message: [{ name: 'data', type }],
-                };
-                const message = { data: input };
-                const primaryType = 'Message';
+            it(`should fail to sign "${input}" (type "${inputType}")`, function () {
+              const types = {
+                EIP712Domain: [],
+                Message: [{ name: 'data', type }],
+              };
+              const message = { data: input };
+              const primaryType = 'Message';
 
-                _expect(() =>
-                  signTypedData({
-                    privateKey,
-                    data: {
-                      types,
-                      primaryType,
-                      domain: {},
-                      message,
-                    },
-                    version: SignTypedDataVersion.V4,
-                  }),
-                ).toThrow(errorMessage);
-              },
-            );
+              expect(() =>
+                signTypedData({
+                  privateKey,
+                  data: {
+                    types,
+                    primaryType,
+                    domain: {},
+                    message,
+                  },
+                  version: SignTypedDataVersion.V4,
+                }),
+              ).toThrow(errorMessage);
+            });
           }
 
-          _it(`should sign array of all ${type} example data`, function () {
+          it(`should sign array of all ${type} example data`, function () {
             const types = {
               EIP712Domain: [],
               Message: [{ name: 'data', type: `${type}[]` }],
             };
             const message = { data: inputs };
             const primaryType = 'Message';
-            _expect(
+            expect(
               signTypedData({
                 privateKey,
                 data: {
@@ -6613,7 +6522,7 @@ describe('recoverTypedSignature', function () {
       ).toThrow('Missing signature parameter');
     });
 
-    it('should throw if passed a null signature', () => {
+    it('should throw if passed an undefined signature', () => {
       expect(() =>
         recoverTypedSignature({
           data: [{ name: 'message', type: 'string', value: 'Hi, Alice!' }],

@@ -23,13 +23,13 @@ describe('encryption', function () {
     ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
   };
 
-  it("Getting bob's encryptionPublicKey", async function () {
+  it("getting bob's encryptionPublicKey", async function () {
     const result = await getEncryptionPublicKey(bob.ethereumPrivateKey);
     expect(result).toBe(bob.encryptionPublicKey);
   });
 
   // encryption test
-  it("Alice encrypts message with bob's encryptionPublicKey", async function () {
+  it("alice encrypts message with bob's encryptionPublicKey", async function () {
     const result = await encrypt({
       publicKey: bob.encryptionPublicKey,
       data: secretMessage,
@@ -43,7 +43,7 @@ describe('encryption', function () {
   });
 
   // safe encryption test
-  it("Alice encryptsSafely message with bob's encryptionPublicKey", async function () {
+  it("alice encryptsSafely message with bob's encryptionPublicKey", async function () {
     const version = 'x25519-xsalsa20-poly1305';
     const result = await encryptSafely({
       publicKey: bob.encryptionPublicKey,
@@ -58,7 +58,7 @@ describe('encryption', function () {
   });
 
   // safe decryption test
-  it('Bob decryptSafely message that Alice encryptSafely for him', async function () {
+  it('bob decryptSafely message that Alice encryptSafely for him', async function () {
     const version = 'x25519-xsalsa20-poly1305';
     const result = await encryptSafely({
       publicKey: bob.encryptionPublicKey,
@@ -74,7 +74,7 @@ describe('encryption', function () {
   });
 
   // decryption test
-  it('Bob decrypts message that Alice sent to him', function () {
+  it('bob decrypts message that Alice sent to him', function () {
     const result = decrypt({
       encryptedData,
       privateKey: bob.ethereumPrivateKey,
@@ -82,7 +82,7 @@ describe('encryption', function () {
     expect(result).toBe(secretMessage);
   });
 
-  it('Decryption failed because version is wrong or missing', function () {
+  it('decryption failed because version is wrong or missing', function () {
     const badVersionData = {
       version: 'x256k1-aes256cbc',
       nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
@@ -98,7 +98,7 @@ describe('encryption', function () {
     ).toThrow('Encryption type/version not supported.');
   });
 
-  it('Decryption failed because nonce is wrong or missing', function () {
+  it('decryption failed because nonce is wrong or missing', function () {
     // encrypted data
     const badNonceData = {
       version: 'x25519-xsalsa20-poly1305',
@@ -115,7 +115,7 @@ describe('encryption', function () {
     ).toThrow('bad nonce size');
   });
 
-  it('Decryption failed because ephemPublicKey is wrong or missing', function () {
+  it('decryption failed because ephemPublicKey is wrong or missing', function () {
     // encrypted data
     const badEphemData = {
       version: 'x25519-xsalsa20-poly1305',
@@ -132,7 +132,7 @@ describe('encryption', function () {
     ).toThrow('Decryption failed.');
   });
 
-  it('Decryption failed because cyphertext is wrong or missing', function () {
+  it('decryption failed because cyphertext is wrong or missing', function () {
     // encrypted data
     const badEphemData = {
       version: 'x25519-xsalsa20-poly1305',

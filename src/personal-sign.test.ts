@@ -127,19 +127,15 @@ describe('personalSign', function () {
   ];
 
   for (const { testLabel, message, signature, addressHex, key } of testCases) {
-    // Reassigned to silence "no-loop-func" ESLint rule
-    // It was complaining because it saw that `it` and `expect` as "modified variables from the outer scope"
-    // which can be dangerous to reference in a loop. But they aren't modified in this case, just invoked.
-    const _expect = expect;
-    it(testLabel, function () {
+    it(`${testLabel}`, function () {
       const signed = personalSign({ privateKey: key, data: message });
-      _expect(signed).toBe(signature);
+      expect(signed).toBe(signature);
 
       const recovered = recoverPersonalSignature({
         data: message,
         signature,
       });
-      _expect(recovered).toBe(addressHex);
+      expect(recovered).toBe(addressHex);
     });
   }
 
