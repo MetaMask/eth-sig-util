@@ -1,6 +1,6 @@
 {
   "name": "@metamask/eth-sig-util",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "A few useful functions for signing ethereum data",
   "keywords": [
     "ethereum",

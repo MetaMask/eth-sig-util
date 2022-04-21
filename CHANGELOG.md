@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.0]
+### Uncategorized
+- Fix typed message schema mistake ([#243](https://github.com/MetaMask/eth-sig-util/pull/243))
+- Bump ajv from 6.12.0 to 6.12.6 ([#240](https://github.com/MetaMask/eth-sig-util/pull/240))
+- Bump minimist from 1.2.5 to 1.2.6 ([#237](https://github.com/MetaMask/eth-sig-util/pull/237))
+- Update ESLint config from v7 to v9 ([#220](https://github.com/MetaMask/eth-sig-util/pull/220))
+
 ## [4.0.0]
 ### Added
 - **BREAKING**: Add subpath exports ([#214](https://github.com/MetaMask/eth-sig-util/pull/214), [#211](https://github.com/MetaMask/eth-sig-util/pull/211))
@@ -82,7 +89,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v4.0.0...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v4.1.0...HEAD
+[4.1.0]: https://github.com/MetaMask/eth-sig-util/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v3.0.1...v4.0.0
 [3.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v2.5.4...v3.0.0
