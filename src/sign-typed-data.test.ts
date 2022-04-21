@@ -1,16 +1,227 @@
 import * as ethUtil from 'ethereumjs-util';
+import Ajv from 'ajv';
 import {
   recoverTypedSignature,
   signTypedData,
   TypedDataUtils,
   typedSignatureHash,
   SignTypedDataVersion,
+  TYPED_MESSAGE_SCHEMA,
 } from './sign-typed-data';
 
 const privateKey = Buffer.from(
   '4af1bceebf7f3634ec3cff8a2c38e51178d5d4ce585c52d6043e5e2cc3418bb0',
   'hex',
 );
+
+/**
+ * Get a list of all Solidity types supported by EIP-712.
+ *
+ * @returns A list of all supported Solidity types.
+ */
+function getEip712SolidityTypes() {
+  const types = ['bool', 'address', 'string', 'bytes'];
+  const ints = Array.from(new Array(32)).map(
+    (_, index) => `int${(index + 1) * 8}`,
+  );
+  const uints = Array.from(new Array(32)).map(
+    (_, index) => `uint${(index + 1) * 8}`,
+  );
+  const bytes = Array.from(new Array(32)).map(
+    (_, index) => `bytes${index + 1}`,
+  );
+
+  return [...types, ...ints, ...uints, ...bytes];
+}
+
+const eip712SolidityTypes = getEip712SolidityTypes();
+
+/**
+ * Validate the given message with the typed message schema.
+ *
+ * @param typedMessage - The typed message to validate.
+ * @returns Whether the message is valid.
+ */
+function validateTypedMessageSchema(
+  typedMessage: Record<string, unknown>,
+): boolean {
+  const ajv = new Ajv();
+  const validate = ajv.compile(TYPED_MESSAGE_SCHEMA);
+  return validate(typedMessage);
+}
+
+describe('TYPED_MESSAGE_SCHEMA', () => {
+  it('should match valid typed message', () => {
+    const typedMessage = {
+      domain: {},
+      message: {},
+      primaryType: 'object',
+      types: {
+        EIP712Domain: [],
+      },
+    };
+
+    expect(validateTypedMessageSchema(typedMessage)).toBe(true);
+  });
+
+  it('should allow custom types in addition to domain', () => {
+    const typedMessage = {
+      domain: {},
+      message: {},
+      primaryType: 'Message',
+      types: {
+        EIP712Domain: [],
+        Message: [],
+      },
+    };
+
+    expect(validateTypedMessageSchema(typedMessage)).toBe(true);
+  });
+
+  eip712SolidityTypes.forEach((solidityType) => {
+    it(`should allow custom type to have type of '${solidityType}'`, () => {
+      const typedMessage = {
+        domain: {},
+        message: {},
+        primaryType: 'Message',
+        types: {
+          EIP712Domain: [],
+          Message: [{ name: 'data', type: solidityType }],
+        },
+      };
+
+      expect(validateTypedMessageSchema(typedMessage)).toBe(true);
+    });
+  });
+
+  it('should allow custom type to have a custom type', () => {
+    const typedMessage = {
+      domain: {},
+      message: {},
+      primaryType: 'Message',
+      types: {
+        CustomValue: [{ name: 'value', type: 'string' }],
+        EIP712Domain: [],
+        Message: [{ name: 'data', type: 'CustomValue' }],
+      },
+    };
+
+    expect(validateTypedMessageSchema(typedMessage)).toBe(true);
+  });
+
+  const invalidStrings = [undefined, null, 0, 1, [], {}];
+
+  for (const invalidString of invalidStrings) {
+    // eslint-disable-next-line no-loop-func
+    it(`should disallow a primary type with value '${invalidString}'`, () => {
+      const typedMessage = {
+        domain: {},
+        message: {},
+        primaryType: invalidString,
+        types: {
+          EIP712Domain: [],
+        },
+      };
+
+      expect(validateTypedMessageSchema(typedMessage)).toBe(false);
+    });
+  }
+
+  const invalidObjects = [undefined, null, 0, 1, [], '', 'test'];
+  for (const invalidObject of invalidObjects) {
+    // eslint-disable-next-line no-loop-func
+    it(`should disallow a typed message with value'${invalidObject}'`, () => {
+      expect(validateTypedMessageSchema(invalidObject as any)).toBe(false);
+    });
+
+    // eslint-disable-next-line no-loop-func
+    it(`should disallow a domain with value '${invalidObject}'`, () => {
+      const typedMessage = {
+        domain: invalidObject,
+        message: {},
+        primaryType: 'object',
+        types: {
+          EIP712Domain: [],
+        },
+      };
+
+      expect(validateTypedMessageSchema(typedMessage)).toBe(false);
+    });
+
+    // eslint-disable-next-line no-loop-func
+    it(`should disallow a message with value '${invalidObject}'`, () => {
+      const typedMessage = {
+        domain: {},
+        message: invalidObject,
+        primaryType: 'object',
+        types: {
+          EIP712Domain: [],
+        },
+      };
+
+      expect(validateTypedMessageSchema(typedMessage)).toBe(false);
+    });
+
+    // eslint-disable-next-line no-loop-func
+    it(`should disallow types with value '${invalidObject}'`, () => {
+      const typedMessage = {
+        domain: {},
+        message: {},
+        primaryType: 'object',
+        types: invalidObject,
+      };
+
+      expect(validateTypedMessageSchema(typedMessage)).toBe(false);
+    });
+  }
+
+  it('should require custom type properties to have a name', () => {
+    const typedMessage = {
+      domain: {},
+      message: {},
+      primaryType: 'Message',
+      types: {
+        EIP712Domain: [],
+        Message: [{ type: 'string' }],
+      },
+    };
+
+    expect(validateTypedMessageSchema(typedMessage)).toBe(false);
+  });
+
+  it('should require custom type properties to have a type', () => {
+    const typedMessage = {
+      domain: {},
+      message: {},
+      primaryType: 'Message',
+      types: {
+        EIP712Domain: [],
+        Message: [{ name: 'name' }],
+      },
+    };
+
+    expect(validateTypedMessageSchema(typedMessage)).toBe(false);
+  });
+
+  const invalidTypes = [undefined, null, 0, 1, [], {}];
+
+  for (const invalidType of invalidTypes) {
+    // eslint-disable-next-line no-loop-func
+    it(`should disallow a type of '${invalidType}'`, () => {
+      const typedMessage = {
+        domain: {},
+        message: {},
+        primaryType: 'Message',
+        types: {
+          EIP712Domain: [],
+          Message: [{ name: 'name', type: invalidType }],
+        },
+      };
+
+      expect(validateTypedMessageSchema(typedMessage)).toBe(false);
+    });
+  }
+});
 
 const encodeDataExamples = {
   // dynamic types supported by EIP-712:
