@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.1]
+### Fixed
+- Fix mistake in TYPED_MESSAGE_SCHEMA ([#243](https://github.com/MetaMask/eth-sig-util/pull/243))
+  - The schema changed in v4 in a way that accidentally disallowed "reference types" (i.e. custom types) apart from the primary type. Reference types are now once again allowed.
+
 ## [4.0.0]
 ### Added
 - **BREAKING**: Add subpath exports ([#214](https://github.com/MetaMask/eth-sig-util/pull/214), [#211](https://github.com/MetaMask/eth-sig-util/pull/211))
@@ -82,7 +87,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v4.0.0...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v4.0.1...HEAD
+[4.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v3.0.1...v4.0.0
 [3.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v2.5.4...v3.0.0
