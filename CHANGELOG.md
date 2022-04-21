@@ -7,11 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [4.0.1]
-### Uncategorized
-- Fix typed message schema mistake ([#243](https://github.com/MetaMask/eth-sig-util/pull/243))
-- Bump ajv from 6.12.0 to 6.12.6 ([#240](https://github.com/MetaMask/eth-sig-util/pull/240))
-- Bump minimist from 1.2.5 to 1.2.6 ([#237](https://github.com/MetaMask/eth-sig-util/pull/237))
-- Update ESLint config from v7 to v9 ([#220](https://github.com/MetaMask/eth-sig-util/pull/220))
+### Fixed
+- Fix mistake in TYPED_MESSAGE_SCHEMA ([#243](https://github.com/MetaMask/eth-sig-util/pull/243))
+  - The schema changed in v4 in a way that accidentally disallowed "reference types" (i.e. custom types) apart from the primary type. Reference types are now once again allowed.
 
 ## [4.0.0]
 ### Added
