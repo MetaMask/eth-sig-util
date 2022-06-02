@@ -19,6 +19,7 @@ Array [
   "encrypt",
   "encryptSafely",
   "decrypt",
+  "decryptWithSharedSecret",
   "decryptSafely",
   "getEncryptionPublicKey",
 ]
