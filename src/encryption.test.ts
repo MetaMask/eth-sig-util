@@ -1,8 +1,10 @@
 import {
   decrypt,
-  decryptSafely, decryptWithSharedSecret,
+  decryptSafely,
+  decryptWithSharedSecret,
   encrypt,
-  encryptSafely, EthEncryptedData,
+  encryptSafely,
+  EthEncryptedData,
   getEncryptionPublicKey,
 } from './encryption';
 
