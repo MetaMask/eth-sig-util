@@ -1,10 +1,10 @@
 import {
   bufferToHex,
   ecsign,
-  keccak,
   publicToAddress,
   toBuffer,
-} from 'ethereumjs-util';
+} from '@ethereumjs/util';
+import { keccak256 } from 'ethereum-cryptography/keccak';
 import { rawEncode, soliditySHA3 } from 'ethereumjs-abi';
 
 import {
@@ -159,7 +159,7 @@ function encodeField(
       'bytes32',
       version === SignTypedDataVersion.V4 && value == null // eslint-disable-line no-eq-null
         ? '0x0000000000000000000000000000000000000000000000000000000000000000'
-        : keccak(encodeData(type, value, types, version)),
+        : keccak256(encodeData(type, value, types, version)),
     ];
   }
 
@@ -168,7 +168,7 @@ function encodeField(
   }
 
   if (type === 'bytes') {
-    return ['bytes32', keccak(value)];
+    return ['bytes32', keccak256(value)];
   }
 
   if (type === 'string') {
@@ -176,7 +176,7 @@ function encodeField(
     if (typeof value === 'string') {
       value = Buffer.from(value, 'utf8');
     }
-    return ['bytes32', keccak(value)];
+    return ['bytes32', keccak256(value)];
   }
 
   if (type.lastIndexOf(']') === type.length - 1) {
@@ -191,7 +191,7 @@ function encodeField(
     );
     return [
       'bytes32',
-      keccak(
+      keccak256(
         rawEncode(
           typeValuePairs.map(([t]) => t),
           typeValuePairs.map(([, v]) => v),
@@ -314,7 +314,7 @@ function hashStruct(
 ): Buffer {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
-  return keccak(encodeData(primaryType, data, types, version));
+  return keccak256(encodeData(primaryType, data, types, version));
 }
 
 /**
@@ -328,7 +328,7 @@ function hashType(
   primaryType: string,
   types: Record<string, MessageTypeProperty[]>,
 ): Buffer {
-  return keccak(encodeType(primaryType, types));
+  return keccak256(encodeType(primaryType, types));
 }
 
 /**
@@ -393,7 +393,7 @@ function eip712Hash<T extends MessageTypes>(
       ),
     );
   }
-  return keccak(Buffer.concat(parts));
+  return keccak256(Buffer.concat(parts));
 }
 
 /**

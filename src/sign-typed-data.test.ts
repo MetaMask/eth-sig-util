@@ -10,7 +10,7 @@ eslint jest/no-restricted-matchers: [
 ]
 */
 
-import * as ethUtil from 'ethereumjs-util';
+import * as ethUtil from '@ethereumjs/util';
 import Ajv from 'ajv';
 import {
   recoverTypedSignature,

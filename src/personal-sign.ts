@@ -4,7 +4,7 @@ import {
   hashPersonalMessage,
   publicToAddress,
   toBuffer,
-} from 'ethereumjs-util';
+} from '@ethereumjs/util';
 
 import {
   concatSig,

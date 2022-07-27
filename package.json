@@ -44,8 +44,9 @@
     "airtap/engine.io-client/xmlhttprequest-ssl": "^1.6.2"
   },
   "dependencies": {
+    "@ethereumjs/util": "^8.0.0-beta.1",
+    "ethereum-cryptography": "^1.1.2",
     "ethereumjs-abi": "^0.6.8",
-    "ethereumjs-util": "^6.2.1",
     "ethjs-util": "^0.1.6",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1"

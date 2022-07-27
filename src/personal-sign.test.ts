@@ -2,7 +2,7 @@ import {
   addHexPrefix,
   privateToAddress,
   privateToPublic,
-} from 'ethereumjs-util';
+} from '@ethereumjs/util';
 
 import {
   extractPublicKey,
