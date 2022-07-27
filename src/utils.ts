@@ -7,7 +7,7 @@ import {
   fromSigned,
   toBuffer,
   toUnsigned,
-} from 'ethereumjs-util';
+} from '@ethereumjs/util';
 import { intToHex, isHexString, stripHexPrefix } from 'ethjs-util';
 
 /**
