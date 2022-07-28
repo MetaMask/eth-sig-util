@@ -169,9 +169,11 @@ function encodeField(
 
   if (type === 'bytes') {
     if (typeof value === 'number') {
-      value = value.toString();
+      value = Buffer.from(value.toString(16), 'hex');
+    } else {
+      value = Buffer.from(value, 'utf-8');
     }
-    return ['bytes32', toBuffer(keccak256(Buffer.from(value, 'utf-8')))];
+    return ['bytes32', toBuffer(keccak256(value))];
   }
 
   if (type === 'string') {
@@ -322,7 +324,7 @@ function hashStruct(
   version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
 ): Buffer {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
-
+ 
   return toBuffer(keccak256(encodeData(primaryType, data, types, version)));
 }
 

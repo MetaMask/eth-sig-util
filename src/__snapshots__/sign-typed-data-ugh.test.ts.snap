@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes" should hash "10" (type "number") 1`] = `"b6976a8d3ca85d894db066bed9dd1eac9a3ac6b0e87155e28e958215cd078f1b"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "bytes" should hash "10" (type "string") 1`] = `"7223320363eca5bb181c12017960acf7bdbb70a05b684bf42bb31f422a19ed0c"`;

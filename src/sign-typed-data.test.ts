@@ -231,48 +231,49 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
 
 const encodeDataExamples = {
   // dynamic types supported by EIP-712:
-  bytes: [10, '10', '0x10', Buffer.from('10', 'utf8')],
-  string: [
-    'Hello!',
-    '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-    '0xabcd',
-    '😁',
-    10,
-  ],
-  // atomic types supported by EIP-712:
-  address: [
-    '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-    '0x0',
-    10,
-    'bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-    Number.MAX_SAFE_INTEGER,
-  ],
-  bool: [true, false, 'true', 'false', 0, 1, -1, Number.MAX_SAFE_INTEGER],
-  bytes1: [
-    '0x10',
-    10,
-    0,
-    1,
-    -1,
-    Number.MAX_SAFE_INTEGER,
-    Buffer.from('10', 'utf8'),
-  ],
-  bytes32: [
-    '0x10',
-    10,
-    0,
-    1,
-    -1,
-    Number.MAX_SAFE_INTEGER,
-    Buffer.from('10', 'utf8'),
-  ],
-  int8: [0, '0', '0x0', 255, -255],
-  int256: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER],
-  uint8: [0, '0', '0x0', 255],
-  uint256: [0, '0', '0x0', Number.MAX_SAFE_INTEGER],
-  // atomic types not supported by EIP-712:
-  int: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER], // interpreted as `int256` by `ethereumjs-abi`
-  uint: [0, '0', '0x0', Number.MAX_SAFE_INTEGER], // interpreted as `uint256` by `ethereumjs-abi`
+  bytes: [10, '10'],
+  // bytes: [10, '10', '0x10', Buffer.from('10', 'utf8')],
+  // string: [
+  //   'Hello!',
+  //   '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+  //   '0xabcd',
+  //   '😁',
+  //   10,
+  // ],
+  // // atomic types supported by EIP-712:
+  // address: [
+  //   '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+  //   '0x0',
+  //   10,
+  //   'bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+  //   Number.MAX_SAFE_INTEGER,
+  // ],
+  // bool: [true, false, 'true', 'false', 0, 1, -1, Number.MAX_SAFE_INTEGER],
+  // bytes1: [
+  //   '0x10',
+  //   10,
+  //   0,
+  //   1,
+  //   -1,
+  //   Number.MAX_SAFE_INTEGER,
+  //   Buffer.from('10', 'utf8'),
+  // ],
+  // bytes32: [
+  //   '0x10',
+  //   10,
+  //   0,
+  //   1,
+  //   -1,
+  //   Number.MAX_SAFE_INTEGER,
+  //   Buffer.from('10', 'utf8'),
+  // ],
+  // int8: [0, '0', '0x0', 255, -255],
+  // int256: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER],
+  // uint8: [0, '0', '0x0', 255],
+  // uint256: [0, '0', '0x0', Number.MAX_SAFE_INTEGER],
+  // // atomic types not supported by EIP-712:
+  // int: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER], // interpreted as `int256` by `ethereumjs-abi`
+  // uint: [0, '0', '0x0', Number.MAX_SAFE_INTEGER], // interpreted as `uint256` by `ethereumjs-abi`
   // `fixed` and `ufixed` types omitted because their encoding in `ethereumjs-abi` is very broken at the moment.
   // `function` type omitted because it is not supported by `ethereumjs-abi`.
 };
@@ -299,13 +300,14 @@ const encodeDataErrorExamples = {
 };
 
 // Union of all types from both sets of examples
-const allExampleTypes = [
-  ...new Set(
-    Object.keys(encodeDataExamples).concat(
-      Object.keys(encodeDataErrorExamples),
-    ),
-  ),
-];
+const allExampleTypes = [...new Set(Object.keys(encodeDataExamples))];
+// const allExampleTypes = [
+//   ...new Set(
+//     Object.keys(encodeDataExamples).concat(
+//       Object.keys(encodeDataErrorExamples),
+//     ),
+//   ),
+// ];
 
 describe('TypedDataUtils.encodeData', function () {
   // The `TypedDataUtils.encodeData` function accepts most Solidity data types, as well as custom
@@ -1695,11 +1697,11 @@ describe('TypedDataUtils.encodeData', function () {
   });
 });
 
-describe('TypedDataUtils.hashStruct', function () {
+describe.only('TypedDataUtils.hashStruct', function () {
   // These tests mirror the `TypedDataUtils.encodeData` tests. The same inputs are expected.
   // See the `encodeData` test comments for more information about these test cases.
-  describe('V3', function () {
-    describe('example data', function () {
+  describe.only('V3', function () {
+    describe.only('example data', function () {
       for (const type of allExampleTypes) {
         describe(`type "${type}"`, function () {
           // Test all examples that do not crash
