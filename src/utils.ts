@@ -108,6 +108,9 @@ export function normalize(input: number | string): string {
   }
 
   if (typeof input === 'number') {
+    if (input < 0) {
+      return '0x';
+    }
     const buffer = toBuffer(input);
     input = bufferToHex(buffer);
   }
