@@ -135,6 +135,12 @@ function validateVersion(
   }
 }
 
+function numberToBuffer(num: number) {
+  const hexVal = num.toString(16);
+  const prepend = hexVal.length % 2 ? '0' : '';
+  return Buffer.from(prepend + hexVal, 'hex');
+}
+
 /**
  * Encode a single field.
  *
@@ -167,22 +173,13 @@ function encodeField(
     throw new Error(`missing value for field ${name} of type ${type}`);
   }
 
-  if (type === 'bytes') {
+  if (type === 'bytes' || type === 'string') {
     if (typeof value === 'number') {
-      value = value.toString();
+      value = numberToBuffer(value);
+    } else {
+      value = Buffer.from(value, 'utf-8');
     }
-    return ['bytes32', toBuffer(keccak256(Buffer.from(value, 'utf-8')))];
-  }
-
-  if (type === 'string') {
-    // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
-    if (typeof value === 'string') {
-      value = Buffer.from(value, 'utf8');
-    }
-    if (typeof value === 'number') {
-      value = value.toString();
-    }
-    return ['bytes32', toBuffer(keccak256(Buffer.from(value, 'utf-8')))];
+    return ['bytes32', toBuffer(keccak256(value))];
   }
 
   if (type.lastIndexOf(']') === type.length - 1) {
@@ -210,6 +207,7 @@ function encodeField(
 
   return [type, value];
 }
+
 
 /**
  * Encodes an object by encoding and concatenating each of its members.
