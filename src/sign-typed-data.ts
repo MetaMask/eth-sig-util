@@ -167,9 +167,11 @@ function encodeField(
     throw new Error(`missing value for field ${name} of type ${type}`);
   }
 
-  const textEncoder = new (global as any).TextEncoder();
   if (type === 'bytes') {
-    return ['bytes32', toBuffer(keccak256(textEncoder.encode(value)))];
+    if (typeof value === 'number') {
+      value = value.toString();
+    }
+    return ['bytes32', toBuffer(keccak256(Buffer.from(value, 'utf-8')))];
   }
 
   if (type === 'string') {
@@ -177,7 +179,10 @@ function encodeField(
     if (typeof value === 'string') {
       value = Buffer.from(value, 'utf8');
     }
-    return ['bytes32', toBuffer(keccak256(textEncoder.encode(value)))];
+    if (typeof value === 'number') {
+      value = value.toString();
+    }
+    return ['bytes32', toBuffer(keccak256(Buffer.from(value, 'utf-8')))];
   }
 
   if (type.lastIndexOf(']') === type.length - 1) {
@@ -331,8 +336,7 @@ function hashType(
   primaryType: string,
   types: Record<string, MessageTypeProperty[]>,
 ): Buffer {
-  const textEncoder = new (global as any).TextEncoder();
-  const encodedHashType = textEncoder.encode(encodeType(primaryType, types));
+  const encodedHashType = Buffer.from(encodeType(primaryType, types), 'utf-8');
   return toBuffer(keccak256(encodedHashType));
 }
 
