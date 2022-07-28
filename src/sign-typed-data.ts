@@ -179,6 +179,7 @@ function encodeField(
     if (typeof value === 'string') {
       value = Buffer.from(value, 'utf8');
     }
+
     if (typeof value === 'number') {
       value = value.toString();
     }
