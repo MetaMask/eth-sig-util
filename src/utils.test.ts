@@ -94,7 +94,7 @@ describe('concatSig', function () {
         Buffer.from(largeNumber, 'hex'),
         Buffer.from(largeNumber, 'hex'),
       ),
-    ).toThrow('Number can only safely store up to 53 bits');
+    ).toThrow('Number exceeds 53 bits');
   });
 });
 
