@@ -106,7 +106,10 @@ export function extractPublicKey({
  * @param signature - The '0x'-prefixed hex encoded message signature.
  * @returns The public key of the signer.
  */
-function getPublicKeyFor(message: ToBufferInputTypes, signature: string): Buffer {
+function getPublicKeyFor(
+  message: ToBufferInputTypes,
+  signature: string,
+): Buffer {
   const messageHash = hashPersonalMessage(legacyToBuffer(message));
   return recoverPublicKey(messageHash, signature);
 }
