@@ -4,10 +4,8 @@ import {
   publicToAddress,
   toBuffer,
 } from '@ethereumjs/util';
-import { keccak } from 'ethereumjs-util'
 import { keccak256 } from 'ethereum-cryptography/keccak';
 import { rawEncode, soliditySHA3 } from 'ethereumjs-abi';
-import { TextEncoder } from 'util';
 
 import {
   concatSig,
@@ -332,7 +330,8 @@ function hashType(
   primaryType: string,
   types: Record<string, MessageTypeProperty[]>,
 ): Buffer {
-  const encodedHashType = new TextEncoder().encode(
+  const textEncoder = new (global as any).TextEncoder();
+  const encodedHashType = textEncoder.encode(
     encodeType(primaryType, types),
   );
   return toBuffer(keccak256(encodedHashType));
@@ -400,8 +399,7 @@ function eip712Hash<T extends MessageTypes>(
       ),
     );
   }
-  // const asUint8Array: Uint8Array = new Uint8Array(Buffer.concat(parts))
-  return keccak(Buffer.concat(parts));
+  return toBuffer(keccak256(Buffer.concat(parts)));
 }
 
 /**
