@@ -6,6 +6,7 @@ import {
   fromRpcSig,
   fromSigned,
   toBuffer,
+  ToBufferInputTypes,
   toUnsigned,
 } from '@ethereumjs/util';
 import { intToHex, isHexString, stripHexPrefix } from 'ethjs-util';
@@ -56,7 +57,7 @@ export function isNullish(value) {
  * @param value - The value to convert to a Buffer.
  * @returns The given value as a Buffer.
  */
-export function legacyToBuffer(value: unknown) {
+export function legacyToBuffer(value: ToBufferInputTypes) {
   return typeof value === 'string' && !isHexString(value)
     ? Buffer.from(value)
     : toBuffer(value);

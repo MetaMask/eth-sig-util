@@ -4,6 +4,7 @@ import {
   hashPersonalMessage,
   publicToAddress,
   toBuffer,
+  ToBufferInputTypes,
 } from '@ethereumjs/util';
 
 import {
@@ -29,7 +30,7 @@ export function personalSign({
   data,
 }: {
   privateKey: Buffer;
-  data: unknown;
+  data: ToBufferInputTypes;
 }): string {
   if (isNullish(data)) {
     throw new Error('Missing data parameter');
@@ -57,7 +58,7 @@ export function recoverPersonalSignature({
   data,
   signature,
 }: {
-  data: unknown;
+  data: ToBufferInputTypes;
   signature: string;
 }): string {
   if (isNullish(data)) {
@@ -85,7 +86,7 @@ export function extractPublicKey({
   data,
   signature,
 }: {
-  data: unknown;
+  data: ToBufferInputTypes;
   signature: string;
 }): string {
   if (isNullish(data)) {
@@ -105,7 +106,7 @@ export function extractPublicKey({
  * @param signature - The '0x'-prefixed hex encoded message signature.
  * @returns The public key of the signer.
  */
-function getPublicKeyFor(message: unknown, signature: string): Buffer {
+function getPublicKeyFor(message: ToBufferInputTypes, signature: string): Buffer {
   const messageHash = hashPersonalMessage(legacyToBuffer(message));
   return recoverPublicKey(messageHash, signature);
 }
