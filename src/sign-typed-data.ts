@@ -174,19 +174,29 @@ function encodeField(
     throw new Error(`missing value for field ${name} of type ${type}`);
   }
 
-  if (type === 'bytes' || type === 'string') {
-    if (typeof value === 'number') {
+  if (type === 'bytes') {
+    if (typeof value === 'number' || !isNaN(Number(value))) {
       value = numberToBuffer(value);
     } else if (isHexString(value)) {
       // TODO
-      if (isNaN(parseInt(value, 16))) {
-        value = Buffer.from(value, 'utf-8');
-      } else {
-        value = numberToBuffer(parseInt(value, 16));
-      }
+      console.log('value bytes:', value);
+      // if (isNaN(parseInt(value, 16))) {
+      // value = Buffer.from(value, 'utf-8');
+      // } else {
+      value = numberToBuffer(parseInt(value, 16));
+      // }
     } else {
       value = Buffer.from(value, 'utf-8');
     }
+  }
+
+  if (type === 'string') {
+    if (typeof value === 'number') {
+      value = numberToBuffer(value);
+    } else {
+      value = Buffer.from(value, 'utf-8');
+    }
+
     return ['bytes32', toBuffer(keccak256(value))];
   }
 
