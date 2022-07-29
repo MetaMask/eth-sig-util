@@ -1,3 +1,4 @@
+import { isHexString } from 'ethjs-util';
 import {
   bufferToHex,
   ecsign,
@@ -176,6 +177,13 @@ function encodeField(
   if (type === 'bytes' || type === 'string') {
     if (typeof value === 'number') {
       value = numberToBuffer(value);
+    } else if (isHexString(value)) {
+      // TODO
+      if (isNaN(parseInt(value, 16))) {
+        value = Buffer.from(value, 'utf-8');
+      } else {
+        value = numberToBuffer(parseInt(value, 16));
+      }
     } else {
       value = Buffer.from(value, 'utf-8');
     }
@@ -207,7 +215,6 @@ function encodeField(
 
   return [type, value];
 }
-
 
 /**
  * Encodes an object by encoding and concatenating each of its members.
