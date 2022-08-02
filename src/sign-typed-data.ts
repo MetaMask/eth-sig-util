@@ -1,3 +1,4 @@
+import { isHexString } from 'ethjs-util';
 import {
   bufferToHex,
   ecsign,
@@ -173,11 +174,22 @@ function encodeField(
     throw new Error(`missing value for field ${name} of type ${type}`);
   }
 
-  if (type === 'bytes' || type === 'string') {
+  if (type === 'bytes') {
+    if (typeof value === 'number') {
+      value = numberToBuffer(value);
+    } else if (isHexString(value) && parseInt(value, 16) <= 16) {
+      value = numberToBuffer(parseInt(value, 16));
+    } else {
+      value = Buffer.from(value, 'utf8');
+    }
+    return ['bytes32', toBuffer(keccak256(value))];
+  }
+
+  if (type === 'string') {
     if (typeof value === 'number') {
       value = numberToBuffer(value);
     } else {
-      value = Buffer.from(value, 'utf-8');
+      value = Buffer.from(value, 'utf8');
     }
     return ['bytes32', toBuffer(keccak256(value))];
   }
@@ -207,7 +219,6 @@ function encodeField(
 
   return [type, value];
 }
-
 
 /**
  * Encodes an object by encoding and concatenating each of its members.
