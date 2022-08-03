@@ -6,13 +6,14 @@ import {
   toBuffer,
 } from '@ethereumjs/util';
 import { keccak256 } from 'ethereum-cryptography/keccak';
-import { rawEncode, soliditySHA3 } from 'ethereumjs-abi';
+import { rawEncode } from 'ethereumjs-abi';
 
 import {
   concatSig,
   isNullish,
   legacyToBuffer,
   recoverPublicKey,
+  solidityPack,
 } from './utils';
 
 /**
@@ -484,12 +485,18 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
     return `${e.type} ${e.name}`;
   });
 
-  return soliditySHA3(
-    ['bytes32', 'bytes32'],
-    [
-      soliditySHA3(new Array(typedData.length).fill('string'), schema),
-      soliditySHA3(types, data),
-    ],
+  return toBuffer(
+    keccak256(
+      solidityPack(
+        ['bytes32', 'bytes32'],
+        [
+          keccak256(
+            solidityPack(new Array(typedData.length).fill('string'), schema),
+          ),
+          keccak256(solidityPack(types, data)),
+        ],
+      ),
+    ),
   );
 }
 

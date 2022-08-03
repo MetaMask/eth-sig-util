@@ -8,8 +8,12 @@ import {
   toBuffer,
   ToBufferInputTypes,
   toUnsigned,
+  setLengthRight,
+  setLengthLeft,
+  isHexPrefixed,
 } from '@ethereumjs/util';
 import { intToHex, isHexString, stripHexPrefix } from 'ethjs-util';
+import BN from 'bn.js';
 
 /**
  * Pads the front of the given hex string with zeroes until it reaches the
@@ -122,4 +126,156 @@ export function normalize(input: number | string): string {
   }
 
   return addHexPrefix(input.toLowerCase());
+}
+
+///
+/// Stolen from ethereumjs-abi:
+///
+
+export function solidityPack(types, values): Uint8Array {
+  if (types.length !== values.length) {
+    throw new Error('Number of types are not matching the values');
+  }
+
+  var ret = [];
+
+  for (var i = 0; i < types.length; i++) {
+    var type = elementaryName(types[i]);
+    var value = values[i];
+    ret.push(solidityHexValue(type, value, null));
+  }
+
+  return Buffer.concat(ret);
+}
+
+function isArray(type) {
+  return type.lastIndexOf(']') === type.length - 1;
+}
+
+function parseTypeArray(type) {
+  var tmp = type.match(/(.*)\[(.*?)\]$/);
+  if (tmp) {
+    return tmp[2] === '' ? 'dynamic' : parseInt(tmp[2], 10);
+  }
+  return null;
+}
+
+// Parse N from type<N>
+function parseTypeN(type) {
+  return parseInt(/^\D+(\d+)$/.exec(type)[1], 10);
+}
+
+function parseNumber(arg) {
+  var type = typeof arg;
+  if (type === 'string') {
+    if (isHexPrefixed(arg)) {
+      return new BN(stripHexPrefix(arg), 16);
+    } else {
+      return new BN(arg, 10);
+    }
+  } else if (type === 'number') {
+    return new BN(arg);
+  } else if (arg.toArray) {
+    // assume this is a BN for the moment, replace with BN.isBN soon
+    return arg;
+  } else {
+    throw new Error('Argument is not a number');
+  }
+}
+
+function solidityHexValue(type, value, bitsize) {
+  // pass in bitsize = null if use default bitsize
+  var size, num;
+  if (isArray(type)) {
+    var subType = type.replace(/\[.*?\]/, '');
+    if (!isArray(subType)) {
+      var arraySize = parseTypeArray(type);
+      if (
+        arraySize !== 'dynamic' &&
+        arraySize !== 0 &&
+        value.length > arraySize
+      ) {
+        throw new Error('Elements exceed array size: ' + arraySize);
+      }
+    }
+    var arrayValues = value.map(function (v) {
+      return solidityHexValue(subType, v, 256);
+    });
+    return Buffer.concat(arrayValues);
+  } else if (type === 'bytes') {
+    return value;
+  } else if (type === 'string') {
+    return Buffer.from(value, 'utf8');
+  } else if (type === 'bool') {
+    bitsize = bitsize || 8;
+    var padding = Array(bitsize / 4).join('0');
+    return Buffer.from(value ? padding + '1' : padding + '0', 'hex');
+  } else if (type === 'address') {
+    var bytesize = 20;
+    if (bitsize) {
+      bytesize = bitsize / 8;
+    }
+    return setLengthLeft(toBuffer(value), bytesize);
+  } else if (type.startsWith('bytes')) {
+    size = parseTypeN(type);
+    if (size < 1 || size > 32) {
+      throw new Error('Invalid bytes<N> width: ' + size);
+    }
+
+    return setLengthRight(toBuffer(value), size);
+  } else if (type.startsWith('uint')) {
+    size = parseTypeN(type);
+    if (size % 8 || size < 8 || size > 256) {
+      throw new Error('Invalid uint<N> width: ' + size);
+    }
+
+    num = parseNumber(value);
+    if (num.bitLength() > size) {
+      throw new Error(
+        'Supplied uint exceeds width: ' + size + ' vs ' + num.bitLength(),
+      );
+    }
+
+    bitsize = bitsize || size;
+    return num.toArrayLike(Buffer, 'be', bitsize / 8);
+  } else if (type.startsWith('int')) {
+    size = parseTypeN(type);
+    if (size % 8 || size < 8 || size > 256) {
+      throw new Error('Invalid int<N> width: ' + size);
+    }
+
+    num = parseNumber(value);
+    if (num.bitLength() > size) {
+      throw new Error(
+        'Supplied int exceeds width: ' + size + ' vs ' + num.bitLength(),
+      );
+    }
+
+    bitsize = bitsize || size;
+    return num.toTwos(size).toArrayLike(Buffer, 'be', bitsize / 8);
+  } else {
+    // FIXME: support all other types
+    throw new Error('Unsupported or invalid type: ' + type);
+  }
+}
+
+function elementaryName(name) {
+  if (name.startsWith('int[')) {
+    return 'int256' + name.slice(3);
+  } else if (name === 'int') {
+    return 'int256';
+  } else if (name.startsWith('uint[')) {
+    return 'uint256' + name.slice(4);
+  } else if (name === 'uint') {
+    return 'uint256';
+  } else if (name.startsWith('fixed[')) {
+    return 'fixed128x128' + name.slice(5);
+  } else if (name === 'fixed') {
+    return 'fixed128x128';
+  } else if (name.startsWith('ufixed[')) {
+    return 'ufixed128x128' + name.slice(6);
+  } else if (name === 'ufixed') {
+    return 'ufixed128x128';
+  }
+  return name;
 }
