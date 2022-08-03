@@ -196,7 +196,7 @@ function encodeField(
     if (typeof value === 'number') {
       value = numberToBuffer(value);
     } else {
-      value = Buffer.from(value, 'utf8');
+      value = Buffer.from(value ?? '', 'utf8');
     }
     return ['bytes32', toBuffer(keccak256(value))];
   }
