@@ -128,77 +128,113 @@ export function normalize(input: number | string): string {
   return addHexPrefix(input.toLowerCase());
 }
 
-///
-/// Stolen from ethereumjs-abi:
-///
+// /
+// / Stolen from ethereumjs-abi:
+// /
 
-export function solidityPack(types, values): Uint8Array {
+/**
+ * Packs non-standard encoded values packed according to their respective type in types in a buffer.
+ *
+ * @param types - Array of types of each value to encode.
+ * @param values - Array of values to encode.
+ * @returns A buffer containing the packed values.
+ */
+export function solidityPack(types: string[], values: any[]) {
   if (types.length !== values.length) {
     throw new Error('Number of types are not matching the values');
   }
 
-  var ret = [];
+  const ret = [];
 
-  for (var i = 0; i < types.length; i++) {
-    var type = elementaryName(types[i]);
-    var value = values[i];
+  for (let i = 0; i < types.length; i++) {
+    const type = elementaryName(types[i]);
+    const value = values[i];
     ret.push(solidityHexValue(type, value, null));
   }
 
   return Buffer.concat(ret);
 }
 
+/**
+ * Checks if a value is an array (represented as a string).
+ *
+ * @param type - The value to check whether it is an array.
+ * @returns A boolean indicating whether the passed value is an array.
+ */
 function isArray(type) {
   return type.lastIndexOf(']') === type.length - 1;
 }
 
+/**
+ * Parse array type for packing solidity values.
+ *
+ * @param type - A string that may be an array to parse.
+ * @returns A parsed value from the array.
+ */
 function parseTypeArray(type) {
-  var tmp = type.match(/(.*)\[(.*?)\]$/);
+  const tmp = type.match(/(.*)\[(.*?)\]$/u);
   if (tmp) {
     return tmp[2] === '' ? 'dynamic' : parseInt(tmp[2], 10);
   }
   return null;
 }
 
-// Parse N from type<N>
+/**
+ * Parse N from type<N>.
+ *
+ * @param type - Value to parse.
+ * @returns Parsed value.
+ */
 function parseTypeN(type) {
-  return parseInt(/^\D+(\d+)$/.exec(type)[1], 10);
+  return parseInt(/^\D+(\d+)$/u.exec(type)[1], 10);
 }
 
+/**
+ * Parse a number for determining a solidity hexvalue.
+ *
+ * @param arg - Number to parse.
+ * @returns Parsed value.
+ */
 function parseNumber(arg) {
-  var type = typeof arg;
+  const type = typeof arg;
   if (type === 'string') {
     if (isHexPrefixed(arg)) {
       return new BN(stripHexPrefix(arg), 16);
-    } else {
-      return new BN(arg, 10);
     }
+    return new BN(arg, 10);
   } else if (type === 'number') {
     return new BN(arg);
   } else if (arg.toArray) {
     // assume this is a BN for the moment, replace with BN.isBN soon
     return arg;
-  } else {
-    throw new Error('Argument is not a number');
   }
+  throw new Error('Argument is not a number');
 }
 
+/**
+ * Get solidity hex value from type, value and bitsize inputs for packing these values in a buffer.
+ *
+ * @param type - The type of the value to encode.
+ * @param value - The value to encode.
+ * @param bitsize - The bitsize of the value to encode.
+ * @returns The encoded soldity hex value.
+ */
 function solidityHexValue(type, value, bitsize) {
   // pass in bitsize = null if use default bitsize
-  var size, num;
+  let size, num;
   if (isArray(type)) {
-    var subType = type.replace(/\[.*?\]/, '');
+    const subType = type.replace(/\[.*?\]/u, '');
     if (!isArray(subType)) {
-      var arraySize = parseTypeArray(type);
+      const arraySize = parseTypeArray(type);
       if (
         arraySize !== 'dynamic' &&
         arraySize !== 0 &&
         value.length > arraySize
       ) {
-        throw new Error('Elements exceed array size: ' + arraySize);
+        throw new Error(`Elements exceed array size: ${arraySize}`);
       }
     }
-    var arrayValues = value.map(function (v) {
+    const arrayValues = value.map(function (v) {
       return solidityHexValue(subType, v, 256);
     });
     return Buffer.concat(arrayValues);
@@ -208,10 +244,10 @@ function solidityHexValue(type, value, bitsize) {
     return Buffer.from(value, 'utf8');
   } else if (type === 'bool') {
     bitsize = bitsize || 8;
-    var padding = Array(bitsize / 4).join('0');
-    return Buffer.from(value ? padding + '1' : padding + '0', 'hex');
+    const padding = Array(bitsize / 4).join('0');
+    return Buffer.from(value ? `${padding}1` : `${padding}0`, 'hex');
   } else if (type === 'address') {
-    var bytesize = 20;
+    let bytesize = 20;
     if (bitsize) {
       bytesize = bitsize / 8;
     }
@@ -219,20 +255,20 @@ function solidityHexValue(type, value, bitsize) {
   } else if (type.startsWith('bytes')) {
     size = parseTypeN(type);
     if (size < 1 || size > 32) {
-      throw new Error('Invalid bytes<N> width: ' + size);
+      throw new Error(`Invalid bytes<N> width: ${size}`);
     }
 
     return setLengthRight(toBuffer(value), size);
   } else if (type.startsWith('uint')) {
     size = parseTypeN(type);
     if (size % 8 || size < 8 || size > 256) {
-      throw new Error('Invalid uint<N> width: ' + size);
+      throw new Error(`Invalid uint<N> width: ${size}`);
     }
 
     num = parseNumber(value);
     if (num.bitLength() > size) {
       throw new Error(
-        'Supplied uint exceeds width: ' + size + ' vs ' + num.bitLength(),
+        `Supplied uint exceeds width: ${size} vs ${num.bitLength()}`,
       );
     }
 
@@ -241,39 +277,44 @@ function solidityHexValue(type, value, bitsize) {
   } else if (type.startsWith('int')) {
     size = parseTypeN(type);
     if (size % 8 || size < 8 || size > 256) {
-      throw new Error('Invalid int<N> width: ' + size);
+      throw new Error(`Invalid int<N> width: ${size}`);
     }
 
     num = parseNumber(value);
     if (num.bitLength() > size) {
       throw new Error(
-        'Supplied int exceeds width: ' + size + ' vs ' + num.bitLength(),
+        `Supplied int exceeds width: ${size} vs ${num.bitLength()}`,
       );
     }
 
     bitsize = bitsize || size;
     return num.toTwos(size).toArrayLike(Buffer, 'be', bitsize / 8);
-  } else {
-    // FIXME: support all other types
-    throw new Error('Unsupported or invalid type: ' + type);
   }
+  // FIXME: support all other types
+  throw new Error(`Unsupported or invalid type: ${type}`);
 }
 
+/**
+ * Gets the correct solidity type name.
+ *
+ * @param name - The type name for which we want the corresponding solidity type name.
+ * @returns The solidity type name for the input value.
+ */
 function elementaryName(name) {
   if (name.startsWith('int[')) {
-    return 'int256' + name.slice(3);
+    return `int256${name.slice(3)}`;
   } else if (name === 'int') {
     return 'int256';
   } else if (name.startsWith('uint[')) {
-    return 'uint256' + name.slice(4);
+    return `uint256${name.slice(4)}`;
   } else if (name === 'uint') {
     return 'uint256';
   } else if (name.startsWith('fixed[')) {
-    return 'fixed128x128' + name.slice(5);
+    return `fixed128x128${name.slice(5)}`;
   } else if (name === 'fixed') {
     return 'fixed128x128';
   } else if (name.startsWith('ufixed[')) {
-    return 'ufixed128x128' + name.slice(6);
+    return `ufixed128x128${name.slice(6)}`;
   } else if (name === 'ufixed') {
     return 'ufixed128x128';
   }
