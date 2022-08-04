@@ -202,9 +202,6 @@ function parseNumber(arg) {
     if (isHexPrefixed(arg)) {
       return new BN(stripHexPrefix(arg), 16);
     }
-    if (isNaN(Number(arg))) {
-      return new BN(arg, 16);
-    }
     return new BN(arg, 10);
   } else if (type === 'number') {
     return new BN(arg);
@@ -377,7 +374,6 @@ function encodeSingle(type, arg) {
   let size, num, ret, i;
 
   if (type === 'address') {
-    console.log('hereMAIN:', arg);
     return encodeSingle('uint160', parseNumber(arg));
   } else if (type === 'bool') {
     return encodeSingle('uint8', arg ? 1 : 0);
