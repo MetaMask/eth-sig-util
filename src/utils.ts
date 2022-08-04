@@ -202,9 +202,10 @@ function parseNumber(arg) {
     if (isHexPrefixed(arg)) {
       return new BN(stripHexPrefix(arg), 16);
     }
-    if (!isNaN(Number(arg))) {
-      return new BN(arg, 10);
+    if (isNaN(Number(arg))) {
+      return new BN(arg, 16);
     }
+    return new BN(arg, 10);
   } else if (type === 'number') {
     return new BN(arg);
   } else if (arg.toArray) {
@@ -269,7 +270,6 @@ function solidityHexValue(type, value, bitsize) {
     if (size % 8 || size < 8 || size > 256) {
       throw new Error(`Invalid uint<N> width: ${size}`);
     }
-
     num = parseNumber(value);
     if (num.bitLength() > size) {
       throw new Error(
@@ -284,7 +284,6 @@ function solidityHexValue(type, value, bitsize) {
     if (size % 8 || size < 8 || size > 256) {
       throw new Error(`Invalid int<N> width: ${size}`);
     }
-
     num = parseNumber(value);
     if (num.bitLength() > size) {
       throw new Error(
@@ -378,6 +377,7 @@ function encodeSingle(type, arg) {
   let size, num, ret, i;
 
   if (type === 'address') {
+    console.log('hereMAIN:', arg);
     return encodeSingle('uint160', parseNumber(arg));
   } else if (type === 'bool') {
     return encodeSingle('uint8', arg ? 1 : 0);
@@ -432,7 +432,6 @@ function encodeSingle(type, arg) {
     if (size % 8 || size < 8 || size > 256) {
       throw new Error(`Invalid uint<N> width: ${size}`);
     }
-
     num = parseNumber(arg);
     if (num.bitLength() > size) {
       throw new Error(
@@ -450,7 +449,6 @@ function encodeSingle(type, arg) {
     if (size % 8 || size < 8 || size > 256) {
       throw new Error(`Invalid int<N> width: ${size}`);
     }
-
     num = parseNumber(arg);
     if (num.bitLength() > size) {
       throw new Error(
@@ -461,7 +459,6 @@ function encodeSingle(type, arg) {
     return num.toTwos(256).toArrayLike(Buffer, 'be', 32);
   } else if (type.startsWith('ufixed')) {
     size = parseTypeNxM(type);
-
     num = parseNumber(arg);
 
     if (num < 0) {
@@ -471,7 +468,6 @@ function encodeSingle(type, arg) {
     return encodeSingle('uint256', num.mul(new BN(2).pow(new BN(size[1]))));
   } else if (type.startsWith('fixed')) {
     size = parseTypeNxM(type);
-
     return encodeSingle(
       'int256',
       parseNumber(arg).mul(new BN(2).pow(new BN(size[1]))),

@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TypedDataUtils.encodeData V4 example data type "address" should encode "0x0" (type "string") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada2990000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "address" should encode "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada299000000000000000000000000bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "address" should encode "10" (type "number") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada299000000000000000000000000000000000000000000000000000000000000000a"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "address" should encode "9007199254740991" (type "number") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada299000000000000000000000000000000000000000000000000001fffffffffffff"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "address" should encode "bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"c92db6bca97089c40b3f6512400e065cf2c27db90a50ce13440d951b13ada29900000000000000000000000000000023eafa60608dacea43aa64cbe38e38e38d"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "address" should encode array of all address example data 1`] = `"1cf487eff7ac1d95e8069104ae1f91e4ecc076c3a5c23645a8b93a413d1bc711d205fe54b02be2a7052a43bfb6bbd04881a4cded4fc6bbb403ce0c670a53d55f"`;
