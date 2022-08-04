@@ -202,9 +202,7 @@ function parseNumber(arg) {
     if (isHexPrefixed(arg)) {
       return new BN(stripHexPrefix(arg), 16);
     }
-    if (!isNaN(Number(arg))) {
-      return new BN(arg, 10);
-    }
+    return new BN(arg, 10);
   } else if (type === 'number') {
     return new BN(arg);
   } else if (arg.toArray) {
