@@ -6,7 +6,6 @@ import {
   toBuffer,
 } from '@ethereumjs/util';
 import { keccak256 } from 'ethereum-cryptography/keccak';
-import { rawEncode } from 'ethereumjs-abi';
 
 import {
   concatSig,
@@ -14,6 +13,7 @@ import {
   legacyToBuffer,
   recoverPublicKey,
   solidityPack,
+  rawEncode
 } from './utils';
 
 /**
