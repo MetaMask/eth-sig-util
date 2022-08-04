@@ -138,7 +138,6 @@ function validateVersion(
   }
 }
 
-
 /**
  * Encode a single field.
  *
