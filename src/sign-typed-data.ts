@@ -13,7 +13,8 @@ import {
   legacyToBuffer,
   recoverPublicKey,
   solidityPack,
-  rawEncode
+  rawEncode,
+  numberToBuffer,
 } from './utils';
 
 /**
@@ -137,18 +138,6 @@ function validateVersion(
   }
 }
 
-/**
- * Node's Buffer.from() method does not seem to buffer numbers correctly out of the box.
- * This helper method formats the number correct for Buffer.from to return correct buffer.
- *
- * @param num - The number to convert to buffer.
- * @returns The number in buffer form.
- */
-function numberToBuffer(num: number) {
-  const hexVal = num.toString(16);
-  const prepend = hexVal.length % 2 ? '0' : '';
-  return Buffer.from(prepend + hexVal, 'hex');
-}
 
 /**
  * Encode a single field.
