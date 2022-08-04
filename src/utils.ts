@@ -202,7 +202,9 @@ function parseNumber(arg) {
     if (isHexPrefixed(arg)) {
       return new BN(stripHexPrefix(arg), 16);
     }
-    return new BN(arg, 10);
+    if (!isNaN(Number(arg))) {
+      return new BN(arg, 10);
+    }
   } else if (type === 'number') {
     return new BN(arg);
   } else if (arg.toArray) {
@@ -258,7 +260,9 @@ function solidityHexValue(type, value, bitsize) {
     if (size < 1 || size > 32) {
       throw new Error(`Invalid bytes<N> width: ${size}`);
     }
-
+    if (typeof value === 'number') {
+      value = normalize(value);
+    }
     return setLengthRight(toBuffer(value), size);
   } else if (type.startsWith('uint')) {
     size = parseTypeN(type);
@@ -419,7 +423,9 @@ function encodeSingle(type, arg) {
     if (size < 1 || size > 32) {
       throw new Error(`Invalid bytes<N> width: ${size}`);
     }
-
+    if (typeof arg === 'number') {
+      arg = normalize(arg);
+    }
     return setLengthRight(toBuffer(arg), 32);
   } else if (type.startsWith('uint')) {
     size = parseTypeN(type);
@@ -493,4 +499,17 @@ function isDynamic(type) {
 function parseTypeNxM(type) {
   const tmp = /^\D+(\d+)x(\d+)$/.exec(type);
   return [parseInt(tmp[1], 10), parseInt(tmp[2], 10)];
+}
+
+/**
+ * Node's Buffer.from() method does not seem to buffer numbers correctly out of the box.
+ * This helper method formats the number correct for Buffer.from to return correct buffer.
+ *
+ * @param num - The number to convert to buffer.
+ * @returns The number in buffer form.
+ */
+export function numberToBuffer(num: number) {
+  const hexVal = num.toString(16);
+  const prepend = hexVal.length % 2 ? '0' : '';
+  return Buffer.from(prepend + hexVal, 'hex');
 }
