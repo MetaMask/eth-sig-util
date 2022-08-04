@@ -258,6 +258,7 @@ function solidityHexValue(type, value, bitsize) {
     if (size < 1 || size > 32) {
       throw new Error(`Invalid bytes<N> width: ${size}`);
     }
+
     if (typeof value === 'number') {
       value = normalize(value);
     }
@@ -421,6 +422,7 @@ function encodeSingle(type, arg) {
     if (size < 1 || size > 32) {
       throw new Error(`Invalid bytes<N> width: ${size}`);
     }
+
     if (typeof arg === 'number') {
       arg = normalize(arg);
     }
