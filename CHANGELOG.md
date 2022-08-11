@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.2]
+### Changed
+- **BREAKING:** Removed support for Node v12 in favor of v14 ([#137](https://github.com/MetaMask/eth-json-rpc-middleware/pull/137))
+
 ## [4.0.1]
 ### Fixed
 - Fix mistake in TYPED_MESSAGE_SCHEMA ([#243](https://github.com/MetaMask/eth-sig-util/pull/243))
