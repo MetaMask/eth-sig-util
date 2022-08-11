@@ -87,57 +87,55 @@ describe('encoding', function () {
 
 describe('encoding bytes33', function () {
   it('should fail', function () {
-    expect(function () {
-      rawEncode('fail', ['bytes33']);
-    }).toThrow();
+    expect(() => rawEncode('fail', ['bytes33'])).toThrow(
+      'types.forEach is not a function',
+    );
   });
 });
 
 describe('encoding uint0', function () {
   it('should fail', function () {
-    expect(function () {
-      rawEncode('fail', ['uint0']);
-    }).toThrow();
+    expect(() => rawEncode('fail', ['uint0'])).toThrow(
+      'types.forEach is not a function',
+    );
   });
 });
 
 describe('encoding uint257', function () {
   it('should fail', function () {
-    expect(function () {
-      rawEncode('fail', ['uint257']);
-    }).toThrow();
+    expect(() => rawEncode('fail', ['uint257'])).toThrow(
+      'types.forEach is not a function',
+    );
   });
 });
 
 describe('encoding int0', function () {
   it('should fail', function () {
-    expect(function () {
-      rawEncode(['int0'], [1]);
-    }).toThrow();
+    expect(() => rawEncode(['int0'], [1])).toThrow('Invalid int<N> width: 0');
   });
 });
 
 describe('encoding int257', function () {
   it('should fail', function () {
-    expect(function () {
-      rawEncode(['int257'], [1]);
-    }).toThrow();
+    expect(() => rawEncode(['int257'], [1])).toThrow(
+      'Invalid int<N> width: 257',
+    );
   });
 });
 
 describe('encoding uint[2] with [1,2,3]', function () {
   it('should fail', function () {
-    expect(function () {
-      rawEncode(['uint[2]'], [[1, 2, 3]]);
-    }).toThrow();
+    expect(() => rawEncode(['uint[2]'], [[1, 2, 3]])).toThrow(
+      'Elements exceed array size: 2',
+    );
   });
 });
 
 describe('encoding uint8 with 9bit data', function () {
   it('should fail', function () {
-    expect(function () {
-      rawEncode(['uint8'], [new BN(1).iushln(9)]);
-    }).toThrow();
+    expect(() => rawEncode(['uint8'], [new BN(1).iushln(9)])).toThrow(
+      'Supplied uint exceeds width: 8 vs 10',
+    );
   });
 });
 
