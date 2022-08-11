@@ -82,7 +82,7 @@ function parseTypeN(type) {
  * @param arg - Number to parse.
  * @returns Parsed value.
  */
-function parseNumber(arg) {
+export function parseNumber(arg) {
   const type = typeof arg;
   if (type === 'string') {
     if (isHexPrefixed(arg)) {
