@@ -1,9 +1,9 @@
-import { rawEncode, solidityPack, parseNumber } from './ethereumjs-abi-utils';
 import BN from 'bn.js';
+import { rawEncode, solidityPack, parseNumber } from './ethereumjs-abi-utils';
 
 describe('encoding negative int256', function () {
   it('should equal', function () {
-    var a = rawEncode(
+    const a = rawEncode(
       ['int256'],
       [
         new BN(
@@ -12,20 +12,21 @@ describe('encoding negative int256', function () {
         ),
       ],
     ).toString('hex');
-    var b = 'fffffffffffff38dd0f10627f5529bdb2c52d4846810af0ac000000000000001';
+    const b =
+      'fffffffffffff38dd0f10627f5529bdb2c52d4846810af0ac000000000000001';
     expect(a).toStrictEqual(b);
   });
 });
 
 describe('encoding string >32bytes', function () {
   it('should equal', function () {
-    var a = rawEncode(
+    const a = rawEncode(
       ['string'],
       [
         ' hello world hello world hello world hello world  hello world hello world hello world hello world  hello world hello world hello world hello world hello world hello world hello world hello world',
       ],
     ).toString('hex');
-    var b =
+    const b =
       '000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000c22068656c6c6f20776f726c642068656c6c6f20776f726c642068656c6c6f20776f726c642068656c6c6f20776f726c64202068656c6c6f20776f726c642068656c6c6f20776f726c642068656c6c6f20776f726c642068656c6c6f20776f726c64202068656c6c6f20776f726c642068656c6c6f20776f726c642068656c6c6f20776f726c642068656c6c6f20776f726c642068656c6c6f20776f726c642068656c6c6f20776f726c642068656c6c6f20776f726c642068656c6c6f20776f726c64000000000000000000000000000000000000000000000000000000000000';
     expect(a).toStrictEqual(b);
   });
@@ -33,17 +34,20 @@ describe('encoding string >32bytes', function () {
 
 describe('encoding uint32 response', function () {
   it('should equal', function () {
-    var a = rawEncode(['uint32'], [42]).toString('hex');
-    var b = '000000000000000000000000000000000000000000000000000000000000002a';
+    const a = rawEncode(['uint32'], [42]).toString('hex');
+    const b =
+      '000000000000000000000000000000000000000000000000000000000000002a';
     expect(a).toStrictEqual(b);
   });
 });
+
 describe('encoding string response (unsupported)', function () {
   it('should equal', function () {
-    var a = rawEncode(['string'], ['a response string (unsupported)']).toString(
-      'hex',
-    );
-    var b =
+    const a = rawEncode(
+      ['string'],
+      ['a response string (unsupported)'],
+    ).toString('hex');
+    const b =
       '0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001f6120726573706f6e736520737472696e672028756e737570706f727465642900';
     expect(a).toStrictEqual(b);
   });
@@ -51,29 +55,36 @@ describe('encoding string response (unsupported)', function () {
 
 describe('encoding', function () {
   it('should work for uint256', function () {
-    var a = rawEncode(['uint256'], [1]).toString('hex');
-    var b = '0000000000000000000000000000000000000000000000000000000000000001';
+    const a = rawEncode(['uint256'], [1]).toString('hex');
+    const b =
+      '0000000000000000000000000000000000000000000000000000000000000001';
     expect(a).toStrictEqual(b);
   });
+
   it('should work for uint', function () {
-    var a = rawEncode(['uint'], [1]).toString('hex');
-    var b = '0000000000000000000000000000000000000000000000000000000000000001';
+    const a = rawEncode(['uint'], [1]).toString('hex');
+    const b =
+      '0000000000000000000000000000000000000000000000000000000000000001';
     expect(a).toStrictEqual(b);
   });
+
   it('should work for int256', function () {
-    var a = rawEncode(['int256'], [-1]).toString('hex');
-    var b = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+    const a = rawEncode(['int256'], [-1]).toString('hex');
+    const b =
+      'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
     expect(a).toStrictEqual(b);
   });
+
   it('should work for string and uint256[2]', function () {
-    var a = rawEncode(['string', 'uint256[2]'], ['foo', [5, 6]]).toString(
+    const a = rawEncode(['string', 'uint256[2]'], ['foo', [5, 6]]).toString(
       'hex',
     );
-    var b =
+    const b =
       '0000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000003666f6f0000000000000000000000000000000000000000000000000000000000';
     expect(a).toStrictEqual(b);
   });
 });
+
 describe('encoding bytes33', function () {
   it('should fail', function () {
     expect(function () {
@@ -81,6 +92,7 @@ describe('encoding bytes33', function () {
     }).toThrow();
   });
 });
+
 describe('encoding uint0', function () {
   it('should fail', function () {
     expect(function () {
@@ -88,6 +100,7 @@ describe('encoding uint0', function () {
     }).toThrow();
   });
 });
+
 describe('encoding uint257', function () {
   it('should fail', function () {
     expect(function () {
@@ -95,6 +108,7 @@ describe('encoding uint257', function () {
     }).toThrow();
   });
 });
+
 describe('encoding int0', function () {
   it('should fail', function () {
     expect(function () {
@@ -102,6 +116,7 @@ describe('encoding int0', function () {
     }).toThrow();
   });
 });
+
 describe('encoding int257', function () {
   it('should fail', function () {
     expect(function () {
@@ -109,6 +124,7 @@ describe('encoding int257', function () {
     }).toThrow();
   });
 });
+
 describe('encoding uint[2] with [1,2,3]', function () {
   it('should fail', function () {
     expect(function () {
@@ -116,6 +132,7 @@ describe('encoding uint[2] with [1,2,3]', function () {
     }).toThrow();
   });
 });
+
 describe('encoding uint8 with 9bit data', function () {
   it('should fail', function () {
     expect(function () {
@@ -126,95 +143,108 @@ describe('encoding uint8 with 9bit data', function () {
 
 describe('solidity tight packing bool', function () {
   it('should equal', function () {
-    var a = solidityPack(['bool'], [true]);
-    var b = '01';
+    let a = solidityPack(['bool'], [true]);
+    let b = '01';
     expect(a.toString('hex')).toStrictEqual(b);
     a = solidityPack(['bool'], [false]);
     b = '00';
     expect(a.toString('hex')).toStrictEqual(b);
   });
 });
+
 describe('solidity tight packing address', function () {
   it('should equal', function () {
-    var a = solidityPack(
+    const a = solidityPack(
       ['address'],
       [new BN('43989fb883ba8111221e89123897538475893837', 16)],
     );
-    var b = '43989fb883ba8111221e89123897538475893837';
+    const b = '43989fb883ba8111221e89123897538475893837';
     expect(a.toString('hex')).toStrictEqual(b);
   });
 });
+
 describe('solidity tight packing string', function () {
   it('should equal', function () {
-    var a = solidityPack(['string'], ['test']);
-    var b = '74657374';
+    const a = solidityPack(['string'], ['test']);
+    const b = '74657374';
     expect(a.toString('hex')).toStrictEqual(b);
   });
 });
+
 describe('solidity tight packing bytes', function () {
   it('should equal', function () {
-    var a = solidityPack(['bytes'], [Buffer.from('123456', 'hex')]);
-    var b = '123456';
+    const a = solidityPack(['bytes'], [Buffer.from('123456', 'hex')]);
+    const b = '123456';
     expect(a.toString('hex')).toStrictEqual(b);
   });
 });
+
 describe('solidity tight packing bytes8', function () {
   it('should equal', function () {
-    var a = solidityPack(['bytes8'], [Buffer.from('123456', 'hex')]);
-    var b = '1234560000000000';
+    const a = solidityPack(['bytes8'], [Buffer.from('123456', 'hex')]);
+    const b = '1234560000000000';
     expect(a.toString('hex')).toStrictEqual(b);
   });
 });
+
 describe('solidity tight packing uint', function () {
   it('should equal', function () {
-    var a = solidityPack(['uint'], [42]);
-    var b = '000000000000000000000000000000000000000000000000000000000000002a';
+    const a = solidityPack(['uint'], [42]);
+    const b =
+      '000000000000000000000000000000000000000000000000000000000000002a';
     expect(a.toString('hex')).toStrictEqual(b);
   });
 });
+
 describe('solidity tight packing uint16', function () {
   it('should equal', function () {
-    var a = solidityPack(['uint16'], [42]);
-    var b = '002a';
+    const a = solidityPack(['uint16'], [42]);
+    const b = '002a';
     expect(a.toString('hex')).toStrictEqual(b);
   });
 });
+
 describe('solidity tight packing int', function () {
   it('should equal', function () {
-    var a = solidityPack(['int'], [-42]);
-    var b = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd6';
+    const a = solidityPack(['int'], [-42]);
+    const b =
+      'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd6';
     expect(a.toString('hex')).toStrictEqual(b);
   });
 });
+
 describe('solidity tight packing int16', function () {
   it('should equal', function () {
-    var a = solidityPack(['int16'], [-42]);
-    var b = 'ffd6';
+    const a = solidityPack(['int16'], [-42]);
+    const b = 'ffd6';
     expect(a.toString('hex')).toStrictEqual(b);
   });
 });
+
 describe('solidity tight packing multiple arguments', function () {
   it('should equal', function () {
-    var a = solidityPack(
+    const a = solidityPack(
       ['bytes32', 'uint32', 'uint32', 'uint32', 'uint32'],
       [Buffer.from('123456', 'hex'), 6, 7, 8, 9],
     );
-    var b =
+    const b =
       '123456000000000000000000000000000000000000000000000000000000000000000006000000070000000800000009';
     expect(a.toString('hex')).toStrictEqual(b);
   });
 });
+
 describe('solidity tight packing uint32[]', function () {
   it('should equal', function () {
-    var a = solidityPack(['uint32[]'], [[8, 9]]);
-    var b =
+    const a = solidityPack(['uint32[]'], [[8, 9]]);
+    const b =
       '00000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000009';
     expect(a.toString('hex')).toStrictEqual(b);
   });
 });
+
 describe('solidity tight packing bool[][]', function () {
   it('should equal', function () {
-    let a = solidityPack(
+    const a = solidityPack(
       ['bool[][]'],
       [
         [
@@ -223,25 +253,28 @@ describe('solidity tight packing bool[][]', function () {
         ],
       ],
     );
-    let b =
+    const b =
       '0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001';
     expect(a.toString('hex')).toStrictEqual(b);
   });
 });
+
 describe('solidity tight packing address[]', function () {
   it('should equal', function () {
-    let a = solidityPack(
+    const a = solidityPack(
       ['address[]'],
       [[new BN('43989fb883ba8111221e89123897538475893837', 16)]],
     );
-    let b = '00000000000000000000000043989fb883ba8111221e89123897538475893837';
+    const b =
+      '00000000000000000000000043989fb883ba8111221e89123897538475893837';
     expect(a.toString('hex')).toStrictEqual(b);
   });
 });
+
 describe('solidity tight packing uint32[2]', function () {
   it('should equal', function () {
-    let a = solidityPack(['uint32[2]'], [[11, 12]]);
-    let b =
+    const a = solidityPack(['uint32[2]'], [[11, 12]]);
+    const b =
       '000000000000000000000000000000000000000000000000000000000000000b000000000000000000000000000000000000000000000000000000000000000c';
     expect(a.toString('hex')).toStrictEqual(b);
   });
