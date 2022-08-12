@@ -4354,7 +4354,8 @@ describe('typedSignatureHash', function () {
           value: 'Hi, Alice!',
         },
       ],
-      errorMessage: "Cannot read properties of undefined (reading 'startsWith')",
+      errorMessage:
+        "Cannot read properties of undefined (reading 'startsWith')",
       label: 'no type',
     },
     {
