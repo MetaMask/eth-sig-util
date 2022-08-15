@@ -584,14 +584,16 @@ describe('TypedDataUtils.encodeData', function () {
         length: null,
       };
 
-      expect(() =>
-        TypedDataUtils.encodeData(
-          primaryType,
-          message,
-          types,
-          SignTypedDataVersion.V3,
-        ).toString('hex'),
-      ).toThrow(`Cannot read properties of null (reading 'toArray')`);
+      expect(
+        () =>
+          TypedDataUtils.encodeData(
+            primaryType,
+            message,
+            types,
+            SignTypedDataVersion.V3,
+          ).toString('hex'),
+        // ).toThrow(`Cannot read properties of null (reading 'toArray')`);
+      ).toThrow(/^Cannot read prop.+ null/u);
     });
 
     it('should encode data with an atomic property set to undefined', function () {
@@ -730,7 +732,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow(`Cannot read properties of null (reading 'name')`);
+      ).toThrow(/^Cannot read prop.+ null/u);
     });
 
     it('should encode data with a custom type property set to undefined', function () {
@@ -1109,7 +1111,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow(`Cannot read properties of null (reading 'toArray')`);
+      ).toThrow(/^Cannot read prop.+ null/u);
     });
 
     it('should throw an error when an atomic property is set to undefined', function () {
@@ -1938,7 +1940,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow(`Cannot read properties of null (reading 'toArray')`);
+      ).toThrow(/^Cannot read prop.+ null/u);
     });
 
     it('should hash data with an atomic property set to undefined', function () {
@@ -2077,7 +2079,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow(`Cannot read properties of null (reading 'name')`);
+      ).toThrow(/^Cannot read prop.+ null/u);
     });
 
     it('should hash data with a custom type property set to undefined', function () {
@@ -2456,7 +2458,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow(`Cannot read properties of null (reading 'toArray')`);
+      ).toThrow(/^Cannot read prop.+ null/u);
     });
 
     it('should throw an error when an atomic property is set to undefined', function () {
@@ -4475,7 +4477,7 @@ describe('signTypedData', function () {
           data: [{ name: 'data', type: 'int32', value: null }],
           version: SignTypedDataVersion.V1,
         }),
-      ).toThrow(`Cannot read properties of null (reading 'toArray')`);
+      ).toThrow(/^Cannot read prop.+ null/u);
     });
 
     it('should sign data with an atomic property set to undefined', function () {
@@ -5094,7 +5096,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V3,
         }),
-      ).toThrow(`Cannot read properties of null (reading 'toArray')`);
+      ).toThrow(/^Cannot read prop.+ null/u);
     });
 
     it('should sign data with an atomic property set to undefined', function () {
@@ -5253,7 +5255,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V3,
         }),
-      ).toThrow(`Cannot read properties of null (reading 'name')`);
+      ).toThrow(/^Cannot read prop.+ null/u);
     });
 
     it('should sign data with a custom type property set to undefined', function () {
@@ -5964,7 +5966,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V4,
         }),
-      ).toThrow(`Cannot read properties of null (reading 'toArray')`);
+      ).toThrow(/^Cannot read prop.+ null/u);
     });
 
     it('should throw an error when an atomic property is set to undefined', function () {
