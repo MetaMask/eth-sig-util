@@ -584,15 +584,13 @@ describe('TypedDataUtils.encodeData', function () {
         length: null,
       };
 
-      expect(
-        () =>
-          TypedDataUtils.encodeData(
-            primaryType,
-            message,
-            types,
-            SignTypedDataVersion.V3,
-          ).toString('hex'),
-        // ).toThrow(`Cannot read properties of null (reading 'toArray')`);
+      expect(() =>
+        TypedDataUtils.encodeData(
+          primaryType,
+          message,
+          types,
+          SignTypedDataVersion.V3,
+        ).toString('hex'),
       ).toThrow(/^Cannot read prop.+ null/u);
     });
 
@@ -4356,8 +4354,7 @@ describe('typedSignatureHash', function () {
           value: 'Hi, Alice!',
         },
       ],
-      errorMessage:
-        "Cannot read properties of undefined (reading 'startsWith')",
+      errorMessage: 'Cannot read',
       label: 'no type',
     },
     {
