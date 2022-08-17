@@ -1,17 +1,20 @@
+import { isHexString } from 'ethjs-util';
 import {
+  arrToBufArr,
   bufferToHex,
   ecsign,
-  keccak,
   publicToAddress,
   toBuffer,
-} from 'ethereumjs-util';
-import { rawEncode, soliditySHA3 } from 'ethereumjs-abi';
+} from '@ethereumjs/util';
+import { keccak256 } from 'ethereum-cryptography/keccak';
+import { rawEncode, solidityPack } from './ethereumjs-abi-utils';
 
 import {
   concatSig,
   isNullish,
   legacyToBuffer,
   recoverPublicKey,
+  numberToBuffer,
 } from './utils';
 
 /**
@@ -159,7 +162,7 @@ function encodeField(
       'bytes32',
       version === SignTypedDataVersion.V4 && value == null // eslint-disable-line no-eq-null
         ? '0x0000000000000000000000000000000000000000000000000000000000000000'
-        : keccak(encodeData(type, value, types, version)),
+        : arrToBufArr(keccak256(encodeData(type, value, types, version))),
     ];
   }
 
@@ -168,15 +171,23 @@ function encodeField(
   }
 
   if (type === 'bytes') {
-    return ['bytes32', keccak(value)];
+    if (typeof value === 'number') {
+      value = numberToBuffer(value);
+    } else if (isHexString(value)) {
+      value = numberToBuffer(parseInt(value, 16));
+    } else {
+      value = Buffer.from(value, 'utf8');
+    }
+    return ['bytes32', arrToBufArr(keccak256(value))];
   }
 
   if (type === 'string') {
-    // convert string to buffer - prevents ethUtil from interpreting strings like '0xabcd' as hex
-    if (typeof value === 'string') {
-      value = Buffer.from(value, 'utf8');
+    if (typeof value === 'number') {
+      value = numberToBuffer(value);
+    } else {
+      value = Buffer.from(value ?? '', 'utf8');
     }
-    return ['bytes32', keccak(value)];
+    return ['bytes32', arrToBufArr(keccak256(value))];
   }
 
   if (type.lastIndexOf(']') === type.length - 1) {
@@ -191,10 +202,12 @@ function encodeField(
     );
     return [
       'bytes32',
-      keccak(
-        rawEncode(
-          typeValuePairs.map(([t]) => t),
-          typeValuePairs.map(([, v]) => v),
+      arrToBufArr(
+        keccak256(
+          rawEncode(
+            typeValuePairs.map(([t]) => t),
+            typeValuePairs.map(([, v]) => v),
+          ),
         ),
       ),
     ];
@@ -314,7 +327,7 @@ function hashStruct(
 ): Buffer {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
-  return keccak(encodeData(primaryType, data, types, version));
+  return arrToBufArr(keccak256(encodeData(primaryType, data, types, version)));
 }
 
 /**
@@ -328,7 +341,8 @@ function hashType(
   primaryType: string,
   types: Record<string, MessageTypeProperty[]>,
 ): Buffer {
-  return keccak(encodeType(primaryType, types));
+  const encodedHashType = Buffer.from(encodeType(primaryType, types), 'utf-8');
+  return arrToBufArr(keccak256(encodedHashType));
 }
 
 /**
@@ -393,7 +407,7 @@ function eip712Hash<T extends MessageTypes>(
       ),
     );
   }
-  return keccak(Buffer.concat(parts));
+  return arrToBufArr(keccak256(Buffer.concat(parts)));
 }
 
 /**
@@ -459,12 +473,18 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
     return `${e.type} ${e.name}`;
   });
 
-  return soliditySHA3(
-    ['bytes32', 'bytes32'],
-    [
-      soliditySHA3(new Array(typedData.length).fill('string'), schema),
-      soliditySHA3(types, data),
-    ],
+  return arrToBufArr(
+    keccak256(
+      solidityPack(
+        ['bytes32', 'bytes32'],
+        [
+          keccak256(
+            solidityPack(new Array(typedData.length).fill('string'), schema),
+          ),
+          keccak256(solidityPack(types, data)),
+        ],
+      ),
+    ),
   );
 }
 

@@ -6,8 +6,9 @@ import {
   fromRpcSig,
   fromSigned,
   toBuffer,
+  ToBufferInputTypes,
   toUnsigned,
-} from 'ethereumjs-util';
+} from '@ethereumjs/util';
 import { intToHex, isHexString, stripHexPrefix } from 'ethjs-util';
 
 /**
@@ -56,7 +57,7 @@ export function isNullish(value) {
  * @param value - The value to convert to a Buffer.
  * @returns The given value as a Buffer.
  */
-export function legacyToBuffer(value: unknown) {
+export function legacyToBuffer(value: ToBufferInputTypes) {
   return typeof value === 'string' && !isHexString(value)
     ? Buffer.from(value)
     : toBuffer(value);
@@ -107,6 +108,9 @@ export function normalize(input: number | string): string {
   }
 
   if (typeof input === 'number') {
+    if (input < 0) {
+      return '0x';
+    }
     const buffer = toBuffer(input);
     input = bufferToHex(buffer);
   }
@@ -118,4 +122,17 @@ export function normalize(input: number | string): string {
   }
 
   return addHexPrefix(input.toLowerCase());
+}
+
+/**
+ * Node's Buffer.from() method does not seem to buffer numbers correctly out of the box.
+ * This helper method formats the number correct for Buffer.from to return correct buffer.
+ *
+ * @param num - The number to convert to buffer.
+ * @returns The number in buffer form.
+ */
+export function numberToBuffer(num: number) {
+  const hexVal = num.toString(16);
+  const prepend = hexVal.length % 2 ? '0' : '';
+  return Buffer.from(prepend + hexVal, 'hex');
 }
