@@ -27,7 +27,7 @@
     "dist"
   ],
   "scripts": {
-    "setup": "yarn install && yarn allow-scripts",
+    "setup": "yarn install",
     "build": "tsc --project .",
     "build:clean": "rimraf dist && yarn build",
     "lint:eslint": "eslint . --cache --ext js,ts",
