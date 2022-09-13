@@ -7,16 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [5.0.0]
-### Uncategorized
-- bump @ethereumjs/util from 8.0.0-beta to 8.0.0 ([#267](https://github.com/MetaMask/eth-sig-util/pull/267))
-- Migrate to Yarn 3 ([#264](https://github.com/MetaMask/eth-sig-util/pull/264))
-- Replace heavy crypto packages for lighter noble implementations via upgrading `ethereumjs-util` to latest (now called `@ethereumjs/util`) ([#260](https://github.com/MetaMask/eth-sig-util/pull/260))
-- Bump Node to v14 ([#263](https://github.com/MetaMask/eth-sig-util/pull/263))
-- Update to latest `typedoc` version ([#249](https://github.com/MetaMask/eth-sig-util/pull/249))
-- Fix lint rules for tests ([#245](https://github.com/MetaMask/eth-sig-util/pull/245))
-
 ### Changed
 - **BREAKING:** Removed support for Node v12 in favor of v14 ([#137](https://github.com/MetaMask/eth-json-rpc-middleware/pull/137))
+- Replace heavy crypto packages for lighter noble implementations via upgrading `ethereumjs-util` to latest (now called `@ethereumjs/util`) ([#260](https://github.com/MetaMask/eth-sig-util/pull/260))
+- Migrate to Yarn 3 ([#264](https://github.com/MetaMask/eth-sig-util/pull/264))
+
 
 ## [4.0.1]
 ### Fixed
