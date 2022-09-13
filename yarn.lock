@@ -443,13 +443,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethereumjs/util@npm:^8.0.0-beta.1":
-  version: 8.0.0-beta.3
-  resolution: "@ethereumjs/util@npm:8.0.0-beta.3"
+"@ethereumjs/util@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "@ethereumjs/util@npm:8.0.0"
   dependencies:
     "@ethereumjs/rlp": ^4.0.0-beta.2
     ethereum-cryptography: ^1.1.2
-  checksum: 4f182b10b908444570229fc502e44eab920e33233c1d06d42c1027b112fd846912be1f3332cf6bb0fbdf5fe9f542b0e17ea1063ee58a17424d257628b09637d8
+  checksum: 360e9795e120f15eba4d683260eca64071f9020eaa9d7276c0cdd80d837933757c0c089ba578a10ad0cfef51118d87649e1c6722a10385991590c4cf51eba62b
   languageName: node
   linkType: hard
 
@@ -855,7 +855,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@metamask/eth-sig-util@workspace:."
   dependencies:
-    "@ethereumjs/util": ^8.0.0-beta.1
+    "@ethereumjs/util": ^8.0.0
     "@lavamoat/allow-scripts": ^2.0.3
     "@metamask/auto-changelog": ^2.6.1
     "@metamask/eslint-config": ^9.0.0
