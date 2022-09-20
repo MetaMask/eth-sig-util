@@ -231,7 +231,7 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
 
 const encodeDataExamples = {
   // dynamic types supported by EIP-712:
-  bytes: [10, '10', '0x10', Buffer.from('10', 'utf8')],
+  bytes: [10, '10', '0x10', Buffer.from('10', 'utf8'), '0xa22cb465000000000000000000000000a9079d872d10185b54c5db2c36cc978cbd3f72b70000000000000000000000000000000000000000000000000000000000000001'],
   string: [
     'Hello!',
     '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
