@@ -174,7 +174,7 @@ function encodeField(
     if (typeof value === 'number') {
       value = numberToBuffer(value);
     } else if (isHexString(value)) {
-      value = numberToBuffer(parseInt(value, 16));
+      value = Buffer.from(value.slice(2), 'hex');
     } else {
       value = Buffer.from(value, 'utf8');
     }
