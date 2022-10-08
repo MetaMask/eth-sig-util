@@ -122,6 +122,8 @@ exports[`TypedDataUtils.encodeData V3 example data type "int" should encode "0x0
 
 exports[`TypedDataUtils.encodeData V3 example data type "int" should encode "9007199254740991" (type "number") 1`] = `"eb542693947f45083bc98c9628ebab536657139910ee549407af31fe8f8fe49c000000000000000000000000000000000000000000000000001fffffffffffff"`;
 
+exports[`TypedDataUtils.encodeData V3 example data type "int8" should encode "-128" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fbffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80"`;
+
 exports[`TypedDataUtils.encodeData V3 example data type "int8" should encode "-255" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fbffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01"`;
 
 exports[`TypedDataUtils.encodeData V3 example data type "int8" should encode "0" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb0000000000000000000000000000000000000000000000000000000000000000"`;
@@ -129,6 +131,8 @@ exports[`TypedDataUtils.encodeData V3 example data type "int8" should encode "0"
 exports[`TypedDataUtils.encodeData V3 example data type "int8" should encode "0" (type "string") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb0000000000000000000000000000000000000000000000000000000000000000"`;
 
 exports[`TypedDataUtils.encodeData V3 example data type "int8" should encode "0x0" (type "string") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "int8" should encode "127" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb000000000000000000000000000000000000000000000000000000000000007f"`;
 
 exports[`TypedDataUtils.encodeData V3 example data type "int8" should encode "255" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb00000000000000000000000000000000000000000000000000000000000000ff"`;
 
@@ -171,6 +175,8 @@ exports[`TypedDataUtils.encodeData V3 example data type "uint8" should encode "0
 exports[`TypedDataUtils.encodeData V3 example data type "uint8" should encode "0" (type "string") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c0000000000000000000000000000000000000000000000000000000000000000"`;
 
 exports[`TypedDataUtils.encodeData V3 example data type "uint8" should encode "0x0" (type "string") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V3 example data type "uint8" should encode "128" (type "number") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c0000000000000000000000000000000000000000000000000000000000000080"`;
 
 exports[`TypedDataUtils.encodeData V3 example data type "uint8" should encode "255" (type "number") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c00000000000000000000000000000000000000000000000000000000000000ff"`;
 
@@ -308,6 +314,8 @@ exports[`TypedDataUtils.encodeData V4 example data type "int" should encode "900
 
 exports[`TypedDataUtils.encodeData V4 example data type "int" should encode array of all int example data 1`] = `"f1e952da5f44a2503d1cc29bec179593cf7f5b7e05b1aedfa8fbb97ec1cf944ddb561d5e1d1b52adaa4c13e82c4cf8eb7b434f9cdf00afca99876cdb9a41fd8b"`;
 
+exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode "-128" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fbffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80"`;
+
 exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode "-255" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fbffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01"`;
 
 exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode "0" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb0000000000000000000000000000000000000000000000000000000000000000"`;
@@ -315,6 +323,8 @@ exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode "0"
 exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode "0" (type "string") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb0000000000000000000000000000000000000000000000000000000000000000"`;
 
 exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode "0x0" (type "string") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode "127" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb000000000000000000000000000000000000000000000000000000000000007f"`;
 
 exports[`TypedDataUtils.encodeData V4 example data type "int8" should encode "255" (type "number") 1`] = `"4aef32d02ba398126fc35c6d9a88d8d3aed515b289c8f93cb3dd13c0dcce59fb00000000000000000000000000000000000000000000000000000000000000ff"`;
 
@@ -365,6 +375,8 @@ exports[`TypedDataUtils.encodeData V4 example data type "uint8" should encode "0
 exports[`TypedDataUtils.encodeData V4 example data type "uint8" should encode "0" (type "string") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c0000000000000000000000000000000000000000000000000000000000000000"`;
 
 exports[`TypedDataUtils.encodeData V4 example data type "uint8" should encode "0x0" (type "string") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c0000000000000000000000000000000000000000000000000000000000000000"`;
+
+exports[`TypedDataUtils.encodeData V4 example data type "uint8" should encode "128" (type "number") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c0000000000000000000000000000000000000000000000000000000000000080"`;
 
 exports[`TypedDataUtils.encodeData V4 example data type "uint8" should encode "255" (type "number") 1`] = `"997a0c895f7d046e9d4bcfa5de41b03f33ca7fa213cb1325edd0cad1e9c3864c00000000000000000000000000000000000000000000000000000000000000ff"`;
 
@@ -494,6 +506,8 @@ exports[`TypedDataUtils.hashStruct V3 example data type "int" should hash "0x0" 
 
 exports[`TypedDataUtils.hashStruct V3 example data type "int" should hash "9007199254740991" (type "number") 1`] = `"58688562012b128b5b702e46276e9ee8815955345556708ae7d25e49a9717eb5"`;
 
+exports[`TypedDataUtils.hashStruct V3 example data type "int8" should hash "-128" (type "number") 1`] = `"7e6a3bd34335447709b492beaaf5f864d524b70c16262bda7571a01cf8918e63"`;
+
 exports[`TypedDataUtils.hashStruct V3 example data type "int8" should hash "-255" (type "number") 1`] = `"5176307b3ebcc216e0c74964fab1ffc6aea9af022f5e1ff5218e8c8f271308a5"`;
 
 exports[`TypedDataUtils.hashStruct V3 example data type "int8" should hash "0" (type "number") 1`] = `"7e41c54c3c21ff362622f9159b9b1566b4d9d883fe397da923f8415f1f2d1b89"`;
@@ -501,6 +515,8 @@ exports[`TypedDataUtils.hashStruct V3 example data type "int8" should hash "0" (
 exports[`TypedDataUtils.hashStruct V3 example data type "int8" should hash "0" (type "string") 1`] = `"7e41c54c3c21ff362622f9159b9b1566b4d9d883fe397da923f8415f1f2d1b89"`;
 
 exports[`TypedDataUtils.hashStruct V3 example data type "int8" should hash "0x0" (type "string") 1`] = `"7e41c54c3c21ff362622f9159b9b1566b4d9d883fe397da923f8415f1f2d1b89"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "int8" should hash "127" (type "number") 1`] = `"35b4f36c1748102398866a776598a67e19aba39fa9ba428bd57385ae1a24760d"`;
 
 exports[`TypedDataUtils.hashStruct V3 example data type "int8" should hash "255" (type "number") 1`] = `"6af1c0206f5eca44c09a657cc0e5b0492c3c50fdac13b4d0f9230629cb4a5524"`;
 
@@ -543,6 +559,8 @@ exports[`TypedDataUtils.hashStruct V3 example data type "uint8" should hash "0" 
 exports[`TypedDataUtils.hashStruct V3 example data type "uint8" should hash "0" (type "string") 1`] = `"73ee3fc1fa9dc8c99c59fcb1d9d8c9fe181510086128e4763618d7c6b2208361"`;
 
 exports[`TypedDataUtils.hashStruct V3 example data type "uint8" should hash "0x0" (type "string") 1`] = `"73ee3fc1fa9dc8c99c59fcb1d9d8c9fe181510086128e4763618d7c6b2208361"`;
+
+exports[`TypedDataUtils.hashStruct V3 example data type "uint8" should hash "128" (type "number") 1`] = `"3a8ff5b4c1ae6a65cb87b82da2d2e5842c8f028daa4ff81354c7e46d732d1ab2"`;
 
 exports[`TypedDataUtils.hashStruct V3 example data type "uint8" should hash "255" (type "number") 1`] = `"30b2c001d2daa96e91576d1019a1842f75d983de5f89934671dc02074971b850"`;
 
@@ -680,6 +698,8 @@ exports[`TypedDataUtils.hashStruct V4 example data type "int" should hash "90071
 
 exports[`TypedDataUtils.hashStruct V4 example data type "int" should hash array of all int example data 1`] = `"d16177fae6110a0f8b8f527d47c595bbb7174f8b7eaef8f1867bb87827834f5c"`;
 
+exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash "-128" (type "number") 1`] = `"7e6a3bd34335447709b492beaaf5f864d524b70c16262bda7571a01cf8918e63"`;
+
 exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash "-255" (type "number") 1`] = `"5176307b3ebcc216e0c74964fab1ffc6aea9af022f5e1ff5218e8c8f271308a5"`;
 
 exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash "0" (type "number") 1`] = `"7e41c54c3c21ff362622f9159b9b1566b4d9d883fe397da923f8415f1f2d1b89"`;
@@ -687,6 +707,8 @@ exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash "0" (
 exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash "0" (type "string") 1`] = `"7e41c54c3c21ff362622f9159b9b1566b4d9d883fe397da923f8415f1f2d1b89"`;
 
 exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash "0x0" (type "string") 1`] = `"7e41c54c3c21ff362622f9159b9b1566b4d9d883fe397da923f8415f1f2d1b89"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash "127" (type "number") 1`] = `"35b4f36c1748102398866a776598a67e19aba39fa9ba428bd57385ae1a24760d"`;
 
 exports[`TypedDataUtils.hashStruct V4 example data type "int8" should hash "255" (type "number") 1`] = `"6af1c0206f5eca44c09a657cc0e5b0492c3c50fdac13b4d0f9230629cb4a5524"`;
 
@@ -737,6 +759,8 @@ exports[`TypedDataUtils.hashStruct V4 example data type "uint8" should hash "0" 
 exports[`TypedDataUtils.hashStruct V4 example data type "uint8" should hash "0" (type "string") 1`] = `"73ee3fc1fa9dc8c99c59fcb1d9d8c9fe181510086128e4763618d7c6b2208361"`;
 
 exports[`TypedDataUtils.hashStruct V4 example data type "uint8" should hash "0x0" (type "string") 1`] = `"73ee3fc1fa9dc8c99c59fcb1d9d8c9fe181510086128e4763618d7c6b2208361"`;
+
+exports[`TypedDataUtils.hashStruct V4 example data type "uint8" should hash "128" (type "number") 1`] = `"3a8ff5b4c1ae6a65cb87b82da2d2e5842c8f028daa4ff81354c7e46d732d1ab2"`;
 
 exports[`TypedDataUtils.hashStruct V4 example data type "uint8" should hash "255" (type "number") 1`] = `"30b2c001d2daa96e91576d1019a1842f75d983de5f89934671dc02074971b850"`;
 
@@ -850,6 +874,8 @@ exports[`signTypedData V1 example data type "int" should sign "9007199254740991"
 
 exports[`signTypedData V1 example data type "int" should sign array of all int example data 1`] = `"0xde812973cfcb24a0f187c94514e1ecf9ff2f4efd8645e8617c6ab9cfcb43268e6720a9411ad8bcc8a8bae8ff07e41f6ab0533aeed7275cf2f9e2d462cc7a4da81c"`;
 
+exports[`signTypedData V1 example data type "int8" should sign "-128" (type "number") 1`] = `"0x5e7020b62cbdf87c0173ff6f6c5d04e3aa5eba8cffb2efb995e8cb3eafe787a81d5e064ebaebc7f5f184d0f06bacb30d1af4d89625a2d105d83f860b4c54d8a51b"`;
+
 exports[`signTypedData V1 example data type "int8" should sign "-255" (type "number") 1`] = `"0x1b6d2413d8402be1b622f11e1ba4dc06d5dab72988e83b627c4078f7ab5170db0eb9eac5c11f2e74f52c3c2e0e3da5929986b089259e5c8ce5edd65cbb34e0a91c"`;
 
 exports[`signTypedData V1 example data type "int8" should sign "0" (type "number") 1`] = `"0x82adbdd541caa7d01d232362295750cda99b38d78851f6947dd89461c78a0efd2e7b1b47389bbf31e20073904d42cb7c01c74a118f8bac4cdc5c5857789f14101b"`;
@@ -857,6 +883,8 @@ exports[`signTypedData V1 example data type "int8" should sign "0" (type "number
 exports[`signTypedData V1 example data type "int8" should sign "0" (type "string") 1`] = `"0x82adbdd541caa7d01d232362295750cda99b38d78851f6947dd89461c78a0efd2e7b1b47389bbf31e20073904d42cb7c01c74a118f8bac4cdc5c5857789f14101b"`;
 
 exports[`signTypedData V1 example data type "int8" should sign "0x0" (type "string") 1`] = `"0x82adbdd541caa7d01d232362295750cda99b38d78851f6947dd89461c78a0efd2e7b1b47389bbf31e20073904d42cb7c01c74a118f8bac4cdc5c5857789f14101b"`;
+
+exports[`signTypedData V1 example data type "int8" should sign "127" (type "number") 1`] = `"0xdf6a95f2a315a97ccd26844140bfb6e9be5614ddbfcb2d6a9f42d2412485caca00f52c1e272111d894eaedbb9beb64303763bd111f9f26e5d7e630c79e31b81b1b"`;
 
 exports[`signTypedData V1 example data type "int8" should sign "255" (type "number") 1`] = `"0x0272945b495eefc12f580a12d5412e9ca012b9942a2b2a1e40c32a7642c2ff0b73265e3c2cf7c4582e5f7e6e36ba977a0198c7b7543bc6ced41b6c3ac1a7b80f1b"`;
 
@@ -903,6 +931,8 @@ exports[`signTypedData V1 example data type "uint8" should sign "0" (type "numbe
 exports[`signTypedData V1 example data type "uint8" should sign "0" (type "string") 1`] = `"0xae299832e19c7f39af7dff766ca760dc25a5d71a1c0c05a0b5d6d89db958774c6ac664c25729294f1ef24939f7f777a50ceb2f761a5c346d5991c8afda8841371c"`;
 
 exports[`signTypedData V1 example data type "uint8" should sign "0x0" (type "string") 1`] = `"0xae299832e19c7f39af7dff766ca760dc25a5d71a1c0c05a0b5d6d89db958774c6ac664c25729294f1ef24939f7f777a50ceb2f761a5c346d5991c8afda8841371c"`;
+
+exports[`signTypedData V1 example data type "uint8" should sign "128" (type "number") 1`] = `"0xf709b210bbeca2cc1a18fe4d80829c65df97ec48bbfd3b438490acba9c0b4acf781d1bc52fb9dc94e7c782ebedab71c458a75259715771096493d0756bf5055d1b"`;
 
 exports[`signTypedData V1 example data type "uint8" should sign "255" (type "number") 1`] = `"0x642ab568aaf2f222ee46892dc8c7609af4cb02ca440279ef17fd3987fc682ead6427d75214d3cd336ee1954ebfbd02a86fcc572242f5b1163db60d25cd22bc5a1b"`;
 
@@ -1022,6 +1052,8 @@ exports[`signTypedData V3 example data type "int" should sign "0x0" (type "strin
 
 exports[`signTypedData V3 example data type "int" should sign "9007199254740991" (type "number") 1`] = `"0x8189a5ff41daf78340d0590eff0d567e230d159276bffe9b7fd471213a49a45831c3f27eb34eef73321b9df64792b494f12e8553c1d6f6976833b3f46319c2301b"`;
 
+exports[`signTypedData V3 example data type "int8" should sign "-128" (type "number") 1`] = `"0x582c842bc88f912cdebd35493eb71b6eac7d627a9e7d7143d3819936953d679e7bb2e4009250f81c1c519f72bddbbaa9ee8ed89c59a28247f07c21927ce2d1a41c"`;
+
 exports[`signTypedData V3 example data type "int8" should sign "-255" (type "number") 1`] = `"0xb6d4b6c9310ebd6559dde32673f6631cf125a90acf0095dfc186b8ff5cd8c30d403e3948e086c70f6b2d2fa6342f8fed39fa2f9e74821e0f5b53fce6ef97aa491b"`;
 
 exports[`signTypedData V3 example data type "int8" should sign "0" (type "number") 1`] = `"0x1316dd89e3828b6e3fb2a1b73f35e9914e5f13bd7e636a6ffc091e38d27d75dd450443e38024d88f7b856da9fccf4b27d508cb403e6206c618a03a912f68f4141b"`;
@@ -1029,6 +1061,8 @@ exports[`signTypedData V3 example data type "int8" should sign "0" (type "number
 exports[`signTypedData V3 example data type "int8" should sign "0" (type "string") 1`] = `"0x1316dd89e3828b6e3fb2a1b73f35e9914e5f13bd7e636a6ffc091e38d27d75dd450443e38024d88f7b856da9fccf4b27d508cb403e6206c618a03a912f68f4141b"`;
 
 exports[`signTypedData V3 example data type "int8" should sign "0x0" (type "string") 1`] = `"0x1316dd89e3828b6e3fb2a1b73f35e9914e5f13bd7e636a6ffc091e38d27d75dd450443e38024d88f7b856da9fccf4b27d508cb403e6206c618a03a912f68f4141b"`;
+
+exports[`signTypedData V3 example data type "int8" should sign "127" (type "number") 1`] = `"0x7b29dfd005580078f83dc0e4fbc53019603ccd9ce5f8374d2edfa7df9fff269245ace834fcbd19599b905a1115ea7178f6fd17b05fc7a21ded9fa1276e0acbce1b"`;
 
 exports[`signTypedData V3 example data type "int8" should sign "255" (type "number") 1`] = `"0xefa01f8b611ed6e95b793055522e622a4b10537ffb5a184090e9eb77f8228fae26357a007a1fc367012e385d59674ebf0ebbbf4c4e053ea9af82d10d3fa703861c"`;
 
@@ -1071,6 +1105,8 @@ exports[`signTypedData V3 example data type "uint8" should sign "0" (type "numbe
 exports[`signTypedData V3 example data type "uint8" should sign "0" (type "string") 1`] = `"0x2e2308e1018ab9e53138698c7171f11eed668a06735a0b61ef8ca6aaa9ce0f9949d8955bd03d151451d91a2230ba60e4d70a42a360de9612aee826b0b1ecf5c71c"`;
 
 exports[`signTypedData V3 example data type "uint8" should sign "0x0" (type "string") 1`] = `"0x2e2308e1018ab9e53138698c7171f11eed668a06735a0b61ef8ca6aaa9ce0f9949d8955bd03d151451d91a2230ba60e4d70a42a360de9612aee826b0b1ecf5c71c"`;
+
+exports[`signTypedData V3 example data type "uint8" should sign "128" (type "number") 1`] = `"0xc94b8a277d98bb0e8b6d65b43263fe23629ce75544798a843fe7647eb08a0dc65d0e93fec4b2db4736ca95747b36616a6b6111a1bafb5b082428dd34c57584761b"`;
 
 exports[`signTypedData V3 example data type "uint8" should sign "255" (type "number") 1`] = `"0x07a0c3566cff100c5861355d1aeddb437269f05f6413498c32be63a7383152123e6a794d4fbfae20a512303ed5b7462d9fbb38cd581b890d3a54817576ef5fe91b"`;
 
@@ -1216,6 +1252,8 @@ exports[`signTypedData V4 example data type "int" should sign "9007199254740991"
 
 exports[`signTypedData V4 example data type "int" should sign array of all int example data 1`] = `"0x9b81e7c4ae04c72bf1f5377a8b26ee3d4ee66350b27739979e573aadd56967d04a784dcf0dce36fb1a6e7401c47ca3e53f2bcb392321f795a6794c061654e40a1c"`;
 
+exports[`signTypedData V4 example data type "int8" should sign "-128" (type "number") 1`] = `"0x582c842bc88f912cdebd35493eb71b6eac7d627a9e7d7143d3819936953d679e7bb2e4009250f81c1c519f72bddbbaa9ee8ed89c59a28247f07c21927ce2d1a41c"`;
+
 exports[`signTypedData V4 example data type "int8" should sign "-255" (type "number") 1`] = `"0xb6d4b6c9310ebd6559dde32673f6631cf125a90acf0095dfc186b8ff5cd8c30d403e3948e086c70f6b2d2fa6342f8fed39fa2f9e74821e0f5b53fce6ef97aa491b"`;
 
 exports[`signTypedData V4 example data type "int8" should sign "0" (type "number") 1`] = `"0x1316dd89e3828b6e3fb2a1b73f35e9914e5f13bd7e636a6ffc091e38d27d75dd450443e38024d88f7b856da9fccf4b27d508cb403e6206c618a03a912f68f4141b"`;
@@ -1223,6 +1261,8 @@ exports[`signTypedData V4 example data type "int8" should sign "0" (type "number
 exports[`signTypedData V4 example data type "int8" should sign "0" (type "string") 1`] = `"0x1316dd89e3828b6e3fb2a1b73f35e9914e5f13bd7e636a6ffc091e38d27d75dd450443e38024d88f7b856da9fccf4b27d508cb403e6206c618a03a912f68f4141b"`;
 
 exports[`signTypedData V4 example data type "int8" should sign "0x0" (type "string") 1`] = `"0x1316dd89e3828b6e3fb2a1b73f35e9914e5f13bd7e636a6ffc091e38d27d75dd450443e38024d88f7b856da9fccf4b27d508cb403e6206c618a03a912f68f4141b"`;
+
+exports[`signTypedData V4 example data type "int8" should sign "127" (type "number") 1`] = `"0x7b29dfd005580078f83dc0e4fbc53019603ccd9ce5f8374d2edfa7df9fff269245ace834fcbd19599b905a1115ea7178f6fd17b05fc7a21ded9fa1276e0acbce1b"`;
 
 exports[`signTypedData V4 example data type "int8" should sign "255" (type "number") 1`] = `"0xefa01f8b611ed6e95b793055522e622a4b10537ffb5a184090e9eb77f8228fae26357a007a1fc367012e385d59674ebf0ebbbf4c4e053ea9af82d10d3fa703861c"`;
 
@@ -1273,6 +1313,8 @@ exports[`signTypedData V4 example data type "uint8" should sign "0" (type "numbe
 exports[`signTypedData V4 example data type "uint8" should sign "0" (type "string") 1`] = `"0x2e2308e1018ab9e53138698c7171f11eed668a06735a0b61ef8ca6aaa9ce0f9949d8955bd03d151451d91a2230ba60e4d70a42a360de9612aee826b0b1ecf5c71c"`;
 
 exports[`signTypedData V4 example data type "uint8" should sign "0x0" (type "string") 1`] = `"0x2e2308e1018ab9e53138698c7171f11eed668a06735a0b61ef8ca6aaa9ce0f9949d8955bd03d151451d91a2230ba60e4d70a42a360de9612aee826b0b1ecf5c71c"`;
+
+exports[`signTypedData V4 example data type "uint8" should sign "128" (type "number") 1`] = `"0xc94b8a277d98bb0e8b6d65b43263fe23629ce75544798a843fe7647eb08a0dc65d0e93fec4b2db4736ca95747b36616a6b6111a1bafb5b082428dd34c57584761b"`;
 
 exports[`signTypedData V4 example data type "uint8" should sign "255" (type "number") 1`] = `"0x07a0c3566cff100c5861355d1aeddb437269f05f6413498c32be63a7383152123e6a794d4fbfae20a512303ed5b7462d9fbb38cd581b890d3a54817576ef5fe91b"`;
 
@@ -1384,6 +1426,8 @@ exports[`typedSignatureHash type "int" should hash "0x0" (type "string") 1`] = `
 
 exports[`typedSignatureHash type "int" should hash "9007199254740991" (type "number") 1`] = `"0x5329c4b59ad6f387865835702708bf22942655839fcf5b253d6078f7b2cfc19b"`;
 
+exports[`typedSignatureHash type "int8" should hash "-128" (type "number") 1`] = `"0xfb44d9858f9c5d4618624703fb7b564d4f96b9cdeb03c186fa067e5fa9fde055"`;
+
 exports[`typedSignatureHash type "int8" should hash "-255" (type "number") 1`] = `"0x3c1ad1a3f6eabb3af2dee3c08282d988cadb0553b77cc20d71c3ce1cdfbc3ac8"`;
 
 exports[`typedSignatureHash type "int8" should hash "0" (type "number") 1`] = `"0x83a255171acdbdc915af829b403e5e99bdd55d0c2029f8b257575d7e4cbf2afc"`;
@@ -1391,6 +1435,8 @@ exports[`typedSignatureHash type "int8" should hash "0" (type "number") 1`] = `"
 exports[`typedSignatureHash type "int8" should hash "0" (type "string") 1`] = `"0x83a255171acdbdc915af829b403e5e99bdd55d0c2029f8b257575d7e4cbf2afc"`;
 
 exports[`typedSignatureHash type "int8" should hash "0x0" (type "string") 1`] = `"0x83a255171acdbdc915af829b403e5e99bdd55d0c2029f8b257575d7e4cbf2afc"`;
+
+exports[`typedSignatureHash type "int8" should hash "127" (type "number") 1`] = `"0x930ff7bc44bce9840d81992bc29dbec02f5bc47280969aec191b605043ed869f"`;
 
 exports[`typedSignatureHash type "int8" should hash "255" (type "number") 1`] = `"0x79267da6a6f7227661909939b3a4a79f4f7681f87e0e908d6cd67ecbde55d4be"`;
 
@@ -1429,6 +1475,8 @@ exports[`typedSignatureHash type "uint8" should hash "0" (type "number") 1`] = `
 exports[`typedSignatureHash type "uint8" should hash "0" (type "string") 1`] = `"0xce16fba9359f3d8139c16d981c2690f124268cb440abb068c102c65e30385cef"`;
 
 exports[`typedSignatureHash type "uint8" should hash "0x0" (type "string") 1`] = `"0xce16fba9359f3d8139c16d981c2690f124268cb440abb068c102c65e30385cef"`;
+
+exports[`typedSignatureHash type "uint8" should hash "128" (type "number") 1`] = `"0x6a52be565d50c7d23d2c4986db6ad1a1ba1ecc2df526320c36c4e0e3ffeab594"`;
 
 exports[`typedSignatureHash type "uint8" should hash "255" (type "number") 1`] = `"0xaba3a954e6f9a8ad5fe36dff7559301ac22d643e8a6101f66631ac6b1b63d4bb"`;
 

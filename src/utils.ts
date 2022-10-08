@@ -1,6 +1,4 @@
 import {
-  addHexPrefix,
-  bufferToHex,
   bufferToInt,
   ecrecover,
   fromRpcSig,
@@ -10,6 +8,7 @@ import {
   toUnsigned,
 } from '@ethereumjs/util';
 import { intToHex, isHexString, stripHexPrefix } from 'ethjs-util';
+import { add0x, bytesToHex, numberToBytes } from '@metamask/utils';
 
 /**
  * Pads the front of the given hex string with zeroes until it reaches the
@@ -78,7 +77,7 @@ export function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
   const rStr = padWithZeroes(toUnsigned(rSig).toString('hex'), 64);
   const sStr = padWithZeroes(toUnsigned(sSig).toString('hex'), 64);
   const vStr = stripHexPrefix(intToHex(vSig));
-  return addHexPrefix(rStr.concat(sStr, vStr));
+  return add0x(rStr.concat(sStr, vStr));
 }
 
 /**
@@ -111,8 +110,8 @@ export function normalize(input: number | string): string | undefined {
     if (input < 0) {
       return '0x';
     }
-    const buffer = toBuffer(input);
-    input = bufferToHex(buffer);
+    const buffer = numberToBytes(input);
+    input = bytesToHex(buffer);
   }
 
   if (typeof input !== 'string') {
@@ -121,7 +120,7 @@ export function normalize(input: number | string): string | undefined {
     throw new Error(msg);
   }
 
-  return addHexPrefix(input.toLowerCase());
+  return add0x(input.toLowerCase());
 }
 
 /**
