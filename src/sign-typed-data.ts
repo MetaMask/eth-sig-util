@@ -2,15 +2,15 @@ import { arrToBufArr, ecsign, publicToAddress } from '@ethereumjs/util';
 import { keccak256 } from 'ethereum-cryptography/keccak';
 import { encode, encodePacked } from '@metamask/abi-utils';
 import {
+  add0x,
+  assert,
+  bigIntToBytes,
+  bytesToHex,
+  concatBytes,
   hexToBytes,
+  isStrictHexString,
   numberToBytes,
   stringToBytes,
-  concatBytes,
-  bytesToHex,
-  add0x,
-  bigIntToBytes,
-  assert,
-  isStrictHexString,
 } from '@metamask/utils';
 import {
   getArrayType,
@@ -596,31 +596,28 @@ export function typedSignatureHash(typedData: TypedDataV1Field[]): string {
  * @param value - The value to normalize.
  * @returns The normalized value.
  */
-function normalizeValue(
-  type: string,
-  value: unknown,
-): [newType: string, normalizedValue: any] {
+function normalizeValue(type: string, value: unknown): any {
   if (isArrayType(type) && Array.isArray(value)) {
     const [innerType] = getArrayType(type);
-    return [type, value.map((item) => normalizeValue(innerType, item)[1])];
+    return value.map((item) => normalizeValue(innerType, item));
   }
 
   if (type === 'address') {
     if (typeof value === 'number') {
-      return [type, padStart(numberToBytes(value), 20)];
+      return padStart(numberToBytes(value), 20);
     }
 
     if (isStrictHexString(value)) {
-      return [type, padStart(hexToBytes(value).subarray(0, 20), 20)];
+      return padStart(hexToBytes(value).subarray(0, 20), 20);
     }
 
     if (value instanceof Uint8Array) {
-      return [type, padStart(value.subarray(0, 20), 20)];
+      return padStart(value.subarray(0, 20), 20);
     }
   }
 
   if (type === 'bool') {
-    return [type, Boolean(value)];
+    return Boolean(value);
   }
 
   if (type.startsWith('bytes') && type !== 'bytes') {
@@ -628,35 +625,35 @@ function normalizeValue(
     if (typeof value === 'number') {
       if (value < 0) {
         // `solidityPack(['bytesN'], [-1])` returns `0x00..00`.
-        return [type, new Uint8Array()];
+        return new Uint8Array();
       }
 
-      return [type, numberToBytes(value).subarray(0, length)];
+      return numberToBytes(value).subarray(0, length);
     }
 
     if (isStrictHexString(value)) {
-      return [type, hexToBytes(value).subarray(0, length)];
+      return hexToBytes(value).subarray(0, length);
     }
 
     if (value instanceof Uint8Array) {
-      return [type, value.subarray(0, length)];
+      return value.subarray(0, length);
     }
   }
 
   if (type.startsWith('uint')) {
     if (typeof value === 'number') {
-      return [type, Math.abs(value)];
+      return Math.abs(value);
     }
   }
 
   if (type.startsWith('int')) {
     if (typeof value === 'number') {
       const length = getLength(type);
-      return [type, BigInt.asIntN(length, BigInt(value))];
+      return BigInt.asIntN(length, BigInt(value));
     }
   }
 
-  return [type, value];
+  return value;
 }
 
 /**
@@ -678,15 +675,11 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
     throw error;
   }
 
-  const normalizedData = typedData.map(({ name, type, value }) => {
-    const [newType, normalizedValue] = normalizeValue(type, value);
-
-    return {
-      name,
-      type: newType,
-      value: normalizedValue,
-    };
-  });
+  const normalizedData = typedData.map(({ name, type, value }) => ({
+    name,
+    type,
+    value: normalizeValue(type, value),
+  }));
 
   const data = normalizedData.map((e) => {
     if (e.type !== 'bytes') {
@@ -714,9 +707,7 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
       encodePacked(
         ['bytes32', 'bytes32'],
         [
-          keccak256(
-            encodePacked(new Array(typedData.length).fill('string'), schema),
-          ),
+          keccak256(encodePacked(['string[]'], [schema])),
           keccak256(encodePacked(types, data)),
         ],
       ),
