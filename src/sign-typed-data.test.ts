@@ -4463,25 +4463,21 @@ const signTypedDataV1ErrorExamples = {
   bytes1: [
     {
       input: 'a',
-      errorMessage:
-        'An unexpected error occurred: Expected a bytes-like value, got "a".',
+      errorMessage: 'Expected a bytes-like value, got "a".',
     },
     {
       input: 'test',
-      errorMessage:
-        'An unexpected error occurred: Expected a bytes-like value, got "test".',
+      errorMessage: 'Expected a bytes-like value, got "test".',
     },
   ],
   bytes32: [
     {
       input: 'a',
-      errorMessage:
-        'An unexpected error occurred: Expected a bytes-like value, got "a".',
+      errorMessage: 'Expected a bytes-like value, got "a".',
     },
     {
       input: 'test',
-      errorMessage:
-        'An unexpected error occurred: Expected a bytes-like value, got "test".',
+      errorMessage: 'Expected a bytes-like value, got "test".',
     },
   ],
 };

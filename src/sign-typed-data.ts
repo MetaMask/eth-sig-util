@@ -1,10 +1,4 @@
-import {
-  arrToBufArr,
-  bufferToHex,
-  ecsign,
-  publicToAddress,
-  toBuffer,
-} from '@ethereumjs/util';
+import { ecsign, arrToBufArr, publicToAddress } from '@ethereumjs/util';
 import { encode, encodePacked } from '@metamask/abi-utils';
 import {
   getArrayType,
@@ -175,20 +169,55 @@ function parseNumber(type: string, value: string | number | bigint) {
   const length = getLength(type);
   const maxValue = BigInt(2) ** BigInt(length) - BigInt(1);
 
+  // Note that this is not accurate, since the actual maximum value for unsigned
+  // integers is `2 ^ (length - 1) - 1`, but this is required for backwards
+  // compatibility with the old implementation.
   assert(
     bigIntValue >= -maxValue && bigIntValue <= maxValue,
     `Unable to encode value: Number "${value}" is out of range for type "${type}".`,
   );
 
-  // This disregards the actual max length of the number, but we need this for
-  // backwards compatibility with the old `ethereumjs-abi` implementation. In
-  // the future, we should throw an error if the value is out of range for the
-  // given type.
-  if (!type.startsWith('u')) {
-    return BigInt.asIntN(length, BigInt(value));
+  return bigIntValue;
+}
+
+/**
+ * Parse an address string to a `Uint8Array`. The behaviour of this is quite
+ * strange, in that it does not parse the address as hexadecimal string, nor as
+ * UTF-8. It does some weird stuff with the string and char codes, and then
+ * returns the result as a `Uint8Array`.
+ *
+ * This is based on the old `ethereumjs-abi` implementation, which essentially
+ * calls `new BN(address, 10)` on the address string. This is not a valid
+ * implementation of address parsing, but it is what we have to work with.
+ *
+ * @param address - The address to parse.
+ * @returns The parsed address.
+ */
+function reallyStrangeAddressToBytes(address: string): Uint8Array {
+  let r = BigInt(0);
+  let b = BigInt(0);
+
+  for (let i = 0; i < address.length; i++) {
+    const c = BigInt(address.charCodeAt(i) - 48);
+    r *= BigInt(10);
+
+    // 'a'
+    if (c >= 49) {
+      b = c - BigInt(49) + BigInt(0xa);
+
+      // 'A'
+    } else if (c >= 17) {
+      b = c - BigInt(17) + BigInt(0xa);
+
+      // '0' - '9'
+    } else {
+      b = c;
+    }
+
+    r += b;
   }
 
-  return bigIntValue;
+  return padStart(bigIntToBytes(r), 20);
 }
 
 /**
@@ -234,8 +263,10 @@ function encodeField(
   if (type === 'address') {
     if (typeof value === 'number') {
       return ['address', padStart(numberToBytes(value), 20)];
-    } else if (typeof value === 'string') {
+    } else if (isStrictHexString(value)) {
       return ['address', add0x(value)];
+    } else if (typeof value === 'string') {
+      return ['address', reallyStrangeAddressToBytes(value).subarray(0, 20)];
     }
   }
 
@@ -253,7 +284,7 @@ function encodeField(
     } else if (isHexString(value)) {
       const prepend = value.length % 2 ? '0' : '';
       value = hexToBytes(`${prepend}${value}`);
-    } else {
+    } else if (typeof value === 'string') {
       value = stringToBytes(value);
     }
     return ['bytes32', arrToBufArr(keccak256(value))];
@@ -274,7 +305,12 @@ function encodeField(
   }
 
   if (type.startsWith('int') && !type.includes('[')) {
-    return [type, bigIntToBytes(parseNumber(type, value))];
+    const bigIntValue = parseNumber(type, value);
+    if (bigIntValue >= BigInt(0)) {
+      return ['uint256', bigIntToBytes(bigIntValue)];
+    }
+
+    return ['int256', bigIntToBytes(bigIntValue)];
   }
 
   if (type === 'string') {
@@ -554,7 +590,7 @@ export const TypedDataUtils = {
  */
 export function typedSignatureHash(typedData: TypedDataV1Field[]): string {
   const hashBuffer = _typedSignatureHash(typedData);
-  return bufferToHex(hashBuffer);
+  return bytesToHex(hashBuffer);
 }
 
 /**
@@ -579,7 +615,7 @@ function normalizeValue(
       return [type, padStart(numberToBytes(value), 20)];
     }
 
-    if (typeof value === 'string') {
+    if (isStrictHexString(value)) {
       return [type, padStart(hexToBytes(value).subarray(0, 20), 20)];
     }
 
@@ -603,7 +639,7 @@ function normalizeValue(
       return [type, numberToBytes(value).subarray(0, length)];
     }
 
-    if (isHexString(value)) {
+    if (isStrictHexString(value)) {
       return [type, hexToBytes(value).subarray(0, length)];
     }
 
@@ -737,7 +773,7 @@ export function signTypedData<
       ? _typedSignatureHash(data as TypedDataV1)
       : TypedDataUtils.eip712Hash(data as TypedMessage<T>, version);
   const sig = ecsign(messageHash, privateKey);
-  return concatSig(toBuffer(sig.v), sig.r, sig.s);
+  return concatSig(arrToBufArr(bigIntToBytes(sig.v)), sig.r, sig.s);
 }
 
 /**
