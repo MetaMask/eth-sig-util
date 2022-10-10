@@ -8,7 +8,6 @@ import {
 } from '@ethereumjs/util';
 import { keccak256 } from 'ethereum-cryptography/keccak';
 import { rawEncode, solidityPack } from './ethereumjs-abi-utils';
-
 import {
   concatSig,
   isNullish,
@@ -174,7 +173,9 @@ function encodeField(
     if (typeof value === 'number') {
       value = numberToBuffer(value);
     } else if (isHexString(value)) {
-      value = Buffer.from(value.slice(2), 'hex');
+        const prepend = value.length % 2 ? '0' : '';
+        value = Buffer.from(prepend + value.slice(2), 'hex');
+
     } else {
       value = Buffer.from(value, 'utf8');
     }
