@@ -186,37 +186,37 @@ function parseNumber(type: string, value: string | number | bigint) {
  * returns the result as a `Uint8Array`.
  *
  * This is based on the old `ethereumjs-abi` implementation, which essentially
- * calls `new BN(address, 10)` on the address string. This is not a valid
- * implementation of address parsing, but it is what we have to work with.
+ * calls `new BN(address, 10)` on the address string, the equivalent of calling
+ * `parseInt(address, 10)` in JavaScript. This is not a valid way to parse an
+ * address and would result in `NaN` in plain JavaScript, but it is the
+ * behaviour of the old implementation, and so we must preserve it for backwards
+ * compatibility.
  *
  * @param address - The address to parse.
  * @returns The parsed address.
  */
 function reallyStrangeAddressToBytes(address: string): Uint8Array {
-  let r = BigInt(0);
-  let b = BigInt(0);
+  let addressValue = BigInt(0);
 
   for (let i = 0; i < address.length; i++) {
-    const c = BigInt(address.charCodeAt(i) - 48);
-    r *= BigInt(10);
+    const character = BigInt(address.charCodeAt(i) - 48);
+    addressValue *= BigInt(10);
 
     // 'a'
-    if (c >= 49) {
-      b = c - BigInt(49) + BigInt(0xa);
+    if (character >= 49) {
+      addressValue += character - BigInt(49) + BigInt(0xa);
 
       // 'A'
-    } else if (c >= 17) {
-      b = c - BigInt(17) + BigInt(0xa);
+    } else if (character >= 17) {
+      addressValue += character - BigInt(17) + BigInt(0xa);
 
       // '0' - '9'
     } else {
-      b = c;
+      addressValue += character;
     }
-
-    r += b;
   }
 
-  return padStart(bigIntToBytes(r), 20);
+  return padStart(bigIntToBytes(addressValue), 20);
 }
 
 /**
