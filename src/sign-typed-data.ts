@@ -10,6 +10,7 @@ import {
   hexToBytes,
   isStrictHexString,
   numberToBytes,
+  signedBigIntToBytes,
   stringToBytes,
 } from '@metamask/utils';
 import {
@@ -17,8 +18,8 @@ import {
   getByteLength,
   getLength,
   isArrayType,
-} from '../../abi-utils/dist/parsers';
-import { padStart } from '../../abi-utils/dist/utils';
+} from '@metamask/abi-utils/dist/parsers';
+import { padStart } from '@metamask/abi-utils/dist/utils';
 import {
   concatSig,
   isNullish,
@@ -657,6 +658,60 @@ function normalizeValue(type: string, value: unknown): any {
 }
 
 /**
+ * For some reason `ethereumjs-abi` treats `address` and `address[]` differently
+ * so we need to normalize `address[]` differently.
+ *
+ * @param values - The values to normalize.
+ * @returns The normalized values.
+ */
+function normalizeAddresses(values: unknown[]) {
+  return values.map((value) => {
+    if (typeof value === 'number') {
+      return padStart(numberToBytes(value), 32);
+    }
+
+    if (isStrictHexString(value)) {
+      return padStart(hexToBytes(value).subarray(0, 32), 32);
+    }
+
+    if (value instanceof Uint8Array) {
+      return padStart(value.subarray(0, 32), 32);
+    }
+
+    return value;
+  });
+}
+
+/**
+ * For some reason `ethereumjs-abi` treats `intN` and `intN[]` differently
+ * so we need to normalize `intN[]` differently.
+ *
+ * @param type - The type of the value to normalize.
+ * @param values - The values to normalize.
+ * @returns The normalized values.
+ */
+function normalizeIntegers(type: string, values: unknown[]) {
+  return values.map((value) => {
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'bigint'
+    ) {
+      const bigIntValue = parseNumber(type, value);
+      if (bigIntValue >= BigInt(0)) {
+        return padStart(bigIntToBytes(bigIntValue), 32);
+      }
+
+      const length = getLength(type);
+      const asIntN = BigInt.asIntN(length, bigIntValue);
+      return signedBigIntToBytes(asIntN, 32);
+    }
+
+    return value;
+  });
+}
+
+/**
  * Generate the "V1" hash for the provided typed message.
  *
  * The hash will be generated in accordance with an earlier version of the EIP-712
@@ -675,11 +730,32 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
     throw error;
   }
 
-  const normalizedData = typedData.map(({ name, type, value }) => ({
-    name,
-    type,
-    value: normalizeValue(type, value),
-  }));
+  const normalizedData = typedData.map(({ name, type, value }) => {
+    // Handle an edge case with `address[]` types.
+    if (type === 'address[]') {
+      return {
+        name,
+        type: 'bytes32[]',
+        value: normalizeAddresses(value),
+      };
+    }
+
+    // Handle an edge case with `intN[]` types.
+    if (type.startsWith('int') && isArrayType(type)) {
+      const [innerType, length] = getArrayType(type);
+      return {
+        name,
+        type: `bytes32[${length ?? ''}]`,
+        value: normalizeIntegers(innerType, value),
+      };
+    }
+
+    return {
+      name,
+      type,
+      value: normalizeValue(type, value),
+    };
+  });
 
   const data = normalizedData.map((e) => {
     if (e.type !== 'bytes') {
@@ -707,8 +783,8 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
       encodePacked(
         ['bytes32', 'bytes32'],
         [
-          keccak256(encodePacked(['string[]'], [schema])),
-          keccak256(encodePacked(types, data)),
+          keccak256(encodePacked(['string[]'], [schema], true)),
+          keccak256(encodePacked(types, data, true)),
         ],
       ),
     ),
