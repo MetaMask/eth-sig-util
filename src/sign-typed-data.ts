@@ -173,9 +173,8 @@ function encodeField(
     if (typeof value === 'number') {
       value = numberToBuffer(value);
     } else if (isHexString(value)) {
-        const prepend = value.length % 2 ? '0' : '';
-        value = Buffer.from(prepend + value.slice(2), 'hex');
-
+      const prepend = value.length % 2 ? '0' : '';
+      value = Buffer.from(prepend + value.slice(2), 'hex');
     } else {
       value = Buffer.from(value, 'utf8');
     }
