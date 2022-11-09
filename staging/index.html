@@ -1,0 +1,98 @@
+<!DOCTYPE html><html class="default"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@metamask/eth-sig-util</title><meta name="description" content="Documentation for @metamask/eth-sig-util"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script async src="assets/search.js" id="search-script"></script></head><body><script>document.body.classList.add(localStorage.getItem("tsd-theme") || "os")</script><header><div class="tsd-page-toolbar"><div class="container"><div class="table-wrap"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget search no-caption">Search</label><input type="text" id="tsd-search-field"/></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">@metamask/eth-sig-util</a></div><div class="table-cell" id="tsd-widgets"><div id="tsd-filter"><a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a><div class="tsd-filter-group"><div class="tsd-select" id="tsd-filter-visibility"><span class="tsd-select-label">All</span><ul class="tsd-select-list"><li data-value="public">Public</li><li data-value="protected">Public/Protected</li><li data-value="private" class="selected">All</li></ul></div> <input type="checkbox" id="tsd-filter-inherited" checked/><label class="tsd-widget" for="tsd-filter-inherited">Inherited</label><input type="checkbox" id="tsd-filter-externals" checked/><label class="tsd-widget" for="tsd-filter-externals">Externals</label></div></div><a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a></div></div></div></div><div class="tsd-page-title"><div class="container"><h1>@metamask/eth-sig-util </h1></div></div></header><div class="container container-main"><div class="row"><div class="col-8 col-content"><div class="tsd-panel tsd-typography">
+<a href="#metamasketh-sig-util" id="metamasketh-sig-util" style="color: inherit; text-decoration: none;">
+  <h1><code>@metamask/eth-sig-util</code></h1>
+</a>
+<p>A small collection of Ethereum signing functions.</p>
+<p>You can find usage examples <a href="https://github.com/metamask/test-dapp">here</a></p>
+<p><a href="https://www.npmjs.com/package/@metamask/eth-sig-util">Available on NPM</a></p>
+
+<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+  <h2>Installation</h2>
+</a>
+<p><code>yarn add @metamask/eth-sig-util</code></p>
+<p>or</p>
+<p><code>npm install @metamask/eth-sig-util</code></p>
+
+<a href="#api" id="api" style="color: inherit; text-decoration: none;">
+  <h2>API</h2>
+</a>
+<p>The full API documentation for the latest published version of this library is <a href="https://metamask.github.io/eth-sig-util/latest/index.html">available here</a>.</p>
+
+<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
+  <h2>Contributing</h2>
+</a>
+
+<a href="#setup" id="setup" style="color: inherit; text-decoration: none;">
+  <h3>Setup</h3>
+</a>
+<ul>
+<li>Install <a href="https://nodejs.org">Node.js</a> version 12<ul>
+<li>If you are using <a href="https://github.com/creationix/nvm#installation">nvm</a> (recommended) running <code>nvm use</code> will automatically choose the right node version for you.</li>
+</ul>
+</li>
+<li>Install <a href="https://yarnpkg.com/en/docs/install">Yarn v1</a></li>
+<li>Run <code>yarn setup</code> to install dependencies and run any required post-install scripts<ul>
+<li><strong>Warning:</strong> Do not use the <code>yarn</code> / <code>yarn install</code> command directly. Use <code>yarn setup</code> instead. The normal install command will skip required post-install scripts, leaving your development environment in an invalid state.</li>
+</ul>
+</li>
+</ul>
+
+<a href="#testing-and-linting" id="testing-and-linting" style="color: inherit; text-decoration: none;">
+  <h3>Testing and Linting</h3>
+</a>
+<p>Run <code>yarn test</code> to run the tests once. To run tests on file changes, run <code>yarn test:watch</code>.</p>
+<p>Run <code>yarn lint</code> to run the linter, or run <code>yarn lint:fix</code> to run the linter and fix any automatically fixable issues.</p>
+
+<a href="#documentation" id="documentation" style="color: inherit; text-decoration: none;">
+  <h3>Documentation</h3>
+</a>
+<p>The API documentation can be generated with the command <code>yarn docs</code>, which saves it in the <code>./docs</code> directory. Open the <code>./docs/index.html</code> file to browse the documentation.</p>
+
+<a href="#release-amp-publishing" id="release-amp-publishing" style="color: inherit; text-decoration: none;">
+  <h3>Release &amp; Publishing</h3>
+</a>
+<p>The project follows the same release process as the other libraries in the MetaMask organization. The GitHub Actions <a href="https://github.com/MetaMask/action-create-release-pr"><code>action-create-release-pr</code></a> and <a href="https://github.com/MetaMask/action-publish-release"><code>action-publish-release</code></a> are used to automate the release process; see those repositories for more information about how they work.</p>
+<ol>
+<li><p>Choose a release version.</p>
+<ul>
+<li>The release version should be chosen according to SemVer. Analyze the changes to see whether they include any breaking changes, new features, or deprecations, then choose the appropriate SemVer version. See <a href="https://semver.org/">the SemVer specification</a> for more information.</li>
+</ul>
+</li>
+<li><p>If this release is backporting changes onto a previous release, then ensure there is a major version branch for that version (e.g. <code>1.x</code> for a <code>v1</code> backport release).</p>
+<ul>
+<li>The major version branch should be set to the most recent release with that major version. For example, when backporting a <code>v1.0.2</code> release, you&#39;d want to ensure there was a <code>1.x</code> branch that was set to the <code>v1.0.1</code> tag.</li>
+</ul>
+</li>
+<li><p>Trigger the <a href="https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch"><code>workflow_dispatch</code></a> event <a href="https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow">manually</a> for the <code>Create Release Pull Request</code> action to create the release PR.</p>
+<ul>
+<li>For a backport release, the base branch should be the major version branch that you ensured existed in step 2. For a normal release, the base branch should be the main branch for that repository (which should be the default value).</li>
+<li>This should trigger the <a href="https://github.com/MetaMask/action-create-release-pr"><code>action-create-release-pr</code></a> workflow to create the release PR.</li>
+</ul>
+</li>
+<li><p>Update the changelog to move each change entry into the appropriate change category (<a href="https://keepachangelog.com/en/1.0.0/#types">See here</a> for the full list of change categories, and the correct ordering), and edit them to be more easily understood by users of the package.</p>
+<ul>
+<li>Generally any changes that don&#39;t affect consumers of the package (e.g. lockfile changes or development environment changes) are omitted. Exceptions may be made for changes that might be of interest despite not having an effect upon the published package (e.g. major test improvements, security improvements, improved documentation, etc.).</li>
+<li>Try to explain each change in terms that users of the package would understand (e.g. avoid referencing internal variables/concepts).</li>
+<li>Consolidate related changes into one change entry if it makes it easier to explain.</li>
+<li>Run <code>yarn auto-changelog validate --rc</code> to check that the changelog is correctly formatted.</li>
+</ul>
+</li>
+<li><p>Review and QA the release.</p>
+<ul>
+<li>If changes are made to the base branch, the release branch will need to be updated with these changes and review/QA will need to restart again. As such, it&#39;s probably best to avoid merging other PRs into the base branch while review is underway.</li>
+</ul>
+</li>
+<li><p>Squash &amp; Merge the release.</p>
+<ul>
+<li>This should trigger the <a href="https://github.com/MetaMask/action-publish-release"><code>action-publish-release</code></a> workflow to tag the final release commit and publish the release on GitHub.</li>
+</ul>
+</li>
+<li><p>Publish the release on npm.</p>
+<ul>
+<li>Wait for the <code>publish-release</code> GitHub Action workflow to finish. This should trigger a second job (<code>publish-npm</code>), which will wait for a run approval by the <a href="https://github.com/orgs/MetaMask/teams/npm-publishers"><code>npm publishers</code></a> team.</li>
+<li>Approve the <code>publish-npm</code> job (or ask somebody on the npm publishers team to approve it for you).</li>
+<li>Once the <code>publish-npm</code> job has finished, check npm to verify that it has been published.</li>
+</ul>
+</li>
+</ol>
+</div></div><div class="col-4 col-menu menu-sticky-wrap menu-highlight"><nav class="tsd-navigation primary"><ul><li class="current"><a href="modules.html">Exports</a></li></ul></nav><nav class="tsd-navigation secondary menu-sticky"><ul><li class="tsd-kind-enum"><a href="enums/SignTypedDataVersion.html" class="tsd-kind-icon">Sign<wbr/>Typed<wbr/>Data<wbr/>Version</a></li><li class="tsd-kind-interface"><a href="interfaces/EthEncryptedData.html" class="tsd-kind-icon">Eth<wbr/>Encrypted<wbr/>Data</a></li><li class="tsd-kind-interface"><a href="interfaces/MessageTypeProperty.html" class="tsd-kind-icon">Message<wbr/>Type<wbr/>Property</a></li><li class="tsd-kind-interface"><a href="interfaces/MessageTypes.html" class="tsd-kind-icon">Message<wbr/>Types</a></li><li class="tsd-kind-interface"><a href="interfaces/TypedDataV1Field.html" class="tsd-kind-icon">Typed<wbr/>Data<wbr/>V1<wbr/>Field</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/TypedMessage.html" class="tsd-kind-icon">Typed<wbr/>Message</a></li><li class="tsd-kind-type-alias"><a href="modules.html#TypedDataV1" class="tsd-kind-icon">Typed<wbr/>Data<wbr/>V1</a></li><li class="tsd-kind-variable"><a href="modules.html#TYPED_MESSAGE_SCHEMA" class="tsd-kind-icon">TYPED_<wbr/>MESSAGE_<wbr/>SCHEMA</a></li><li class="tsd-kind-variable"><a href="modules.html#TypedDataUtils" class="tsd-kind-icon">Typed<wbr/>Data<wbr/>Utils</a></li><li class="tsd-kind-function"><a href="modules.html#concatSig" class="tsd-kind-icon">concat<wbr/>Sig</a></li><li class="tsd-kind-function"><a href="modules.html#decrypt" class="tsd-kind-icon">decrypt</a></li><li class="tsd-kind-function"><a href="modules.html#decryptSafely" class="tsd-kind-icon">decrypt<wbr/>Safely</a></li><li class="tsd-kind-function"><a href="modules.html#encrypt" class="tsd-kind-icon">encrypt</a></li><li class="tsd-kind-function"><a href="modules.html#encryptSafely" class="tsd-kind-icon">encrypt<wbr/>Safely</a></li><li class="tsd-kind-function"><a href="modules.html#extractPublicKey" class="tsd-kind-icon">extract<wbr/>Public<wbr/>Key</a></li><li class="tsd-kind-function"><a href="modules.html#getEncryptionPublicKey" class="tsd-kind-icon">get<wbr/>Encryption<wbr/>Public<wbr/>Key</a></li><li class="tsd-kind-function"><a href="modules.html#normalize" class="tsd-kind-icon">normalize</a></li><li class="tsd-kind-function"><a href="modules.html#personalSign" class="tsd-kind-icon">personal<wbr/>Sign</a></li><li class="tsd-kind-function"><a href="modules.html#recoverPersonalSignature" class="tsd-kind-icon">recover<wbr/>Personal<wbr/>Signature</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#recoverTypedSignature" class="tsd-kind-icon">recover<wbr/>Typed<wbr/>Signature</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#signTypedData" class="tsd-kind-icon">sign<wbr/>Typed<wbr/>Data</a></li><li class="tsd-kind-function"><a href="modules.html#typedSignatureHash" class="tsd-kind-icon">typed<wbr/>Signature<wbr/>Hash</a></li></ul></nav></div></div></div><footer class=""><div class="container"><h2>Legend</h2><div class="tsd-legend-group"><ul class="tsd-legend"><li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li></ul></div><h2>Settings</h2><p>Theme <select id="theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></p></div></footer><div class="overlay"></div><script src="assets/main.js"></script></body></html>
