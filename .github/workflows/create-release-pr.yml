@@ -21,7 +21,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           # This is to guarantee that the most recent tag is fetched.
           # This can be configured to a more reasonable value by consumers.
@@ -29,12 +29,10 @@ jobs:
           # We check out the specified branch, which will be used as the base
           # branch for all git operations and the release PR.
           ref: ${{ github.event.inputs.base-branch }}
-      - name: Get Node.js version
-        id: nvm
-        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
-      - uses: actions/setup-node@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
+          node-version-file: '.nvmrc'
       - uses: MetaMask/action-create-release-pr@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

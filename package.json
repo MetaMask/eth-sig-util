@@ -29,13 +29,12 @@
   "scripts": {
     "build": "tsc --project .",
     "build:clean": "rimraf dist && yarn build",
-    "docs": "typedoc",
-    "docs:publish": "typedoc --cleanOutputDir false --gitRevision \"v$(jq -r .version < ./package.json)\"",
+    "build:docs": "typedoc",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
     "lint:eslint": "eslint . --cache --ext js,ts",
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
     "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' '**/*.yml' '!.yarnrc.yml' --ignore-path .gitignore --no-error-on-unmatched-pattern",
-    "prepublishOnly": "yarn build:clean",
+    "prepack": "./scripts/prepack.sh",
     "setup": "yarn install",
     "test": "jest",
     "test:watch": "jest --watch"
