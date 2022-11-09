@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [5.0.0]
+## [5.0.1]
+### Fixed
+- Fix issue introduced in `v5.0.0` where the method `encodeField` encoded fields typed as `bytes` and passed as hexstrings were encoded differently than previous versions ([#271](https://github.com/MetaMask/eth-sig-util/pull/271), [#274](https://github.com/MetaMask/eth-sig-util/pull/274))
+
+## [5.0.0] [DEPRECATED]
 ### Changed
 - **BREAKING:** Removed support for Node v12 in favor of v14 ([#137](https://github.com/MetaMask/eth-json-rpc-middleware/pull/137))
 - Replace heavy crypto packages for lighter noble implementations via upgrading `ethereumjs-util` to latest (now called `@ethereumjs/util`) ([#260](https://github.com/MetaMask/eth-sig-util/pull/260))
@@ -94,7 +98,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.0...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.1...HEAD
+[5.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.0...v5.0.1
 [5.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v4.0.1...v5.0.0
 [4.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v3.0.1...v4.0.0
