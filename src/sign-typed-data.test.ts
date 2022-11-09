@@ -229,48 +229,74 @@ describe('TYPED_MESSAGE_SCHEMA', () => {
   }
 });
 
+const MAX_SAFE_INTEGER_AS_HEX = `0x${Number.MAX_SAFE_INTEGER.toString(16)}`; // 0x1fffffffffffff - contains an even number of characters (16)
+const MAX_SAFE_INTEGER_PLUS_ONE_CHAR_AS_HEX = `0x${Number.MAX_SAFE_INTEGER.toString(
+  16,
+)}1`; // 0x1fffffffffffff1 or 144115188075855860 - contains an odd number of characters in hexadecimal format (17) and is greater than MAX_SAFE_INTEGER
+
+/*
+  we test both even and odd length hex values because Node's Buffer.from() method does not buffer hex numbers correctly
+ so we conditionally prepend hexstrings with a zero before buffering them depending on whether the string contains an 
+ even or odd number of characters 
+ */
+
 const encodeDataExamples = {
   // dynamic types supported by EIP-712:
   bytes: [
     10,
     '10',
-    '0x10',
+    '0x10', // even
+    '0x101', // odd
     Buffer.from('10', 'utf8'),
-    '0xa22cb465000000000000000000000000a9079d872d10185b54c5db2c36cc978cbd3f72b70000000000000000000000000000000000000000000000000000000000000001',
+    '0xa22cb465000000000000000000000000a9079d872d10185b54c5db2c36cc978cbd3f72b70000000000000000000000000000000000000000000000000000000000000001', // even number of characters hex string with value greater than MAX_SAFE_INTEGER
+    MAX_SAFE_INTEGER_AS_HEX,
+    MAX_SAFE_INTEGER_PLUS_ONE_CHAR_AS_HEX,
   ],
   string: [
     'Hello!',
     '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-    '0xabcd',
+    '0xabcd', // even
+    '0xabcde', // odd
     '😁',
     10,
+    MAX_SAFE_INTEGER_AS_HEX,
+    MAX_SAFE_INTEGER_PLUS_ONE_CHAR_AS_HEX,
   ],
   // atomic types supported by EIP-712:
   address: [
     '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-    '0x0',
+    '0x0', // odd
+    '0x10', // even
     10,
     'bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
     Number.MAX_SAFE_INTEGER,
+    MAX_SAFE_INTEGER_AS_HEX,
+    MAX_SAFE_INTEGER_PLUS_ONE_CHAR_AS_HEX,
   ],
   bool: [true, false, 'true', 'false', 0, 1, -1, Number.MAX_SAFE_INTEGER],
   bytes1: [
-    '0x10',
+    '0x10', // even
+    '0x101', // odd
     10,
     0,
     1,
     -1,
     Number.MAX_SAFE_INTEGER,
     Buffer.from('10', 'utf8'),
+    MAX_SAFE_INTEGER_AS_HEX,
+    MAX_SAFE_INTEGER_PLUS_ONE_CHAR_AS_HEX,
   ],
   bytes32: [
-    '0x10',
+    '0x10', // even
+    '0x101', // odd
     10,
     0,
     1,
     -1,
     Number.MAX_SAFE_INTEGER,
     Buffer.from('10', 'utf8'),
+    MAX_SAFE_INTEGER_AS_HEX,
+    MAX_SAFE_INTEGER_PLUS_ONE_CHAR_AS_HEX,
   ],
   int8: [0, '0', '0x0', 255, -255],
   int256: [0, '0', '0x0', Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER],
