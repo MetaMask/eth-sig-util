@@ -16,7 +16,7 @@
 <a href="#api" id="api" style="color: inherit; text-decoration: none;">
   <h2>API</h2>
 </a>
-<p>The full API documentation for the latest published version of this library is <a href="https://metamask.github.io/eth-sig-util/index.html">available here</a>.</p>
+<p>The full API documentation for the latest published version of this library is <a href="https://metamask.github.io/eth-sig-util/latest/index.html">available here</a>.</p>
 
 <a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
   <h2>Contributing</h2>
@@ -26,15 +26,12 @@
   <h3>Setup</h3>
 </a>
 <ul>
-<li>Install <a href="https://nodejs.org">Node.js</a> version 12<ul>
+<li>Install <a href="https://nodejs.org">Node.js</a> version 14<ul>
 <li>If you are using <a href="https://github.com/creationix/nvm#installation">nvm</a> (recommended) running <code>nvm use</code> will automatically choose the right node version for you.</li>
 </ul>
 </li>
-<li>Install <a href="https://yarnpkg.com/en/docs/install">Yarn v1</a></li>
-<li>Run <code>yarn setup</code> to install dependencies and run any requried post-install scripts<ul>
-<li><strong>Warning:</strong> Do not use the <code>yarn</code> / <code>yarn install</code> command directly. Use <code>yarn setup</code> instead. The normal install command will skip required post-install scripts, leaving your development environment in an invalid state.</li>
-</ul>
-</li>
+<li>Install <a href="https://yarnpkg.com/getting-started/install">Yarn v3</a></li>
+<li>Run <code>yarn install</code> to install dependencies and run any required post-install scripts</li>
 </ul>
 
 <a href="#testing-and-linting" id="testing-and-linting" style="color: inherit; text-decoration: none;">
@@ -89,9 +86,9 @@
 </li>
 <li><p>Publish the release on npm.</p>
 <ul>
-<li>Be very careful to use a clean local environment to publish the release, and follow exactly the same steps used during CI.</li>
-<li>Use <code>npm publish --dry-run</code> to examine the release contents to ensure the correct files are included. Compare to previous releases if necessary (e.g. using <code>https://unpkg.com/browse/[package name]@[package version]/</code>).</li>
-<li>Once you are confident the release contents are correct, publish the release using <code>npm publish</code>.</li>
+<li>Wait for the <code>publish-release</code> GitHub Action workflow to finish. This should trigger a second job (<code>publish-npm</code>), which will wait for a run approval by the <a href="https://github.com/orgs/MetaMask/teams/npm-publishers"><code>npm publishers</code></a> team.</li>
+<li>Approve the <code>publish-npm</code> job (or ask somebody on the npm publishers team to approve it for you).</li>
+<li>Once the <code>publish-npm</code> job has finished, check npm to verify that it has been published.</li>
 </ul>
 </li>
 </ol>
