@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.0.1]
 ### Fixed
-- Fix issue introduced in `v5.0.0` where the `encodeField` encoded fields typed as `bytes` and passed as a hexstring was encoded differently than previous versions ([#271](https://github.com/MetaMask/eth-sig-util/pull/271), [#274](https://github.com/MetaMask/eth-sig-util/pull/274))
+- Fix issue introduced in `v5.0.0` where the method `encodeField` encoded fields typed as `bytes` and passed as hexstrings were encoded differently than previous versions ([#271](https://github.com/MetaMask/eth-sig-util/pull/271), [#274](https://github.com/MetaMask/eth-sig-util/pull/274))
 
 ## [5.0.0] [DEPRECATED]
 ### Changed
