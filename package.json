@@ -1,6 +1,6 @@
 {
   "name": "@metamask/eth-sig-util",
-  "version": "5.0.1",
+  "version": "5.1.0",
   "description": "A few useful functions for signing ethereum data",
   "keywords": [
     "ethereum",
@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@ethereumjs/util": "^8.0.0",
-    "bn.js": "4.11.8",
+    "bn.js": "^4.11.8",
     "ethereum-cryptography": "^1.1.2",
     "ethjs-util": "^0.1.6",
     "tweetnacl": "^1.0.3",
