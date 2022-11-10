@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [5.0.2]
-### Uncategorized
-- allow any minor version of bn.js above 4.11.8 ([#280](https://github.com/MetaMask/eth-sig-util/pull/280))
+### Changed
+- allow `bn.js` to resolve any minor/patch version above 4.11.8 ([#280](https://github.com/MetaMask/eth-sig-util/pull/280))
 
 ## [5.0.1]
 ### Fixed
