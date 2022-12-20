@@ -6036,6 +6036,7 @@ describe('signTypedData', function () {
             message,
           },
           version: SignTypedDataVersion.V4,
+          logging: true,
         }),
       ).toThrow('missing value for field length of type int32');
     });

@@ -15,6 +15,7 @@ import {
   recoverPublicKey,
   numberToBuffer,
 } from './utils';
+import { Hash } from 'crypto';
 
 /**
  * This is the message format used for `V1` of `signTypedData`.
@@ -145,6 +146,7 @@ function validateVersion(
  * @param type - The type of the field being encoded.
  * @param value - The value to encode.
  * @param version - The EIP-712 version the encoding should comply with.
+ * @param thisComponent - The component of the hash being constructed.
  * @returns Encoded representation of the field.
  */
 function encodeField(
@@ -153,15 +155,24 @@ function encodeField(
   type: string,
   value: any,
   version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+  thisComponent: HashComponent
 ): [type: string, value: any] {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
+  thisComponent.name = name;
 
   if (types[type] !== undefined) {
+    const data = encodeData(type, value, types, version, thisComponent);
+    const hash = keccak256(data);
+    const res =
+      version === SignTypedDataVersion.V4 && value == null // eslint-disable-line no-eq-null
+        ? '0x0000000000000000000000000000000000000000000000000000000000000000'
+        : arrToBufArr(hash);
+    thisComponent.value = res.toString('hex');
     return [
       'bytes32',
       version === SignTypedDataVersion.V4 && value == null // eslint-disable-line no-eq-null
         ? '0x0000000000000000000000000000000000000000000000000000000000000000'
-        : arrToBufArr(keccak256(encodeData(type, value, types, version))),
+        : arrToBufArr(hash),
     ];
   }
 
@@ -178,7 +189,10 @@ function encodeField(
     } else {
       value = Buffer.from(value, 'utf8');
     }
-    return ['bytes32', arrToBufArr(keccak256(value))];
+
+    const res = arrToBufArr(keccak256(value));
+    thisComponent.value = res.toString('hex');
+    return ['bytes32', res];
   }
 
   if (type === 'string') {
@@ -187,7 +201,9 @@ function encodeField(
     } else {
       value = Buffer.from(value ?? '', 'utf8');
     }
-    return ['bytes32', arrToBufArr(keccak256(value))];
+    const res = arrToBufArr(keccak256(value));
+    thisComponent.value = res.toString('hex');
+    return ['bytes32', res];
   }
 
   if (type.lastIndexOf(']') === type.length - 1) {
@@ -197,8 +213,19 @@ function encodeField(
       );
     }
     const parsedType = type.slice(0, type.lastIndexOf('['));
-    const typeValuePairs = value.map((item) =>
-      encodeField(types, name, parsedType, item, version),
+    thisComponent.components = value.map(() => {
+      const comp: HashComponent = { name };
+      return comp;
+    });
+    const typeValuePairs = value.map((item, index) =>
+      encodeField(
+        types,
+        name,
+        parsedType,
+        item,
+        version,
+        thisComponent.components[index],
+      ),
     );
     return [
       'bytes32',
@@ -223,6 +250,7 @@ function encodeField(
  * @param data - The object to encode.
  * @param types - Type definitions for all types included in the message.
  * @param version - The EIP-712 version the encoding should comply with.
+ * @param parentComponent - The loggable parent component.
  * @returns An encoded representation of an object.
  */
 function encodeData(
@@ -230,6 +258,7 @@ function encodeData(
   data: Record<string, unknown>,
   types: Record<string, MessageTypeProperty[]>,
   version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+  parentComponent: HashComponent = { name: primaryType, components: [] },
 ): Buffer {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
@@ -237,18 +266,29 @@ function encodeData(
   const encodedValues: unknown[] = [hashType(primaryType, types)];
 
   for (const field of types[primaryType]) {
+    const thisComponent: HashComponent = {
+      name: field.name,
+      components: [],
+    };
+
     if (version === SignTypedDataVersion.V3 && data[field.name] === undefined) {
       continue;
     }
+
     const [type, value] = encodeField(
       types,
       field.name,
       field.type,
       data[field.name],
       version,
+      thisComponent,
     );
     encodedTypes.push(type);
     encodedValues.push(value);
+    thisComponent.value = value.toString('hex');
+    if (parentComponent && Array.isArray(parentComponent.components)) {
+      parentComponent.components.push(thisComponent);
+    }
   }
 
   return rawEncode(encodedTypes, encodedValues);
@@ -317,6 +357,7 @@ function findTypeDependencies(
  * @param data - The object to hash.
  * @param types - Type definitions for all types included in the message.
  * @param version - The EIP-712 version the encoding should comply with.
+ * @param parentComponent - The component of the hash that is specific to this object.
  * @returns The hash of the object.
  */
 function hashStruct(
@@ -324,10 +365,24 @@ function hashStruct(
   data: Record<string, unknown>,
   types: Record<string, MessageTypeProperty[]>,
   version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+  parentComponent: HashComponent = { name: primaryType, components: [] },
 ): Buffer {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
+  const thisComponent: HashComponent = {
+    name: primaryType,
+  };
 
-  return arrToBufArr(keccak256(encodeData(primaryType, data, types, version)));
+  const encodedData = encodeData(
+    primaryType,
+    data,
+    types,
+    version,
+    thisComponent,
+  );
+  const hash = keccak256(encodedData);
+  thisComponent.value = hash.toString();
+  parentComponent.components.push(thisComponent);
+  return arrToBufArr(hash);
 }
 
 /**
@@ -377,13 +432,21 @@ function sanitizeData<T extends MessageTypes>(
  *
  * @param typedData - The typed message to hash.
  * @param version - The EIP-712 version the encoding should comply with.
+ * @param loggedSignature - The signature object to log the hash components to.
  * @returns The hash of the typed message.
  */
 function eip712Hash<T extends MessageTypes>(
   typedData: TypedMessage<T>,
   version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+  loggedSignature: LoggedSignature = { components: [] },
 ): Buffer {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
+  const thisComponent: HashComponent = {
+    name: 'EIP712 Top Level Hash',
+    components: [],
+  };
+
+  loggedSignature.components.push(thisComponent);
 
   const sanitizedData = sanitizeData(typedData);
   const parts = [Buffer.from('1901', 'hex')];
@@ -396,6 +459,16 @@ function eip712Hash<T extends MessageTypes>(
     ),
   );
 
+  thisComponent.components.push({
+    name: 'EIP-191 Signature Prefix',
+    value: parts[0].toString('hex'),
+  });
+
+  thisComponent.components.push({
+    name: 'EIP712Domain',
+    value: parts[1].toString('hex'),
+  });
+
   if (sanitizedData.primaryType !== 'EIP712Domain') {
     parts.push(
       hashStruct(
@@ -404,10 +477,14 @@ function eip712Hash<T extends MessageTypes>(
         sanitizedData.message,
         sanitizedData.types,
         version,
+        thisComponent
       ),
     );
   }
-  return arrToBufArr(keccak256(Buffer.concat(parts)));
+
+  const hash = keccak256(Buffer.concat(parts));
+  thisComponent.value = hash.toString();
+  return arrToBufArr(hash);
 }
 
 /**
@@ -488,6 +565,17 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
   );
 }
 
+interface LoggedSignature {
+  hash?: string;
+  signature?: string;
+  components?: HashComponent[];
+}
+interface HashComponent {
+  name?: string;
+  value?: string;
+  components?: HashComponent[];
+}
+
 /**
  * Sign typed data according to EIP-712. The signing differs based upon the `version`.
  *
@@ -505,6 +593,7 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
  * @param options.privateKey - The private key to sign with.
  * @param options.data - The typed data to sign.
  * @param options.version - The signing version to use.
+ * @param options.logging - Whether to log the signature components.
  * @returns The '0x'-prefixed hex encoded signature.
  */
 export function signTypedData<
@@ -514,10 +603,12 @@ export function signTypedData<
   privateKey,
   data,
   version,
+  logging = false,
 }: {
   privateKey: Buffer;
   data: V extends 'V1' ? TypedDataV1 : TypedMessage<T>;
   version: V;
+  logging?: boolean;
 }): string {
   validateVersion(version);
   if (isNullish(data)) {
@@ -526,14 +617,24 @@ export function signTypedData<
     throw new Error('Missing private key parameter');
   }
 
+  const loggedSignature: LoggedSignature = {
+    components: [],
+  };
+
   const messageHash =
     version === SignTypedDataVersion.V1
       ? _typedSignatureHash(data as TypedDataV1)
       : TypedDataUtils.eip712Hash(
           data as TypedMessage<T>,
           version as SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+          loggedSignature
         );
   const sig = ecsign(messageHash, privateKey);
+  loggedSignature.hash = messageHash.toString('hex');
+  loggedSignature.signature = sig.toString();
+  if (logging) {
+    console.log(JSON.stringify(loggedSignature, null, 2));
+  }
   return concatSig(toBuffer(sig.v), sig.r, sig.s);
 }
 
@@ -555,10 +656,12 @@ export function recoverTypedSignature<
   data,
   signature,
   version,
+  logging = false,
 }: {
   data: V extends 'V1' ? TypedDataV1 : TypedMessage<T>;
   signature: string;
   version: V;
+  logging?: boolean;
 }): string {
   validateVersion(version);
   if (isNullish(data)) {
@@ -567,14 +670,22 @@ export function recoverTypedSignature<
     throw new Error('Missing signature parameter');
   }
 
+  const loggedSignature: LoggedSignature = {
+    components: [],
+  };
+
   const messageHash =
     version === SignTypedDataVersion.V1
       ? _typedSignatureHash(data as TypedDataV1)
       : TypedDataUtils.eip712Hash(
           data as TypedMessage<T>,
           version as SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+          loggedSignature,
         );
   const publicKey = recoverPublicKey(messageHash, signature);
   const sender = publicToAddress(publicKey);
+  if (typeof logging === 'boolean' && logging) {
+    console.log(JSON.stringify(loggedSignature, null, 2));
+  }
   return bufferToHex(sender);
 }
