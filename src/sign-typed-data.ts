@@ -15,7 +15,6 @@ import {
   recoverPublicKey,
   numberToBuffer,
 } from './utils';
-import { Hash } from 'crypto';
 
 /**
  * This is the message format used for `V1` of `signTypedData`.
@@ -155,7 +154,7 @@ function encodeField(
   type: string,
   value: any,
   version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-  thisComponent: HashComponent
+  thisComponent: HashComponent,
 ): [type: string, value: any] {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
   thisComponent.name = name;
@@ -477,7 +476,7 @@ function eip712Hash<T extends MessageTypes>(
         sanitizedData.message,
         sanitizedData.types,
         version,
-        thisComponent
+        thisComponent,
       ),
     );
   }
@@ -627,7 +626,7 @@ export function signTypedData<
       : TypedDataUtils.eip712Hash(
           data as TypedMessage<T>,
           version as SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-          loggedSignature
+          loggedSignature,
         );
   const sig = ecsign(messageHash, privateKey);
   loggedSignature.hash = messageHash.toString('hex');
@@ -647,6 +646,7 @@ export function signTypedData<
  * @param options.data - The typed data that was signed.
  * @param options.signature - The '0x-prefixed hex encoded message signature.
  * @param options.version - The signing version to use.
+ * @param options.logging - Whether to log the signature components.
  * @returns The '0x'-prefixed hex address of the signer.
  */
 export function recoverTypedSignature<
