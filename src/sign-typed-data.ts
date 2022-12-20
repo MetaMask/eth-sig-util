@@ -274,6 +274,9 @@ function encodeData(
       continue;
     }
 
+    if (!field) {
+      console.log('No field found for', data);
+    }
     const [type, value] = encodeField(
       types,
       field.name,
@@ -284,7 +287,7 @@ function encodeData(
     );
     encodedTypes.push(type);
     encodedValues.push(value);
-    thisComponent.value = value.toString('hex');
+    thisComponent.value = value.toString();
     if (parentComponent && Array.isArray(parentComponent.components)) {
       parentComponent.components.push(thisComponent);
     }
