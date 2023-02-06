@@ -837,17 +837,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/eslint-config@npm:^9.0.0":
-  version: 9.0.0
-  resolution: "@metamask/eslint-config@npm:9.0.0"
+"@metamask/eslint-config@npm:^11.1.0":
+  version: 11.1.0
+  resolution: "@metamask/eslint-config@npm:11.1.0"
   peerDependencies:
-    eslint: ^7.23.0
-    eslint-config-prettier: ^8.1.0
-    eslint-plugin-import: ^2.22.1
-    eslint-plugin-jsdoc: ^36.1.0
-    eslint-plugin-prettier: ^3.3.1
-    prettier: ^2.2.1
-  checksum: e44768e5f674e61743f1b147c589932e11f6d717b3f52b4b44ee3ab6b0b1078d379aea93473204c740fdff4b309393fc361c1e63c9cecc59ed5c8ab704eb6d20
+    eslint: ^8.27.0
+    eslint-config-prettier: ^8.5.0
+    eslint-plugin-import: ^2.26.0
+    eslint-plugin-jsdoc: ^39.6.2
+    eslint-plugin-prettier: ^4.2.1
+    prettier: ^2.7.1
+  checksum: 2345eb03821d80d605d60c393a3249b322ae32cee87497b338d81cc723d28d87d44adec92ba657fdc83e7df8599ec9eed06f1ad78f0febd13c318fb5a5ba2a7a
   languageName: node
   linkType: hard
 
@@ -858,7 +858,7 @@ __metadata:
     "@ethereumjs/util": ^8.0.0
     "@lavamoat/allow-scripts": ^2.0.3
     "@metamask/auto-changelog": ^3.1.0
-    "@metamask/eslint-config": ^9.0.0
+    "@metamask/eslint-config": ^11.1.0
     "@metamask/eslint-config-jest": ^9.0.0
     "@metamask/eslint-config-nodejs": ^9.0.0
     "@metamask/eslint-config-typescript": ^9.0.1
