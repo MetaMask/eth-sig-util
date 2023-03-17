@@ -327,7 +327,7 @@ function hashStruct(
 ): Buffer {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
-  const encoded = encodeData(primaryType, data, types, version)
+  const encoded = encodeData(primaryType, data, types, version);
   const hashed = keccak256(encoded);
   const buf = arrToBufArr(hashed);
   return buf;
