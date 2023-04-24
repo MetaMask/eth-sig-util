@@ -904,7 +904,7 @@ __metadata:
     eslint-plugin-jsdoc: ^39.2.0
     eslint-plugin-node: ^11.1.0
     eslint-plugin-prettier: ^3.4.0
-    ethereum-cryptography: ^1.2.0
+    ethereum-cryptography: ^2.0.0
     ethjs-util: ^0.1.6
     jest: ^27.0.6
     prettier: ^2.3.2
@@ -927,24 +927,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/hashes@npm:1.2.0, @noble/hashes@npm:~1.2.0":
-  version: 1.2.0
-  resolution: "@noble/hashes@npm:1.2.0"
-  checksum: 8ca080ce557b8f40fb2f78d3aedffd95825a415ac8e13d7ffe3643f8626a8c2d99a3e5975b555027ac24316d8b3c02a35b8358567c0c23af681e6573602aa434
-  languageName: node
-  linkType: hard
-
 "@noble/hashes@npm:1.3.0, @noble/hashes@npm:^1.3.0, @noble/hashes@npm:~1.3.0":
   version: 1.3.0
   resolution: "@noble/hashes@npm:1.3.0"
   checksum: d7ddb6d7c60f1ce1f87facbbef5b724cdea536fc9e7f59ae96e0fc9de96c8f1a2ae2bdedbce10f7dcc621338dfef8533daa73c873f2b5c87fa1a4e05a95c2e2e
-  languageName: node
-  linkType: hard
-
-"@noble/secp256k1@npm:1.7.1, @noble/secp256k1@npm:~1.7.0":
-  version: 1.7.1
-  resolution: "@noble/secp256k1@npm:1.7.1"
-  checksum: d2301f1f7690368d8409a3152450458f27e54df47e3f917292de3de82c298770890c2de7c967d237eff9c95b70af485389a9695f73eb05a43e2bd562d18b18cb
   languageName: node
   linkType: hard
 
@@ -1030,17 +1016,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scure/bip32@npm:1.1.5":
-  version: 1.1.5
-  resolution: "@scure/bip32@npm:1.1.5"
-  dependencies:
-    "@noble/hashes": ~1.2.0
-    "@noble/secp256k1": ~1.7.0
-    "@scure/base": ~1.1.0
-  checksum: b08494ab0d2b1efee7226d1b5100db5157ebea22a78bb87126982a76a186cb3048413e8be0ba2622d00d048a20acbba527af730de86c132a77de616eb9907a3b
-  languageName: node
-  linkType: hard
-
 "@scure/bip32@npm:1.3.0":
   version: 1.3.0
   resolution: "@scure/bip32@npm:1.3.0"
@@ -1049,16 +1024,6 @@ __metadata:
     "@noble/hashes": ~1.3.0
     "@scure/base": ~1.1.0
   checksum: 6eae997f9bdf41fe848134898960ac48e645fa10e63d579be965ca331afd0b7c1b8ebac170770d237ab4099dafc35e5a82995384510025ccf2abe669f85e8918
-  languageName: node
-  linkType: hard
-
-"@scure/bip39@npm:1.1.1":
-  version: 1.1.1
-  resolution: "@scure/bip39@npm:1.1.1"
-  dependencies:
-    "@noble/hashes": ~1.2.0
-    "@scure/base": ~1.1.0
-  checksum: fbb594c50696fa9c14e891d872f382e50a3f919b6c96c55ef2fb10c7102c546dafb8f099a62bd114c12a00525b595dcf7381846f383f0ddcedeaa6e210747d2f
   languageName: node
   linkType: hard
 
@@ -2762,18 +2727,6 @@ __metadata:
   version: 2.0.3
   resolution: "esutils@npm:2.0.3"
   checksum: 22b5b08f74737379a840b8ed2036a5fb35826c709ab000683b092d9054e5c2a82c27818f12604bfc2a9a76b90b6834ef081edbc1c7ae30d1627012e067c6ec87
-  languageName: node
-  linkType: hard
-
-"ethereum-cryptography@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "ethereum-cryptography@npm:1.2.0"
-  dependencies:
-    "@noble/hashes": 1.2.0
-    "@noble/secp256k1": 1.7.1
-    "@scure/bip32": 1.1.5
-    "@scure/bip39": 1.1.1
-  checksum: 97e8e8253cb9f5a9271bd0201c37609c451c890eb85883b9c564f14743c3d7c673287406c93bf5604307593ee298ad9a03983388b85c11ca61461b9fc1a4f2c7
   languageName: node
   linkType: hard
 
