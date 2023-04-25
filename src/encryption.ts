@@ -189,7 +189,7 @@ export function decrypt({
       // return decrypted msg data
       try {
         if (!decryptedMessage) {
-          throw new Error(`No open box.`);
+          throw new Error();
         }
         const output = naclUtil.encodeUTF8(decryptedMessage);
         if (!output) {
@@ -197,7 +197,10 @@ export function decrypt({
         }
         return output;
       } catch (err) {
-        throw new Error(`Decryption failed: ${err.message as string}`);
+        if (err && typeof err.message === 'string' && err.message.length) {
+          throw new Error(`Decryption failed: ${err.message}`);
+        }
+        throw new Error(`Decryption failed.`);
       }
     }
 

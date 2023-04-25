@@ -98,10 +98,11 @@ export function parseNumber(arg: string | number | BN): BN {
   } else if (type === 'number') {
     return new BN(arg);
   } else if (
-    Object.prototype.hasOwnProperty.call(arg, 'toArray') &&
+    arg &&
+    Object.prototype.hasOwnProperty.call(arg, 'toArray') ||
     BN.isBN(arg)
   ) {
-    return arg;
+    return arg as BN;
   }
   throw new Error('Argument is not a number');
 }

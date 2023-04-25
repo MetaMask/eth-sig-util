@@ -625,7 +625,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should encode data with an atomic property set to undefined', function () {
@@ -1143,7 +1143,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should throw an error when an atomic property is set to undefined', function () {
@@ -1972,7 +1972,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should hash data with an atomic property set to undefined', function () {
@@ -2490,7 +2490,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should throw an error when an atomic property is set to undefined', function () {
@@ -4508,7 +4508,7 @@ describe('signTypedData', function () {
           data: [{ name: 'data', type: 'int32', value: null }],
           version: SignTypedDataVersion.V1,
         }),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should sign data with an atomic property set to undefined', function () {
@@ -5127,7 +5127,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V3,
         }),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should sign data with an atomic property set to undefined', function () {
@@ -5999,7 +5999,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V4,
         }),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should throw an error when an atomic property is set to undefined', function () {
