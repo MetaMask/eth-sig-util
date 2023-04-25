@@ -191,11 +191,7 @@ export function decrypt({
         if (!decryptedMessage) {
           throw new Error();
         }
-        const output = naclUtil.encodeUTF8(decryptedMessage);
-        if (!output) {
-          throw new Error('No output.');
-        }
-        return output;
+        return naclUtil.encodeUTF8(decryptedMessage);
       } catch (err) {
         if (err && typeof err.message === 'string' && err.message.length) {
           throw new Error(`Decryption failed: ${err.message as string}`);
