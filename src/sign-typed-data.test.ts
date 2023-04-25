@@ -3354,6 +3354,22 @@ describe('TypedDataUtils.findTypeDependencies', () => {
       new Set(['Person']),
     );
   });
+
+  it('should throw when called with null input', function () {
+    const primaryType = null;
+
+    expect(() => {
+      TypedDataUtils.findTypeDependencies(primaryType as any as string, {});
+    }).toThrow('Invalid findTypeDependencies input null');
+  });
+
+  it('should throw when called with undefined input', function () {
+    const primaryType = undefined;
+
+    expect(() => {
+      TypedDataUtils.findTypeDependencies(primaryType as any as string, {});
+    }).toThrow('Invalid findTypeDependencies input undefined');
+  });
 });
 
 describe('TypedDataUtils.sanitizeData', function () {

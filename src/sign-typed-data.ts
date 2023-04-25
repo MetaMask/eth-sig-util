@@ -301,10 +301,12 @@ function findTypeDependencies(
   types: Record<string, MessageTypeProperty[]>,
   results: Set<string> = new Set(),
 ): Set<string> {
-  const match = primaryType.match(/^\w*/u);
-  if (!match) {
-    throw new Error(`Invalid findTypeDependencies input "${primaryType}"`);
+  if (typeof primaryType !== 'string') {
+    throw new Error(
+      `Invalid findTypeDependencies input ${JSON.stringify(primaryType)}`,
+    );
   }
+  const match = primaryType.match(/^\w*/u) as RegExpMatchArray;
   [primaryType] = match;
   if (results.has(primaryType) || types[primaryType] === undefined) {
     return results;
