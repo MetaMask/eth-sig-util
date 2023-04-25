@@ -87,7 +87,7 @@ describe('encoding', function () {
 
 describe('encoding bytes33', function () {
   it('should fail', function () {
-    expect(() => rawEncode('fail', ['bytes33'])).toThrow(
+    expect(() => rawEncode('fail' as any, ['bytes33'])).toThrow(
       'types.forEach is not a function',
     );
   });
@@ -95,7 +95,7 @@ describe('encoding bytes33', function () {
 
 describe('encoding uint0', function () {
   it('should fail', function () {
-    expect(() => rawEncode('fail', ['uint0'])).toThrow(
+    expect(() => rawEncode('fail' as any, ['uint0'])).toThrow(
       'types.forEach is not a function',
     );
   });
@@ -103,7 +103,7 @@ describe('encoding uint0', function () {
 
 describe('encoding uint257', function () {
   it('should fail', function () {
-    expect(() => rawEncode('fail', ['uint257'])).toThrow(
+    expect(() => rawEncode('fail' as any, ['uint257'])).toThrow(
       'types.forEach is not a function',
     );
   });

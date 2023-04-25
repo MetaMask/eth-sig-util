@@ -58,6 +58,7 @@ export type MessageTypeProperty = {
 };
 
 export type MessageTypes = {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   EIP712Domain: MessageTypeProperty[];
   [additionalProperties: string]: MessageTypeProperty[];
 };
@@ -152,9 +153,10 @@ function encodeField(
   types: Record<string, MessageTypeProperty[]>,
   name: string,
   type: string,
+  // TODO: constrain type on `value`
   value: any,
   version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-): [type: string, value: any] {
+): [type: string, value: Buffer | string] {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
   if (types[type] !== undefined) {
@@ -162,7 +164,7 @@ function encodeField(
       'bytes32',
       version === SignTypedDataVersion.V4 && value == null // eslint-disable-line no-eq-null
         ? '0x0000000000000000000000000000000000000000000000000000000000000000'
-        : arrToBufArr(keccak256(encodeData(type, value, types, version))),
+          arrToBufArr(keccak256(encodeData(type, value, types, version))),
     ];
   }
 
@@ -175,7 +177,7 @@ function encodeField(
       value = numberToBuffer(value);
     } else if (isHexString(value)) {
       const prepend = value.length % 2 ? '0' : '';
-      value = Buffer.from(prepend + value.slice(2), 'hex');
+      value = Buffer.from(prepend + (value as string).slice(2), 'hex');
     } else {
       value = Buffer.from(value, 'utf8');
     }
@@ -235,7 +237,7 @@ function encodeData(
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
   const encodedTypes = ['bytes32'];
-  const encodedValues: unknown[] = [hashType(primaryType, types)];
+  const encodedValues: (Buffer | string)[] = [hashType(primaryType, types)];
 
   for (const field of types[primaryType]) {
     if (version === SignTypedDataVersion.V3 && data[field.name] === undefined) {

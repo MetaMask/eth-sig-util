@@ -117,7 +117,7 @@ export function normalize(input: number | string): string {
 
   if (typeof input !== 'string') {
     let msg = 'eth-sig-util.normalize() requires hex string or integer input.';
-    msg += ` received ${typeof input}: ${input as any}`;
+    msg += ` received ${typeof input}: ${input as any as string}`;
     throw new Error(msg);
   }
 
