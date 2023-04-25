@@ -3,12 +3,12 @@ import { concatSig, padWithZeroes, normalize } from './utils';
 describe('padWithZeroes', function () {
   it('pads a string shorter than the target length with zeroes', function () {
     const input = 'abc';
-    expect(padWithZeroes(input, 5)).toStrictEqual(`00${input}`);
+    expect(padWithZeroes(input, 5)).toBe(`00${input}`);
   });
 
   it('pads an empty string', function () {
     const input = '';
-    expect(padWithZeroes(input, 4)).toStrictEqual(`0000`);
+    expect(padWithZeroes(input, 4)).toBe(`0000`);
   });
 
   it('returns a string equal to the target length without modifying it', function () {

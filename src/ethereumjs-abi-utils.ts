@@ -4,6 +4,7 @@
 /* eslint jsdoc/require-param-description: 0 */
 
 import {
+  ToBufferInputTypes,
   toBuffer,
   setLengthRight,
   setLengthLeft,
@@ -32,7 +33,7 @@ export function solidityPack(types: string[], values: any[]): Buffer {
     throw new Error('Number of types are not matching the values');
   }
 
-  const ret = [];
+  const ret: Buffer[] = [];
 
   for (let i = 0; i < types.length; i++) {
     const type = elementaryName(types[i]);
@@ -74,7 +75,11 @@ function parseTypeArray(type: string): 'dynamic' | number | null {
  * @returns Parsed value.
  */
 function parseTypeN(type: string): number {
-  return parseInt(/^\D+(\d+)$/u.exec(type)[1], 10);
+  const match = /^\D+(\d+)$/u.exec(type);
+  if (match === null) {
+    throw new Error(`Invalid parseTypeN input "${type}".`);
+  }
+  return parseInt(match[1], 10);
 }
 
 /**
@@ -86,18 +91,24 @@ function parseTypeN(type: string): number {
 export function parseNumber(arg: string | number | BN): BN {
   const type = typeof arg;
   if (type === 'string') {
-    if (isHexPrefixed(arg)) {
+    if (isHexPrefixed(arg as string)) {
       return new BN(stripHexPrefix(arg), 16);
     }
     return new BN(arg, 10);
   } else if (type === 'number') {
     return new BN(arg);
-  } else if (arg.toArray) {
-    // assume this is a BN for the moment, replace with BN.isBN soon
+  } else if (
+    Object.prototype.hasOwnProperty.call(arg, 'toArray') &&
+    BN.isBN(arg)
+  ) {
     return arg;
   }
   throw new Error('Argument is not a number');
 }
+
+// type SolPrimType = 'bytes' | 'string' | 'bool';
+// type SolType = SolPrimType | SolPrimType[];
+// type SolType = 'bytes' | 'string' | 'bool';
 
 /**
  * Get solidity hex value from type, value and bitsize inputs for packing these values in a buffer.
@@ -110,8 +121,9 @@ export function parseNumber(arg: string | number | BN): BN {
 function solidityHexValue(
   type: string,
   value: ToBufferInputTypes,
-  bitsize: number,
+  bitsize: number | null,
 ): Buffer {
+  // function solidityHexValue(type: string, value: Buffer[] | Buffer | string, bitsize: number): Buffer {
   // pass in bitsize = null if use default bitsize
   if (isArray(type)) {
     const subType = type.replace(/\[.*?\]/u, '');
@@ -120,6 +132,7 @@ function solidityHexValue(
       if (
         arraySize !== 'dynamic' &&
         arraySize !== 0 &&
+        arraySize !== null &&
         (value as any[]).length > arraySize
       ) {
         throw new Error(`Elements exceed array size: ${arraySize}`);
@@ -134,6 +147,7 @@ function solidityHexValue(
   } else if (type === 'string') {
     return Buffer.from(value as string, 'utf8');
   } else if (type === 'bool') {
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     bitsize = bitsize || 8;
     const padding = Array(bitsize / 4).join('0');
     return Buffer.from(value ? `${padding}1` : `${padding}0`, 'hex');
@@ -159,13 +173,14 @@ function solidityHexValue(
       throw new Error(`Invalid uint<N> width: ${size}`);
     }
 
-    const num = parseNumber(value);
+    const num = parseNumber(value as number);
     if (num.bitLength() > size) {
       throw new Error(
         `Supplied uint exceeds width: ${size} vs ${num.bitLength()}`,
       );
     }
 
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     bitsize = bitsize || size;
     return num.toArrayLike(Buffer, 'be', bitsize / 8);
   } else if (type.startsWith('int')) {
@@ -174,13 +189,14 @@ function solidityHexValue(
       throw new Error(`Invalid int<N> width: ${size}`);
     }
 
-    const num = parseNumber(value);
+    const num = parseNumber(value as number);
     if (num.bitLength() > size) {
       throw new Error(
         `Supplied int exceeds width: ${size} vs ${num.bitLength()}`,
       );
     }
 
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     bitsize = bitsize || size;
     return num.toTwos(size).toArrayLike(Buffer, 'be', bitsize / 8);
   }
@@ -221,18 +237,19 @@ function elementaryName(name: string): string {
  */
 export function rawEncode(
   types: string[],
-  values: (Buffer | string | number | string[] | number[])[],
+  values: (BN | Buffer | string | number | string[] | number[])[],
 ): Buffer {
-  const output = [];
-  const data = [];
+  // export function rawEncode(types: string[], values: (Buffer|string|number|string[])[]): Buffer {
+  const output: Buffer[] = [];
+  const data: Buffer[] = [];
 
   let headLength = 0;
 
   types.forEach((type) => {
     if (isArray(type)) {
-      const size: number | 'dynamic' = parseTypeArray(type);
+      const size: number | 'dynamic' | null = parseTypeArray(type);
       // eslint-disable-next-line no-negated-condition
-      if (size !== 'dynamic') {
+      if (size !== 'dynamic' && size !== null) {
         headLength += 32 * size;
       } else {
         headLength += 32;
@@ -268,33 +285,38 @@ export function rawEncode(
  */
 function encodeSingle(
   type: string,
-  arg: Buffer | string | number | string[] | number[],
+  arg: BN | Buffer | string | number | string[] | number[],
 ): Buffer {
-  let size, num, ret, i;
-
   if (type === 'address') {
-    return encodeSingle('uint160', parseNumber(arg));
+    return encodeSingle('uint160', parseNumber(arg as string));
   } else if (type === 'bool') {
     return encodeSingle('uint8', arg ? 1 : 0);
   } else if (type === 'string') {
     return encodeSingle('bytes', Buffer.from(arg as string, 'utf8'));
+    // } else if (isArray(type) && Array.isArray(arg)) {
   } else if (isArray(type)) {
     // this part handles fixed-length ([2]) and variable length ([]) arrays
     // NOTE: we catch here all calls to arrays, that simplifies the rest
     if (typeof (arg as any).length === 'undefined') {
       throw new Error('Not an array?');
     }
-    size = parseTypeArray(type);
-    if (size !== 'dynamic' && size !== 0 && (arg as any).length > size) {
+    const size = parseTypeArray(type);
+    if (
+      size !== 'dynamic' &&
+      size !== 0 &&
+      size !== null &&
+      (arg as any).length > size
+    ) {
       throw new Error(`Elements exceed array size: ${size}`);
     }
-    ret = [];
+    const ret: Buffer[] = [];
     type = type.slice(0, type.lastIndexOf('['));
     if (typeof arg === 'string') {
       arg = JSON.parse(arg);
     }
 
-    for (i in arg as any[]) {
+    // TODO: if this is array, should do for-of
+    for (const i in arg as Record<string, any>) {
       if (Object.prototype.hasOwnProperty.call(arg, i)) {
         ret.push(encodeSingle(type, arg[i]));
       }
@@ -308,7 +330,7 @@ function encodeSingle(
   } else if (type === 'bytes') {
     arg = Buffer.from(arg as Buffer);
 
-    ret = Buffer.concat([encodeSingle('uint256', arg.length), arg]);
+    let ret = Buffer.concat([encodeSingle('uint256', arg.length), arg]);
 
     if (arg.length % 32 !== 0) {
       ret = Buffer.concat([ret, zeros(32 - (arg.length % 32))]);
@@ -316,7 +338,7 @@ function encodeSingle(
 
     return ret;
   } else if (type.startsWith('bytes')) {
-    size = parseTypeN(type);
+    const size = parseTypeN(type);
     if (size < 1 || size > 32) {
       throw new Error(`Invalid bytes<N> width: ${size}`);
     }
@@ -325,30 +347,30 @@ function encodeSingle(
     const nArg = typeof arg === 'number' ? normalize(arg) : arg;
     return setLengthRight(toBuffer(nArg as string), 32);
   } else if (type.startsWith('uint')) {
-    size = parseTypeN(type);
+    const size = parseTypeN(type);
     if (size % 8 || size < 8 || size > 256) {
       throw new Error(`Invalid uint<N> width: ${size}`);
     }
 
-    num = parseNumber(arg);
+    const num = parseNumber(arg as string);
     if (num.bitLength() > size) {
       throw new Error(
         `Supplied uint exceeds width: ${size} vs ${num.bitLength()}`,
       );
     }
 
-    if (num < 0) {
+    if (num.isNeg()) {
       throw new Error('Supplied uint is negative');
     }
 
     return num.toArrayLike(Buffer, 'be', 32);
   } else if (type.startsWith('int')) {
-    size = parseTypeN(type);
+    const size = parseTypeN(type);
     if (size % 8 || size < 8 || size > 256) {
       throw new Error(`Invalid int<N> width: ${size}`);
     }
 
-    num = parseNumber(arg);
+    const num = parseNumber(arg as string);
     if (num.bitLength() > size) {
       throw new Error(
         `Supplied int exceeds width: ${size} vs ${num.bitLength()}`,
@@ -357,21 +379,21 @@ function encodeSingle(
 
     return num.toTwos(256).toArrayLike(Buffer, 'be', 32);
   } else if (type.startsWith('ufixed')) {
-    size = parseTypeNxM(type);
+    const size = parseTypeNxM(type);
 
-    num = parseNumber(arg);
+    const num = parseNumber(arg as string);
 
-    if (num < 0) {
+    if (num.isNeg()) {
       throw new Error('Supplied ufixed is negative');
     }
 
     return encodeSingle('uint256', num.mul(new BN(2).pow(new BN(size[1]))));
   } else if (type.startsWith('fixed')) {
-    size = parseTypeNxM(type);
+    const size = parseTypeNxM(type);
 
     return encodeSingle(
       'int256',
-      parseNumber(arg).mul(new BN(2).pow(new BN(size[1]))),
+      parseNumber(arg as string).mul(new BN(2).pow(new BN(size[1]))),
     );
   }
 
@@ -394,6 +416,9 @@ function isDynamic(type: string): boolean {
  * @param type
  */
 function parseTypeNxM(type: string): [number, number] {
-  const tmp = /^\D+(\d+)x(\d+)$/u.exec(type);
-  return [parseInt(tmp[1], 10), parseInt(tmp[2], 10)];
+  const match = /^\D+(\d+)x(\d+)$/u.exec(type);
+  if (match === null) {
+    throw new Error(`Invalid parseTypeNxM input "${type}".`);
+  }
+  return [parseInt(match[1], 10), parseInt(match[2], 10)];
 }

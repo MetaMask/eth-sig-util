@@ -45,7 +45,7 @@ export function encrypt({
       const ephemeralKeyPair = nacl.box.keyPair();
 
       // assemble encryption parameters - from string to UInt8
-      let pubKeyUInt8Array;
+      let pubKeyUInt8Array: Uint8Array;
       try {
         pubKeyUInt8Array = naclUtil.decodeBase64(publicKey);
       } catch (err) {
@@ -111,7 +111,7 @@ export function encryptSafely({
   const DEFAULT_PADDING_LENGTH = 2 ** 11;
   const NACL_EXTRA_BYTES = 16;
 
-  if (typeof data === 'object' && 'toJSON' in data) {
+  if (typeof data === 'object' && data && 'toJSON' in data) {
     // remove toJSON attack vector
     // TODO, check all possible children
     throw new Error(
@@ -166,7 +166,7 @@ export function decrypt({
   switch (encryptedData.version) {
     case 'x25519-xsalsa20-poly1305': {
       // string to buffer to UInt8Array
-      const recieverPrivateKeyUint8Array = nacl_decodeHex(privateKey);
+      const recieverPrivateKeyUint8Array = naclDecodeHex(privateKey);
       const recieverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(
         recieverPrivateKeyUint8Array,
       ).secretKey;
@@ -187,17 +187,18 @@ export function decrypt({
       );
 
       // return decrypted msg data
-      let output;
       try {
-        output = naclUtil.encodeUTF8(decryptedMessage);
-      } catch (err) {
-        throw new Error('Decryption failed.');
-      }
-
-      if (output) {
+        if (!decryptedMessage) {
+          throw new Error(`No open box.`);
+        }
+        const output = naclUtil.encodeUTF8(decryptedMessage);
+        if (!output) {
+          throw new Error('No output.');
+        }
         return output;
+      } catch (err) {
+        throw new Error(`Decryption failed: ${err.message as string}`);
       }
-      throw new Error('Decryption failed.');
     }
 
     default:
@@ -237,7 +238,7 @@ export function decryptSafely({
  * @returns The encryption public key.
  */
 export function getEncryptionPublicKey(privateKey: string): string {
-  const privateKeyUint8Array = nacl_decodeHex(privateKey);
+  const privateKeyUint8Array = naclDecodeHex(privateKey);
   const encryptionPublicKey =
     nacl.box.keyPair.fromSecretKey(privateKeyUint8Array).publicKey;
   return naclUtil.encodeBase64(encryptionPublicKey);
@@ -249,7 +250,7 @@ export function getEncryptionPublicKey(privateKey: string): string {
  * @param msgHex - The string to convert.
  * @returns The converted string.
  */
-function nacl_decodeHex(msgHex: string): Uint8Array {
+function naclDecodeHex(msgHex: string): Uint8Array {
   const msgBase64 = Buffer.from(msgHex, 'hex').toString('base64');
   return naclUtil.decodeBase64(msgBase64);
 }

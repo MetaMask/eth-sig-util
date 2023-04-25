@@ -102,7 +102,7 @@ export function recoverPublicKey(
  * @param input - The value to normalize.
  * @returns The normalized value.
  */
-export function normalize(input: number | string): string {
+export function normalize(input: number | string): string | undefined {
   if (!input) {
     return undefined;
   }

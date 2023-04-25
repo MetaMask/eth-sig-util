@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+
 import { rawEncode, solidityPack, parseNumber } from './ethereumjs-abi-utils';
 
 describe('encoding negative int256', function () {
@@ -289,7 +290,7 @@ describe('solidity packing different amounts of values and types should fail', f
 describe('parseNumber should throw an error when passed an object', function () {
   it('should throw "Argument is not a number', function () {
     expect(() => {
-      parseNumber({ test: 'test' });
+      parseNumber({ test: 'test' } as any);
     }).toThrow('Argument is not a number');
   });
 });

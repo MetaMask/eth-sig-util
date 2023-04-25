@@ -1,5 +1,5 @@
-import { concatSig, normalize } from './utils';
 import * as sigUtil from '.';
+import { concatSig, normalize } from './utils';
 
 describe('exports', () => {
   it('should have all expected exports', () => {

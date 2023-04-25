@@ -164,6 +164,7 @@ function encodeField(
       'bytes32',
       version === SignTypedDataVersion.V4 && value == null // eslint-disable-line no-eq-null
         ? '0x0000000000000000000000000000000000000000000000000000000000000000'
+        : // ? Buffer.from('0x0000000000000000000000000000000000000000000000000000000000000000', 'utf8')
           arrToBufArr(keccak256(encodeData(type, value, types, version))),
     ];
   }
@@ -300,7 +301,11 @@ function findTypeDependencies(
   types: Record<string, MessageTypeProperty[]>,
   results: Set<string> = new Set(),
 ): Set<string> {
-  [primaryType] = primaryType.match(/^\w*/u);
+  const match = primaryType.match(/^\w*/u);
+  if (!match) {
+    throw new Error(`Invalid findTypeDependencies input "${primaryType}"`);
+  }
+  [primaryType] = match;
   if (results.has(primaryType) || types[primaryType] === undefined) {
     return results;
   }
@@ -368,7 +373,8 @@ function sanitizeData<T extends MessageTypes>(
   }
 
   if ('types' in sanitizedData) {
-    sanitizedData.types = { EIP712Domain: [], ...sanitizedData.types };
+    // TODO: Fix types
+    sanitizedData.types = { EIP712Domain: [], ...sanitizedData.types } as any;
   }
   return sanitizedData as Required<TypedMessage<T>>;
 }
