@@ -327,7 +327,10 @@ function hashStruct(
 ): Buffer {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
-  return arrToBufArr(keccak256(encodeData(primaryType, data, types, version)));
+  const encoded = encodeData(primaryType, data, types, version);
+  const hashed = keccak256(encoded);
+  const buf = arrToBufArr(hashed);
+  return buf;
 }
 
 /**
@@ -368,6 +371,26 @@ function sanitizeData<T extends MessageTypes>(
 }
 
 /**
+ * Create a EIP-712 Domain Hash.
+ * This hash is used at the top of the EIP-712 encoding.
+ *
+ * @param typedData - The typed message to hash.
+ * @param version - The EIP-712 version the encoding should comply with.
+ * @returns The hash of the domain object.
+ */
+function eip712DomainHash<T extends MessageTypes>(
+  typedData: TypedMessage<T>,
+  version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+): Buffer {
+  validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
+
+  const sanitizedData = sanitizeData(typedData);
+  const { domain } = sanitizedData;
+  const domainType = { EIP712Domain: sanitizedData.types.EIP712Domain };
+  return hashStruct('EIP712Domain', domain, domainType, version);
+}
+
+/**
  * Hash a typed message according to EIP-712. The returned message starts with the EIP-712 prefix,
  * which is "1901", followed by the hash of the domain separator, then the data (if any).
  * The result is hashed again and returned.
@@ -387,14 +410,7 @@ function eip712Hash<T extends MessageTypes>(
 
   const sanitizedData = sanitizeData(typedData);
   const parts = [Buffer.from('1901', 'hex')];
-  parts.push(
-    hashStruct(
-      'EIP712Domain',
-      sanitizedData.domain,
-      sanitizedData.types,
-      version,
-    ),
-  );
+  parts.push(eip712DomainHash(typedData, version));
 
   if (sanitizedData.primaryType !== 'EIP712Domain') {
     parts.push(
@@ -421,6 +437,7 @@ export const TypedDataUtils = {
   hashType,
   sanitizeData,
   eip712Hash,
+  eip712DomainHash,
 };
 
 /**
