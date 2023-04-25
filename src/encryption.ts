@@ -198,7 +198,7 @@ export function decrypt({
         return output;
       } catch (err) {
         if (err && typeof err.message === 'string' && err.message.length) {
-          throw new Error(`Decryption failed: ${err.message}`);
+          throw new Error(`Decryption failed: ${err.message as string}`);
         }
         throw new Error(`Decryption failed.`);
       }
