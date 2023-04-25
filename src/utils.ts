@@ -103,16 +103,16 @@ export function recoverPublicKey(
  * @returns The normalized value.
  */
 export function normalize(input: number | string): string | undefined {
-  if (!input) {
-    return undefined;
-  }
-
   if (typeof input === 'number') {
     if (input < 0) {
       return '0x';
     }
     const buffer = toBuffer(input);
     input = bufferToHex(buffer);
+  }
+
+  if (!input) {
+    return undefined;
   }
 
   if (typeof input !== 'string') {
