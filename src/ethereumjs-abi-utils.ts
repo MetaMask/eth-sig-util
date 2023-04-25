@@ -107,10 +107,6 @@ export function parseNumber(arg: string | number | BN): BN {
   throw new Error('Argument is not a number');
 }
 
-// type SolPrimType = 'bytes' | 'string' | 'bool';
-// type SolType = SolPrimType | SolPrimType[];
-// type SolType = 'bytes' | 'string' | 'bool';
-
 /**
  * Get solidity hex value from type, value and bitsize inputs for packing these values in a buffer.
  *
@@ -124,7 +120,6 @@ function solidityHexValue(
   value: ToBufferInputTypes,
   bitsize: number | null,
 ): Buffer {
-  // function solidityHexValue(type: string, value: Buffer[] | Buffer | string, bitsize: number): Buffer {
   // pass in bitsize = null if use default bitsize
   if (isArray(type)) {
     const subType = type.replace(/\[.*?\]/u, '');
@@ -240,7 +235,6 @@ export function rawEncode(
   types: string[],
   values: (BN | Buffer | string | number | string[] | number[])[],
 ): Buffer {
-  // export function rawEncode(types: string[], values: (Buffer|string|number|string[])[]): Buffer {
   const output: Buffer[] = [];
   const data: Buffer[] = [];
 
@@ -294,7 +288,6 @@ function encodeSingle(
     return encodeSingle('uint8', arg ? 1 : 0);
   } else if (type === 'string') {
     return encodeSingle('bytes', Buffer.from(arg as string, 'utf8'));
-    // } else if (isArray(type) && Array.isArray(arg)) {
   } else if (isArray(type)) {
     // this part handles fixed-length ([2]) and variable length ([]) arrays
     // NOTE: we catch here all calls to arrays, that simplifies the rest

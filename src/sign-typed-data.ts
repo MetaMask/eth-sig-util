@@ -162,10 +162,10 @@ function encodeField(
   if (types[type] !== undefined) {
     return [
       'bytes32',
+      // TODO: return Buffer, remove string from return type
       version === SignTypedDataVersion.V4 && value == null // eslint-disable-line no-eq-null
         ? '0x0000000000000000000000000000000000000000000000000000000000000000'
-        : // ? Buffer.from('0x0000000000000000000000000000000000000000000000000000000000000000', 'utf8')
-          arrToBufArr(keccak256(encodeData(type, value, types, version))),
+        : arrToBufArr(keccak256(encodeData(type, value, types, version))),
     ];
   }
 
