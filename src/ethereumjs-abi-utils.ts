@@ -410,7 +410,7 @@ function isDynamic(type: string): boolean {
  */
 function parseTypeNxM(type: string): [number, number] {
   const match = /^\D+(\d+)x(\d+)$/u.exec(type);
-  if (match === null) {
+  if (match === null || match.length < 1) {
     throw new Error(`Invalid parseTypeNxM input "${type}".`);
   }
   return [parseInt(match[1], 10), parseInt(match[2], 10)];

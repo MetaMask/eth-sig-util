@@ -94,6 +94,22 @@ describe('encoding bytes33', function () {
   });
 });
 
+describe('encoding invalid type', function () {
+  it('should fail', function () {
+    expect(() => rawEncode(['fail'], ['bytes33'])).toThrow(
+      'Unsupported or invalid type: fail',
+    );
+  });
+});
+
+describe('encoding invalid fixed type', function () {
+  it('should fail', function () {
+    expect(() => rawEncode(['fixedfail'], ['bytes33'])).toThrow(
+      'Invalid parseTypeNxM input "fixedfail".',
+    );
+  });
+});
+
 describe('encoding uint0', function () {
   it('should fail', function () {
     expect(() => rawEncode('fail' as any, ['uint0'])).toThrow(
