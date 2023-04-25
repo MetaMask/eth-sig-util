@@ -1,4 +1,3 @@
-import { isHexString } from 'ethjs-util';
 import {
   arrToBufArr,
   bufferToHex,
@@ -7,6 +6,8 @@ import {
   toBuffer,
 } from '@ethereumjs/util';
 import { keccak256 } from 'ethereum-cryptography/keccak';
+import { isHexString } from 'ethjs-util';
+
 import { rawEncode, solidityPack } from './ethereumjs-abi-utils';
 import {
   concatSig,
@@ -28,11 +29,11 @@ export type TypedDataV1 = TypedDataV1Field[];
  * @property type - The type of a field (must be a supported Solidity type).
  * @property value - The value of the field.
  */
-export interface TypedDataV1Field {
+export type TypedDataV1Field = {
   name: string;
   type: string;
   value: any;
-}
+};
 
 /**
  * Represents the version of `signTypedData` being used.
@@ -51,15 +52,15 @@ export enum SignTypedDataVersion {
   V4 = 'V4',
 }
 
-export interface MessageTypeProperty {
+export type MessageTypeProperty = {
   name: string;
   type: string;
-}
+};
 
-export interface MessageTypes {
+export type MessageTypes = {
   EIP712Domain: MessageTypeProperty[];
   [additionalProperties: string]: MessageTypeProperty[];
-}
+};
 
 /**
  * This is the message format used for `signTypeData`, for all versions
@@ -78,7 +79,7 @@ export interface MessageTypes {
  * @property domain.salt - A disambiguating salt for the protocol.
  * @property message - The message to be signed.
  */
-export interface TypedMessage<T extends MessageTypes> {
+export type TypedMessage<T extends MessageTypes> = {
   types: T;
   primaryType: keyof T;
   domain: {
@@ -89,7 +90,7 @@ export interface TypedMessage<T extends MessageTypes> {
     salt?: ArrayBuffer;
   };
   message: Record<string, unknown>;
-}
+};
 
 export const TYPED_MESSAGE_SCHEMA = {
   type: 'object',
@@ -190,7 +191,7 @@ function encodeField(
     return ['bytes32', arrToBufArr(keccak256(value))];
   }
 
-  if (type.lastIndexOf(']') === type.length - 1) {
+  if (type.endsWith(']')) {
     if (version === SignTypedDataVersion.V3) {
       throw new Error(
         'Arrays are unimplemented in encodeData; use V4 extension',
@@ -546,10 +547,7 @@ export function signTypedData<
   const messageHash =
     version === SignTypedDataVersion.V1
       ? _typedSignatureHash(data as TypedDataV1)
-      : TypedDataUtils.eip712Hash(
-          data as TypedMessage<T>,
-          version as SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-        );
+      : TypedDataUtils.eip712Hash(data as TypedMessage<T>, version);
   const sig = ecsign(messageHash, privateKey);
   return concatSig(toBuffer(sig.v), sig.r, sig.s);
 }
@@ -587,10 +585,7 @@ export function recoverTypedSignature<
   const messageHash =
     version === SignTypedDataVersion.V1
       ? _typedSignatureHash(data as TypedDataV1)
-      : TypedDataUtils.eip712Hash(
-          data as TypedMessage<T>,
-          version as SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-        );
+      : TypedDataUtils.eip712Hash(data as TypedMessage<T>, version);
   const publicKey = recoverPublicKey(messageHash, signature);
   const sender = publicToAddress(publicKey);
   return bufferToHex(sender);

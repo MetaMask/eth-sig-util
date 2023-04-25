@@ -3,12 +3,12 @@ import * as naclUtil from 'tweetnacl-util';
 
 import { isNullish } from './utils';
 
-export interface EthEncryptedData {
+export type EthEncryptedData = {
   version: string;
   nonce: string;
   ephemPublicKey: string;
   ciphertext: string;
-}
+};
 
 /**
  * Encrypt a message.

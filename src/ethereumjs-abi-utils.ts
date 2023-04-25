@@ -10,8 +10,9 @@ import {
   isHexPrefixed,
   zeros,
 } from '@ethereumjs/util';
-import { stripHexPrefix } from 'ethjs-util';
 import BN from 'bn.js';
+import { stripHexPrefix } from 'ethjs-util';
+
 import { normalize } from './utils';
 
 //
