@@ -543,9 +543,7 @@ function eip712Hash<T extends MessageTypes>(
 
   const sanitizedData = sanitizeData(typedData);
   const parts = [hexToBytes('1901')];
-  parts.push(
-    eip712DomainHash(typedData, version)
-  );
+  parts.push(eip712DomainHash(typedData, version));
 
   if (sanitizedData.primaryType !== 'EIP712Domain') {
     parts.push(
