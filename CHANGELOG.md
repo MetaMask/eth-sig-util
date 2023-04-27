@@ -7,13 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [5.1.0]
-### Uncategorized
-- chore: bump ethereum-cryptography, @ethereumjs/util ([#302](https://github.com/MetaMask/eth-sig-util/pull/302))
-- disable yarn telemetry ([#305](https://github.com/MetaMask/eth-sig-util/pull/305))
-- Break out domainHash generation ([#301](https://github.com/MetaMask/eth-sig-util/pull/301))
-- Bump http-cache-semantics from 4.1.0 to 4.1.1 ([#296](https://github.com/MetaMask/eth-sig-util/pull/296))
-- Bump json5 from 1.0.1 to 1.0.2 ([#294](https://github.com/MetaMask/eth-sig-util/pull/294))
-- Bump @metamask/auto-changelog from 2.6.1 to 3.1.0 ([#286](https://github.com/MetaMask/eth-sig-util/pull/286))
+### Changed
+- deps: bump ethereum-cryptography, @ethereumjs/util ([#302](https://github.com/MetaMask/eth-sig-util/pull/302))
 
 ## [5.0.2]
 ### Changed
