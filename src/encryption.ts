@@ -166,9 +166,9 @@ export function decrypt({
   switch (encryptedData.version) {
     case 'x25519-xsalsa20-poly1305': {
       // string to buffer to UInt8Array
-      const recieverPrivateKeyUint8Array = naclDecodeHex(privateKey);
-      const recieverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(
-        recieverPrivateKeyUint8Array,
+      const receiverPrivateKeyUint8Array = naclDecodeHex(privateKey);
+      const receiverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(
+        receiverPrivateKeyUint8Array,
       ).secretKey;
 
       // assemble decryption parameters
@@ -183,7 +183,7 @@ export function decrypt({
         ciphertext,
         nonce,
         ephemPublicKey,
-        recieverEncryptionPrivateKey,
+        receiverEncryptionPrivateKey,
       );
 
       // return decrypted msg data
