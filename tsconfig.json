@@ -16,8 +16,5 @@
   "jsonCompilerOptions": {
     "strictNullChecks": true
   },
-  "parserOptions": {
-    "project": ["./tsconfig.json"]
-  },
   "include": ["./src/**/*.ts"]
 }
