@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.0]
+### Uncategorized
+- chore: bump ethereum-cryptography, @ethereumjs/util ([#302](https://github.com/MetaMask/eth-sig-util/pull/302))
+- disable yarn telemetry ([#305](https://github.com/MetaMask/eth-sig-util/pull/305))
+- Break out domainHash generation ([#301](https://github.com/MetaMask/eth-sig-util/pull/301))
+- Bump http-cache-semantics from 4.1.0 to 4.1.1 ([#296](https://github.com/MetaMask/eth-sig-util/pull/296))
+- Bump json5 from 1.0.1 to 1.0.2 ([#294](https://github.com/MetaMask/eth-sig-util/pull/294))
+- Bump @metamask/auto-changelog from 2.6.1 to 3.1.0 ([#286](https://github.com/MetaMask/eth-sig-util/pull/286))
+
 ## [5.0.2]
 ### Changed
 - allow `bn.js` to resolve any minor/patch version above 4.11.8 ([#280](https://github.com/MetaMask/eth-sig-util/pull/280))
@@ -102,7 +111,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.2...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v5.1.0...HEAD
+[5.1.0]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.2...v5.1.0
 [5.0.2]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.1...v5.0.2
 [5.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.0...v5.0.1
 [5.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v4.0.1...v5.0.0
