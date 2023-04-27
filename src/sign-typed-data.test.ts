@@ -812,7 +812,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to encode with a missing primary type definition', function () {
@@ -842,7 +842,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
 
     it('should encode data when given extraneous types', function () {
@@ -1330,7 +1330,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to encode with a missing primary type definition', function () {
@@ -1360,7 +1360,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
 
     it('should encode data when given extraneous types', function () {
@@ -2159,7 +2159,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to hash with a missing primary type definition', function () {
@@ -2189,7 +2189,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
 
     it('should hash data when given extraneous types', function () {
@@ -2677,7 +2677,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to hash with a missing primary type definition', function () {
@@ -2707,7 +2707,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
 
     it('should hash data when given extraneous types', function () {
@@ -4394,7 +4394,7 @@ describe('typedSignatureHash', function () {
           value: 'Hi, Alice!',
         },
       ],
-      errorMessage: 'Unsupported or invalid type: jocker',
+      errorMessage: 'Unsupported or invalid type: "jocker"',
       label: 'an unrecognized type',
     },
     {
@@ -4572,7 +4572,7 @@ describe('signTypedData', function () {
           ],
           version: SignTypedDataVersion.V1,
         }),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to sign an unrecognized type', function () {
@@ -4582,7 +4582,7 @@ describe('signTypedData', function () {
           data: [{ name: 'data', type: 'foo', value: 'test' }],
           version: SignTypedDataVersion.V1,
         }),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
   });
 
@@ -5361,7 +5361,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V3,
         }),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to sign with a missing primary type definition', function () {
@@ -5404,7 +5404,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V3,
         }),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
 
     it('should sign data when given extraneous types', function () {
@@ -6233,7 +6233,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V4,
         }),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to sign with a missing primary type definition', function () {
@@ -6276,7 +6276,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V4,
         }),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
 
     it('should sign data when given extraneous types', function () {

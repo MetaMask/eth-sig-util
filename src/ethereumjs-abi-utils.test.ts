@@ -97,7 +97,7 @@ describe('encoding bytes33', function () {
 describe('encoding invalid type', function () {
   it('should fail', function () {
     expect(() => rawEncode(['fail'], ['bytes33'])).toThrow(
-      'Unsupported or invalid type: fail',
+      'Unsupported or invalid type: "fail"',
     );
   });
 });

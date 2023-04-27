@@ -196,7 +196,7 @@ function solidityHexValue(
     return num.toTwos(size).toArrayLike(Buffer, 'be', bitsize / 8);
   }
   // FIXME: support all other types
-  throw new Error(`Unsupported or invalid type: ${type}`);
+  throw new Error(`Unsupported or invalid type: ${JSON.stringify(type)}`);
 }
 
 /**
@@ -390,7 +390,7 @@ function encodeSingle(
     );
   }
 
-  throw new Error(`Unsupported or invalid type: ${type}`);
+  throw new Error(`Unsupported or invalid type: ${JSON.stringify(type)}`);
 }
 
 // Is a type dynamic?
