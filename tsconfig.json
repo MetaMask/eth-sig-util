@@ -13,8 +13,5 @@
     "target": "ES2017",
     "typeRoots": ["./node_modules/@types"]
   },
-  "jsonCompilerOptions": {
-    "strictNullChecks": true
-  },
   "include": ["./src/**/*.ts"]
 }
