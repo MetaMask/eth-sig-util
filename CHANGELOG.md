@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.0.3]
 ### Changed
-- deps: bump ethereum-cryptography, @ethereumjs/util ([#302](https://github.com/MetaMask/eth-sig-util/pull/302))
+- Bump ethereum-cryptography, @ethereumjs/util ([#302](https://github.com/MetaMask/eth-sig-util/pull/302))
 
 ## [5.0.2]
 ### Changed
