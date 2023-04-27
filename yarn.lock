@@ -821,7 +821,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/abi-utils@npm:^1.0.0":
+"@metamask/abi-utils@npm:^1.2.0":
   version: 1.2.0
   resolution: "@metamask/abi-utils@npm:1.2.0"
   dependencies:
@@ -900,7 +900,7 @@ __metadata:
   dependencies:
     "@ethereumjs/util": ^8.0.6
     "@lavamoat/allow-scripts": ^2.3.1
-    "@metamask/abi-utils": ^1.0.0
+    "@metamask/abi-utils": ^1.2.0
     "@metamask/auto-changelog": ^3.1.0
     "@metamask/eslint-config": ^11.1.0
     "@metamask/eslint-config-jest": ^11.1.0
