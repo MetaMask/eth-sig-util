@@ -24,7 +24,12 @@
   },
   "main": "./dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "!__snapshots__",
+    "!*.test.js",
+    "!*.test.js.map",
+    "!*.test.ts",
+    "!*.test.d.ts"
   ],
   "scripts": {
     "build": "tsc --project .",
