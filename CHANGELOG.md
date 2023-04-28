@@ -8,8 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.1.0]
 ### Changed
+- rawEncode: fix broken BigNumber negativity check ([#307](https://github.com/MetaMask/eth-sig-util/pull/307))
+- Specify type interface for multiple functions ([#307](https://github.com/MetaMask/eth-sig-util/pull/307))
+- Improve `type` parameter input validation ([#307](https://github.com/MetaMask/eth-sig-util/pull/307))
 - deps: bn.js@4.11.8->4.12.0 ([#309](https://github.com/MetaMask/eth-sig-util/pull/309))
-- Type specification; minor input validation fixes; TypeScript 4.8 ([#307](https://github.com/MetaMask/eth-sig-util/pull/307))
+- devDeps: Support TypeScript version ~4.8.4 ([#307](https://github.com/MetaMask/eth-sig-util/pull/307))
 
 ## [5.0.3]
 ### Changed
