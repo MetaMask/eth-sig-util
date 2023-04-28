@@ -24,13 +24,13 @@ describe('encryption', function () {
   };
 
   it("getting bob's encryptionPublicKey", async function () {
-    const result = await getEncryptionPublicKey(bob.ethereumPrivateKey);
+    const result = getEncryptionPublicKey(bob.ethereumPrivateKey);
     expect(result).toBe(bob.encryptionPublicKey);
   });
 
   // encryption test
   it("alice encrypts message with bob's encryptionPublicKey", async function () {
-    const result = await encrypt({
+    const result = encrypt({
       publicKey: bob.encryptionPublicKey,
       data: secretMessage,
       version: 'x25519-xsalsa20-poly1305',
@@ -45,7 +45,7 @@ describe('encryption', function () {
   // safe encryption test
   it("alice encryptsSafely message with bob's encryptionPublicKey", async function () {
     const version = 'x25519-xsalsa20-poly1305';
-    const result = await encryptSafely({
+    const result = encryptSafely({
       publicKey: bob.encryptionPublicKey,
       data: secretMessage,
       version,
@@ -60,7 +60,7 @@ describe('encryption', function () {
   // safe decryption test
   it('bob decryptSafely message that Alice encryptSafely for him', async function () {
     const version = 'x25519-xsalsa20-poly1305';
-    const result = await encryptSafely({
+    const result = encryptSafely({
       publicKey: bob.encryptionPublicKey,
       data: secretMessage,
       version,
@@ -154,7 +154,7 @@ describe('encryption', function () {
       it('should throw if passed null public key', function () {
         expect(() =>
           encrypt({
-            publicKey: null,
+            publicKey: null as any,
             data: secretMessage,
             version: 'x25519-xsalsa20-poly1305',
           }),
@@ -164,7 +164,7 @@ describe('encryption', function () {
       it('should throw if passed undefined public key', function () {
         expect(() =>
           encrypt({
-            publicKey: undefined,
+            publicKey: undefined as any,
             data: secretMessage,
             version: 'x25519-xsalsa20-poly1305',
           }),
@@ -196,7 +196,7 @@ describe('encryption', function () {
           encrypt({
             publicKey: bob.encryptionPublicKey,
             data: secretMessage,
-            version: null,
+            version: null as any,
           }),
         ).toThrow('Missing version parameter');
       });
@@ -206,7 +206,7 @@ describe('encryption', function () {
           encrypt({
             publicKey: bob.encryptionPublicKey,
             data: secretMessage,
-            version: undefined,
+            version: undefined as any,
           }),
         ).toThrow('Missing version parameter');
       });
@@ -216,7 +216,7 @@ describe('encryption', function () {
       it('should throw if passed null public key', function () {
         expect(() =>
           encryptSafely({
-            publicKey: null,
+            publicKey: null as any,
             data: secretMessage,
             version: 'x25519-xsalsa20-poly1305',
           }),
@@ -226,7 +226,7 @@ describe('encryption', function () {
       it('should throw if passed undefined public key', function () {
         expect(() =>
           encryptSafely({
-            publicKey: undefined,
+            publicKey: undefined as any,
             data: secretMessage,
             version: 'x25519-xsalsa20-poly1305',
           }),
@@ -258,7 +258,7 @@ describe('encryption', function () {
           encryptSafely({
             publicKey: bob.encryptionPublicKey,
             data: secretMessage,
-            version: null,
+            version: null as any,
           }),
         ).toThrow('Missing version parameter');
       });
@@ -268,7 +268,7 @@ describe('encryption', function () {
           encryptSafely({
             publicKey: bob.encryptionPublicKey,
             data: secretMessage,
-            version: undefined,
+            version: undefined as any,
           }),
         ).toThrow('Missing version parameter');
       });
@@ -278,7 +278,7 @@ describe('encryption', function () {
       it('should throw if passed null encrypted data', function () {
         expect(() =>
           decrypt({
-            encryptedData: null,
+            encryptedData: null as any,
             privateKey: bob.ethereumPrivateKey,
           }),
         ).toThrow('Missing encryptedData parameter');
@@ -287,7 +287,7 @@ describe('encryption', function () {
       it('should throw if passed undefined encrypted data', function () {
         expect(() =>
           decrypt({
-            encryptedData: undefined,
+            encryptedData: undefined as any,
             privateKey: bob.ethereumPrivateKey,
           }),
         ).toThrow('Missing encryptedData parameter');
@@ -297,7 +297,7 @@ describe('encryption', function () {
         expect(() =>
           decrypt({
             encryptedData,
-            privateKey: null,
+            privateKey: null as any,
           }),
         ).toThrow('Missing privateKey parameter');
       });
@@ -306,7 +306,7 @@ describe('encryption', function () {
         expect(() =>
           decrypt({
             encryptedData,
-            privateKey: undefined,
+            privateKey: undefined as any,
           }),
         ).toThrow('Missing privateKey parameter');
       });
@@ -316,7 +316,7 @@ describe('encryption', function () {
       it('should throw if passed null encrypted data', function () {
         expect(() =>
           decryptSafely({
-            encryptedData: null,
+            encryptedData: null as any,
             privateKey: bob.ethereumPrivateKey,
           }),
         ).toThrow('Missing encryptedData parameter');
@@ -325,7 +325,7 @@ describe('encryption', function () {
       it('should throw if passed undefined encrypted data', function () {
         expect(() =>
           decryptSafely({
-            encryptedData: undefined,
+            encryptedData: undefined as any,
             privateKey: bob.ethereumPrivateKey,
           }),
         ).toThrow('Missing encryptedData parameter');
@@ -335,7 +335,7 @@ describe('encryption', function () {
         expect(() =>
           decryptSafely({
             encryptedData,
-            privateKey: null,
+            privateKey: null as any,
           }),
         ).toThrow('Missing privateKey parameter');
       });
@@ -344,7 +344,7 @@ describe('encryption', function () {
         expect(() =>
           decryptSafely({
             encryptedData,
-            privateKey: undefined,
+            privateKey: undefined as any,
           }),
         ).toThrow('Missing privateKey parameter');
       });

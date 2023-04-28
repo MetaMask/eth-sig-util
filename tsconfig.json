@@ -9,9 +9,9 @@
     "outDir": "dist",
     "rootDir": "src",
     "sourceMap": true,
+    "strictNullChecks": true,
     "target": "ES2017",
     "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["./src/**/*.ts"],
-  "exclude": ["**/*.test.ts"]
+  "include": ["./src/**/*.ts"]
 }

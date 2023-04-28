@@ -12,6 +12,7 @@ module.exports = {
     },
   ],
   rules: {
+    '@typescript-eslint/prefer-nullish-coalescing': 'off',
     camelcase: [
       'error',
       {
@@ -22,6 +23,8 @@ module.exports = {
         ],
       },
     ],
+    'id-denylist': 'off',
+    'id-length': 'off',
     'no-param-reassign': 'off',
   },
   ignorePatterns: ['!.eslintrc.js', 'test/*.js', 'dist'],

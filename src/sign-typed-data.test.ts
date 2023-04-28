@@ -9,9 +9,11 @@ eslint jest/no-restricted-matchers: [
   }
 ]
 */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import * as ethUtil from '@ethereumjs/util';
 import Ajv from 'ajv';
+
 import {
   recoverTypedSignature,
   signTypedData,
@@ -623,7 +625,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should encode data with an atomic property set to undefined', function () {
@@ -810,7 +812,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to encode with a missing primary type definition', function () {
@@ -840,7 +842,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
 
     it('should encode data when given extraneous types', function () {
@@ -1141,7 +1143,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should throw an error when an atomic property is set to undefined', function () {
@@ -1328,7 +1330,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to encode with a missing primary type definition', function () {
@@ -1358,7 +1360,7 @@ describe('TypedDataUtils.encodeData', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
 
     it('should encode data when given extraneous types', function () {
@@ -1970,7 +1972,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should hash data with an atomic property set to undefined', function () {
@@ -2157,7 +2159,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to hash with a missing primary type definition', function () {
@@ -2187,7 +2189,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V3,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
 
     it('should hash data when given extraneous types', function () {
@@ -2488,7 +2490,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should throw an error when an atomic property is set to undefined', function () {
@@ -2675,7 +2677,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to hash with a missing primary type definition', function () {
@@ -2705,7 +2707,7 @@ describe('TypedDataUtils.hashStruct', function () {
           types,
           SignTypedDataVersion.V4,
         ).toString('hex'),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
 
     it('should hash data when given extraneous types', function () {
@@ -3351,6 +3353,22 @@ describe('TypedDataUtils.findTypeDependencies', () => {
     expect(findTypeDependencies(primaryType, types)).toStrictEqual(
       new Set(['Person']),
     );
+  });
+
+  it('should throw when called with null input', function () {
+    const primaryType = null;
+
+    expect(() => {
+      TypedDataUtils.findTypeDependencies(primaryType as any as string, {});
+    }).toThrow('Invalid findTypeDependencies input null');
+  });
+
+  it('should throw when called with undefined input', function () {
+    const primaryType = undefined;
+
+    expect(() => {
+      TypedDataUtils.findTypeDependencies(primaryType as any as string, {});
+    }).toThrow('Invalid findTypeDependencies input undefined');
   });
 });
 
@@ -4376,7 +4394,7 @@ describe('typedSignatureHash', function () {
           value: 'Hi, Alice!',
         },
       ],
-      errorMessage: 'Unsupported or invalid type: jocker',
+      errorMessage: 'Unsupported or invalid type: "jocker"',
       label: 'an unrecognized type',
     },
     {
@@ -4506,7 +4524,7 @@ describe('signTypedData', function () {
           data: [{ name: 'data', type: 'int32', value: null }],
           version: SignTypedDataVersion.V1,
         }),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should sign data with an atomic property set to undefined', function () {
@@ -4554,7 +4572,7 @@ describe('signTypedData', function () {
           ],
           version: SignTypedDataVersion.V1,
         }),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to sign an unrecognized type', function () {
@@ -4564,7 +4582,7 @@ describe('signTypedData', function () {
           data: [{ name: 'data', type: 'foo', value: 'test' }],
           version: SignTypedDataVersion.V1,
         }),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
   });
 
@@ -5125,7 +5143,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V3,
         }),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should sign data with an atomic property set to undefined', function () {
@@ -5343,7 +5361,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V3,
         }),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to sign with a missing primary type definition', function () {
@@ -5386,7 +5404,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V3,
         }),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
 
     it('should sign data when given extraneous types', function () {
@@ -5694,7 +5712,9 @@ describe('signTypedData', function () {
           const inputs = encodeDataExamples[type] || [];
           for (const input of inputs) {
             const inputType = input instanceof Buffer ? 'Buffer' : typeof input;
-            it(`should sign "${input}" (type "${inputType}")`, function () {
+            it(`should sign "${
+              input as string
+            }" (type "${inputType}")`, function () {
               const types = {
                 EIP712Domain: [],
                 Message: [{ name: 'data', type }],
@@ -5995,7 +6015,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V4,
         }),
-      ).toThrow(/^Cannot read prop.+ null/u);
+      ).toThrow(/^Argument is not a number/u);
     });
 
     it('should throw an error when an atomic property is set to undefined', function () {
@@ -6213,7 +6233,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V4,
         }),
-      ).toThrow('Unsupported or invalid type: function');
+      ).toThrow('Unsupported or invalid type: "function"');
     });
 
     it('should throw an error when trying to sign with a missing primary type definition', function () {
@@ -6256,7 +6276,7 @@ describe('signTypedData', function () {
           },
           version: SignTypedDataVersion.V4,
         }),
-      ).toThrow('Unsupported or invalid type: foo');
+      ).toThrow('Unsupported or invalid type: "foo"');
     });
 
     it('should sign data when given extraneous types', function () {
@@ -6298,7 +6318,7 @@ describe('signTypedData', function () {
       expect(() =>
         signTypedData({
           privateKey,
-          data: null,
+          data: null as any,
           version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Missing data parameter');
@@ -6308,7 +6328,7 @@ describe('signTypedData', function () {
       expect(() =>
         signTypedData({
           privateKey,
-          data: undefined,
+          data: undefined as any,
           version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Missing data parameter');
@@ -6317,7 +6337,7 @@ describe('signTypedData', function () {
     it('should throw if passed a null private key', () => {
       expect(() =>
         signTypedData({
-          privateKey: null,
+          privateKey: null as any,
           data: [{ name: 'data', type: 'string', value: 'Hello!' }],
           version: SignTypedDataVersion.V1,
         }),
@@ -6327,7 +6347,7 @@ describe('signTypedData', function () {
     it('should throw if passed an undefined private key', () => {
       expect(() =>
         signTypedData({
-          privateKey: undefined,
+          privateKey: undefined as any,
           data: [{ name: 'data', type: 'string', value: 'Hello!' }],
           version: SignTypedDataVersion.V1,
         }),
@@ -6527,7 +6547,7 @@ describe('recoverTypedSignature', function () {
     it('should throw if passed null data', () => {
       expect(() =>
         recoverTypedSignature({
-          data: null,
+          data: null as any,
           signature: exampleSignature,
           version: SignTypedDataVersion.V1,
         }),
@@ -6537,7 +6557,7 @@ describe('recoverTypedSignature', function () {
     it('should throw if passed undefined data', () => {
       expect(() =>
         recoverTypedSignature({
-          data: undefined,
+          data: undefined as any,
           signature: exampleSignature,
           version: SignTypedDataVersion.V1,
         }),
@@ -6548,7 +6568,7 @@ describe('recoverTypedSignature', function () {
       expect(() =>
         recoverTypedSignature({
           data: [{ name: 'message', type: 'string', value: 'Hi, Alice!' }],
-          signature: null,
+          signature: null as any,
           version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Missing signature parameter');
@@ -6558,7 +6578,7 @@ describe('recoverTypedSignature', function () {
       expect(() =>
         recoverTypedSignature({
           data: [{ name: 'message', type: 'string', value: 'Hi, Alice!' }],
-          signature: undefined,
+          signature: undefined as any,
           version: SignTypedDataVersion.V1,
         }),
       ).toThrow('Missing signature parameter');

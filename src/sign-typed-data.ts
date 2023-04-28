@@ -1,4 +1,3 @@
-import { isHexString } from 'ethjs-util';
 import {
   arrToBufArr,
   bufferToHex,
@@ -7,6 +6,8 @@ import {
   toBuffer,
 } from '@ethereumjs/util';
 import { keccak256 } from 'ethereum-cryptography/keccak';
+import { isHexString } from 'ethjs-util';
+
 import { rawEncode, solidityPack } from './ethereumjs-abi-utils';
 import {
   concatSig,
@@ -28,11 +29,11 @@ export type TypedDataV1 = TypedDataV1Field[];
  * @property type - The type of a field (must be a supported Solidity type).
  * @property value - The value of the field.
  */
-export interface TypedDataV1Field {
+export type TypedDataV1Field = {
   name: string;
   type: string;
   value: any;
-}
+};
 
 /**
  * Represents the version of `signTypedData` being used.
@@ -51,15 +52,16 @@ export enum SignTypedDataVersion {
   V4 = 'V4',
 }
 
-export interface MessageTypeProperty {
+export type MessageTypeProperty = {
   name: string;
   type: string;
-}
+};
 
-export interface MessageTypes {
+export type MessageTypes = {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   EIP712Domain: MessageTypeProperty[];
   [additionalProperties: string]: MessageTypeProperty[];
-}
+};
 
 /**
  * This is the message format used for `signTypeData`, for all versions
@@ -78,7 +80,7 @@ export interface MessageTypes {
  * @property domain.salt - A disambiguating salt for the protocol.
  * @property message - The message to be signed.
  */
-export interface TypedMessage<T extends MessageTypes> {
+export type TypedMessage<T extends MessageTypes> = {
   types: T;
   primaryType: keyof T;
   domain: {
@@ -89,7 +91,7 @@ export interface TypedMessage<T extends MessageTypes> {
     salt?: ArrayBuffer;
   };
   message: Record<string, unknown>;
-}
+};
 
 export const TYPED_MESSAGE_SCHEMA = {
   type: 'object',
@@ -151,14 +153,16 @@ function encodeField(
   types: Record<string, MessageTypeProperty[]>,
   name: string,
   type: string,
+  // TODO: constrain type on `value`
   value: any,
   version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-): [type: string, value: any] {
+): [type: string, value: Buffer | string] {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
   if (types[type] !== undefined) {
     return [
       'bytes32',
+      // TODO: return Buffer, remove string from return type
       version === SignTypedDataVersion.V4 && value == null // eslint-disable-line no-eq-null
         ? '0x0000000000000000000000000000000000000000000000000000000000000000'
         : arrToBufArr(keccak256(encodeData(type, value, types, version))),
@@ -174,7 +178,7 @@ function encodeField(
       value = numberToBuffer(value);
     } else if (isHexString(value)) {
       const prepend = value.length % 2 ? '0' : '';
-      value = Buffer.from(prepend + value.slice(2), 'hex');
+      value = Buffer.from(prepend + (value as string).slice(2), 'hex');
     } else {
       value = Buffer.from(value, 'utf8');
     }
@@ -190,7 +194,7 @@ function encodeField(
     return ['bytes32', arrToBufArr(keccak256(value))];
   }
 
-  if (type.lastIndexOf(']') === type.length - 1) {
+  if (type.endsWith(']')) {
     if (version === SignTypedDataVersion.V3) {
       throw new Error(
         'Arrays are unimplemented in encodeData; use V4 extension',
@@ -234,7 +238,7 @@ function encodeData(
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
   const encodedTypes = ['bytes32'];
-  const encodedValues: unknown[] = [hashType(primaryType, types)];
+  const encodedValues: (Buffer | string)[] = [hashType(primaryType, types)];
 
   for (const field of types[primaryType]) {
     if (version === SignTypedDataVersion.V3 && data[field.name] === undefined) {
@@ -297,7 +301,13 @@ function findTypeDependencies(
   types: Record<string, MessageTypeProperty[]>,
   results: Set<string> = new Set(),
 ): Set<string> {
-  [primaryType] = primaryType.match(/^\w*/u);
+  if (typeof primaryType !== 'string') {
+    throw new Error(
+      `Invalid findTypeDependencies input ${JSON.stringify(primaryType)}`,
+    );
+  }
+  const match = primaryType.match(/^\w*/u) as RegExpMatchArray;
+  [primaryType] = match;
   if (results.has(primaryType) || types[primaryType] === undefined) {
     return results;
   }
@@ -365,7 +375,8 @@ function sanitizeData<T extends MessageTypes>(
   }
 
   if ('types' in sanitizedData) {
-    sanitizedData.types = { EIP712Domain: [], ...sanitizedData.types };
+    // TODO: Fix types
+    sanitizedData.types = { EIP712Domain: [], ...sanitizedData.types } as any;
   }
   return sanitizedData as Required<TypedMessage<T>>;
 }
@@ -546,10 +557,7 @@ export function signTypedData<
   const messageHash =
     version === SignTypedDataVersion.V1
       ? _typedSignatureHash(data as TypedDataV1)
-      : TypedDataUtils.eip712Hash(
-          data as TypedMessage<T>,
-          version as SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-        );
+      : TypedDataUtils.eip712Hash(data as TypedMessage<T>, version);
   const sig = ecsign(messageHash, privateKey);
   return concatSig(toBuffer(sig.v), sig.r, sig.s);
 }
@@ -587,10 +595,7 @@ export function recoverTypedSignature<
   const messageHash =
     version === SignTypedDataVersion.V1
       ? _typedSignatureHash(data as TypedDataV1)
-      : TypedDataUtils.eip712Hash(
-          data as TypedMessage<T>,
-          version as SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-        );
+      : TypedDataUtils.eip712Hash(data as TypedMessage<T>, version);
   const publicKey = recoverPublicKey(messageHash, signature);
   const sender = publicToAddress(publicKey);
   return bufferToHex(sender);

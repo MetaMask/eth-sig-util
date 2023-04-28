@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+
 import { rawEncode, solidityPack, parseNumber } from './ethereumjs-abi-utils';
 
 describe('encoding negative int256', function () {
@@ -87,15 +88,31 @@ describe('encoding', function () {
 
 describe('encoding bytes33', function () {
   it('should fail', function () {
-    expect(() => rawEncode('fail', ['bytes33'])).toThrow(
+    expect(() => rawEncode('fail' as any, ['bytes33'])).toThrow(
       'types.forEach is not a function',
+    );
+  });
+});
+
+describe('encoding invalid type', function () {
+  it('should fail', function () {
+    expect(() => rawEncode(['fail'], ['bytes33'])).toThrow(
+      'Unsupported or invalid type: "fail"',
+    );
+  });
+});
+
+describe('encoding invalid fixed type', function () {
+  it('should fail', function () {
+    expect(() => rawEncode(['fixedfail'], ['bytes33'])).toThrow(
+      'Invalid parseTypeNxM input "fixedfail".',
     );
   });
 });
 
 describe('encoding uint0', function () {
   it('should fail', function () {
-    expect(() => rawEncode('fail', ['uint0'])).toThrow(
+    expect(() => rawEncode('fail' as any, ['uint0'])).toThrow(
       'types.forEach is not a function',
     );
   });
@@ -103,7 +120,7 @@ describe('encoding uint0', function () {
 
 describe('encoding uint257', function () {
   it('should fail', function () {
-    expect(() => rawEncode('fail', ['uint257'])).toThrow(
+    expect(() => rawEncode('fail' as any, ['uint257'])).toThrow(
       'types.forEach is not a function',
     );
   });
@@ -289,7 +306,7 @@ describe('solidity packing different amounts of values and types should fail', f
 describe('parseNumber should throw an error when passed an object', function () {
   it('should throw "Argument is not a number', function () {
     expect(() => {
-      parseNumber({ test: 'test' });
+      parseNumber({ test: 'test' } as any);
     }).toThrow('Argument is not a number');
   });
 });

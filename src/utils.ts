@@ -102,7 +102,7 @@ export function recoverPublicKey(
  * @param input - The value to normalize.
  * @returns The normalized value.
  */
-export function normalize(input: number | string): string {
+export function normalize(input: number | string): string | undefined {
   if (!input) {
     return undefined;
   }
@@ -117,7 +117,7 @@ export function normalize(input: number | string): string {
 
   if (typeof input !== 'string') {
     let msg = 'eth-sig-util.normalize() requires hex string or integer input.';
-    msg += ` received ${typeof input}: ${input}`;
+    msg += ` received ${typeof input}: ${input as any as string}`;
     throw new Error(msg);
   }
 

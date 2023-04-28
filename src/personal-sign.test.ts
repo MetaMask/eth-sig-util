@@ -162,7 +162,7 @@ describe('personalSign', function () {
       it('should throw if passed a null private key', function () {
         expect(() =>
           personalSign({
-            privateKey: null,
+            privateKey: null as any,
             data: helloWorldMessage,
           }),
         ).toThrow('Missing privateKey parameter');
@@ -171,7 +171,7 @@ describe('personalSign', function () {
       it('should throw if passed an undefined private key', function () {
         expect(() =>
           personalSign({
-            privateKey: undefined,
+            privateKey: undefined as any,
             data: helloWorldMessage,
           }),
         ).toThrow('Missing privateKey parameter');
@@ -201,7 +201,7 @@ describe('personalSign', function () {
         expect(() =>
           recoverPersonalSignature({
             data: helloWorldMessage,
-            signature: null,
+            signature: null as any,
           }),
         ).toThrow('Missing signature parameter');
       });
@@ -210,7 +210,7 @@ describe('personalSign', function () {
         expect(() =>
           recoverPersonalSignature({
             data: helloWorldMessage,
-            signature: undefined,
+            signature: undefined as any,
           }),
         ).toThrow('Missing signature parameter');
       });
@@ -239,7 +239,7 @@ describe('personalSign', function () {
         expect(() =>
           extractPublicKey({
             data: helloWorldMessage,
-            signature: null,
+            signature: null as any,
           }),
         ).toThrow('Missing signature parameter');
       });
@@ -248,7 +248,7 @@ describe('personalSign', function () {
         expect(() =>
           extractPublicKey({
             data: helloWorldMessage,
-            signature: undefined,
+            signature: undefined as any,
           }),
         ).toThrow('Missing signature parameter');
       });
