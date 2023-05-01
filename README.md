@@ -2,8 +2,6 @@
 
 A small collection of Ethereum signing functions.
 
-You can find usage examples [here](https://github.com/metamask/test-dapp)
-
 [Available on NPM](https://www.npmjs.com/package/@metamask/eth-sig-util)
 
 ## Installation
