@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.0]
+### Changed
+- rawEncode: fix broken BigNumber negativity check ([#307](https://github.com/MetaMask/eth-sig-util/pull/307))
+- Specify type interface for multiple functions ([#307](https://github.com/MetaMask/eth-sig-util/pull/307))
+- Improve `type` parameter input validation ([#307](https://github.com/MetaMask/eth-sig-util/pull/307))
+- deps: bn.js@4.11.8->4.12.0 ([#309](https://github.com/MetaMask/eth-sig-util/pull/309))
+- devDeps: Support TypeScript version ~4.8.4 ([#307](https://github.com/MetaMask/eth-sig-util/pull/307))
+
 ## [5.0.3]
 ### Changed
 - Bump ethereum-cryptography, @ethereumjs/util ([#302](https://github.com/MetaMask/eth-sig-util/pull/302))
@@ -106,7 +114,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.3...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v5.1.0...HEAD
+[5.1.0]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.3...v5.1.0
 [5.0.3]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.2...v5.0.3
 [5.0.2]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.1...v5.0.2
 [5.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.0...v5.0.1
