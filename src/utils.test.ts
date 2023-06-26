@@ -124,6 +124,12 @@ describe('normalize', function () {
     expect(result).toBe('0x');
   });
 
+  it('should normalize an empty string to 0x', function () {
+    const initial = '';
+    const result = normalize(initial);
+    expect(result).toBe('0x');
+  });
+
   // TODO: Add validation to disallow null.
   it('should return undefined if given null', function () {
     const initial = null;

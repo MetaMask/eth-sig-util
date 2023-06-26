@@ -103,7 +103,7 @@ export function recoverPublicKey(
  * @returns The normalized value.
  */
 export function normalize(input: number | string): string | undefined {
-  if (!input) {
+  if (isNullish(input)) {
     return undefined;
   }
 
