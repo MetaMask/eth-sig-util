@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [6.0.0]
 ### Changed
-- **BREAKING**: Fix `normalize` for empty strings ([#315](https://github.com/MetaMask/eth-sig-util/pull/315))
-  - This is breaking as it changes the behavior of the function with an empty string as input: it will now return `0x` instead of `undefined`
+- **BREAKING**: Fix `normalize` for empty strings and `0` ([#315](https://github.com/MetaMask/eth-sig-util/pull/315))
+  - This is breaking as it changes the behavior of the function with an empty string or `0` as input: it will now return `0x` for an empty string and `0x00` for `0`, instead of `undefined`
 
 ## [5.1.0]
 ### Changed
