@@ -111,6 +111,12 @@ describe('normalize', function () {
     expect(result).toBe(`0x${initial.toLowerCase()}`);
   });
 
+  it('should normalize 0 to a byte-pair hex string', function () {
+    const initial = 0;
+    const result = normalize(initial);
+    expect(result).toBe('0x00');
+  });
+
   it('should normalize an integer to a byte-pair hex string', function () {
     const initial = 1;
     const result = normalize(initial);
