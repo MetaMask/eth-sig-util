@@ -7,8 +7,8 @@ import {
   ToBufferInputTypes,
   toUnsigned,
 } from '@ethereumjs/util';
-import { intToHex, isHexString, stripHexPrefix } from 'ethjs-util';
 import { add0x, bytesToHex, numberToBytes } from '@metamask/utils';
+import { intToHex, isHexString, stripHexPrefix } from 'ethjs-util';
 
 /**
  * Pads the front of the given hex string with zeroes until it reaches the

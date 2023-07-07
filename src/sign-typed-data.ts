@@ -1,6 +1,12 @@
 import { arrToBufArr, ecsign, publicToAddress } from '@ethereumjs/util';
-import { keccak256 } from 'ethereum-cryptography/keccak';
 import { encode, encodePacked } from '@metamask/abi-utils';
+import {
+  getArrayType,
+  getByteLength,
+  getLength,
+  isArrayType,
+} from '@metamask/abi-utils/dist/parsers';
+import { padStart } from '@metamask/abi-utils/dist/utils';
 import {
   add0x,
   assert,
@@ -13,13 +19,8 @@ import {
   signedBigIntToBytes,
   stringToBytes,
 } from '@metamask/utils';
-import {
-  getArrayType,
-  getByteLength,
-  getLength,
-  isArrayType,
-} from '@metamask/abi-utils/dist/parsers';
-import { padStart } from '@metamask/abi-utils/dist/utils';
+import { keccak256 } from 'ethereum-cryptography/keccak';
+
 import {
   concatSig,
   isNullish,
@@ -360,7 +361,9 @@ function encodeData(
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
   const encodedTypes = ['bytes32'];
-  const encodedValues: (string | bigint | boolean | Uint8Array | Buffer)[] = [hashType(primaryType, types)];
+  const encodedValues: (string | bigint | boolean | Uint8Array | Buffer)[] = [
+    hashType(primaryType, types),
+  ];
 
   for (const field of types[primaryType]) {
     if (version === SignTypedDataVersion.V3 && data[field.name] === undefined) {
