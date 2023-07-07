@@ -935,19 +935,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@metamask/utils@npm:^3.2.0":
-  version: 3.2.0
-  resolution: "@metamask/utils@npm:3.2.0"
-  dependencies:
-    "@types/debug": ^4.1.7
-    debug: ^4.3.4
-    fast-deep-equal: ^3.1.3
-    superstruct: ^0.16.5
-  checksum: 99adcbd273c69075628913259f8c3fb843291898eba813f4f5fe0bfc060ae5955e2c69e70e15b04156793f8d84edd077d1fac3f8c3927e067d0f311eef9d4469
-  languageName: node
-  linkType: hard
-
-"@metamask/utils@npm:^3.4.1":
+"@metamask/utils@npm:^3.2.0, @metamask/utils@npm:^3.4.1":
   version: 3.6.0
   resolution: "@metamask/utils@npm:3.6.0"
   dependencies:
@@ -5610,13 +5598,6 @@ __metadata:
   version: 3.1.1
   resolution: "strip-json-comments@npm:3.1.1"
   checksum: 492f73e27268f9b1c122733f28ecb0e7e8d8a531a6662efbd08e22cccb3f9475e90a1b82cab06a392f6afae6d2de636f977e231296400d0ec5304ba70f166443
-  languageName: node
-  linkType: hard
-
-"superstruct@npm:^0.16.5":
-  version: 0.16.5
-  resolution: "superstruct@npm:0.16.5"
-  checksum: 9f843c38695b584a605ae9b028629de18a85bd0dca0e9449b4ab98bb7b9ac3d82599870acbab9fbd2ee454c6b187af7e61562e252dfadabd974191ab4ab2e3ce
   languageName: node
   linkType: hard
 
