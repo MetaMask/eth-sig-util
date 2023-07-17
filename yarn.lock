@@ -835,14 +835,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/eslint-config-jest@npm:^11.1.0":
-  version: 11.1.0
-  resolution: "@metamask/eslint-config-jest@npm:11.1.0"
+"@metamask/eslint-config-jest@npm:^12.1.0":
+  version: 12.1.0
+  resolution: "@metamask/eslint-config-jest@npm:12.1.0"
   peerDependencies:
-    "@metamask/eslint-config": ^11.0.0
+    "@metamask/eslint-config": ^12.0.0
     eslint: ^8.27.0
     eslint-plugin-jest: ^27.1.5
-  checksum: a649cf317327532d0d18795ac3bc74766e649e821ca3130dac288b16d5243ae72b5bda4eb85c678f1b4f9c073904ac6162b740c237b67921e64ce4f40c6ceb77
+  checksum: 98f60234412051d429237dbf32b147a648a0e3b6adacafda24999ec9eb8096155c8000c62204415100c97980cc3bfe0a0fe19e4c318b8bb529eaf57e9f96e680
   languageName: node
   linkType: hard
 
@@ -892,7 +892,7 @@ __metadata:
     "@lavamoat/allow-scripts": ^2.3.1
     "@metamask/auto-changelog": ^3.1.0
     "@metamask/eslint-config": ^11.1.0
-    "@metamask/eslint-config-jest": ^11.1.0
+    "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^11.1.0
     "@metamask/eslint-config-typescript": ^11.1.0
     "@types/bn.js": ^4.11.6
