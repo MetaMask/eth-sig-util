@@ -384,7 +384,7 @@ exports[`TypedDataUtils.encodeData V4 should encode data when called unbound 1`]
 
 exports[`TypedDataUtils.encodeData V4 should encode data when given extraneous types 1`] = `"cddf41b07426e1a761f3da57e35474ae3deaa5b596306531f651c6dc1321e4fd6cdba77591a790691c694fa0be937f835b8a589095e427022aa1035e579ee596"`;
 
-exports[`TypedDataUtils.encodeData V4 should encode data with a custom data type array 1`] = `"077b2e5169bfc57ed1b6acf858d27ae9b8311db1ccf71df99dfcf9efe8eec43856cacfdc07c6f697bc1bc978cf38559d5c729ed1cd1177e047df929e19dc2a2e8548546251a0cc6d0005e1a792e00f85feed5056e580102ed1afa615f87bb130b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8"`;
+exports[`TypedDataUtils.encodeData V4 should encode data with a custom data type array 1`] = `"077b2e5169bfc57ed1b6acf858d27ae9b8311db1ccf71df99dfcf9efe8eec43856cacfdc07c6f697bc1bc978cf38559d5c729ed1cd1177e047df929e19dc2a2ebfe1302b079804af4cd9e10539928375539a1724a1cf42d42b2918298c371eafb5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8"`;
 
 exports[`TypedDataUtils.encodeData V4 should encode data with a custom type property set to null 1`] = `"a0cedeb2dc280ba39b857546d74f5549c3a1d7bdc2dd96bf881f76108e23dac2fc71e5fa27ff56c350aa531bc129ebdf613b772b6604664f5d8dbe21b85eb0c80000000000000000000000000000000000000000000000000000000000000000b5aadf3154a261abdd9086fc627b61efca26ae5702701d05cd2305f7c52a2fc8"`;
 
@@ -756,7 +756,7 @@ exports[`TypedDataUtils.hashStruct V4 should hash data when called unbound 1`] =
 
 exports[`TypedDataUtils.hashStruct V4 should hash data when given extraneous types 1`] = `"15d2c54cdaa22a6a3a8dbd89086b2ffcf0853857db9bcf1541765a8f769a63ba"`;
 
-exports[`TypedDataUtils.hashStruct V4 should hash data with a custom data type array 1`] = `"ac26cc7aa2cb9a8a445fae4e48b33f978b558da9b16e26381c53814d3317f541"`;
+exports[`TypedDataUtils.hashStruct V4 should hash data with a custom data type array 1`] = `"e4ef223c74f2085fbac1f734aa89e00985dc1dfa72419eedc9e33b52a6d15a2b"`;
 
 exports[`TypedDataUtils.hashStruct V4 should hash data with a custom type property set to null 1`] = `"fdecfae63c304f6fc7795188607e3838f5bf6798e47f147efdb2c71fcec1335e"`;
 
@@ -1300,7 +1300,7 @@ exports[`signTypedData V4 should sign a typed message with only custom domain se
 
 exports[`signTypedData V4 should sign data when given extraneous types 1`] = `"0x9809571f17ee150687932fb7b993f4437b05caf9c8e64818ab4356b33992f3796636c18e88ba9c6dc140f39f95d8ae5770ad2f17070af208690c82d33f3bc8701c"`;
 
-exports[`signTypedData V4 should sign data with a custom data type array 1`] = `"0x17c484deba479e3e9f821a6d5defc0179ddf52195c0cd75895c936b3ab4d217c6ba7f1f164a3ac9701e1694a04a13f421fb67ec44cd316846326a98b0d5838a01c"`;
+exports[`signTypedData V4 should sign data with a custom data type array 1`] = `"0x96cf12332272746492a9b9a56ff928e6ad2538d4d3faaaaeb7a691720c94e68e5e14d56fa847deff4e8ccbe11e0aa72066f1330cb22045199c33ce67a9cef5cf1c"`;
 
 exports[`signTypedData V4 should sign data with a custom type property set to null 1`] = `"0xc24daccba3391e6f6c3c07c8d62b8c83f7bb4e370613cb2d9ece63a4897d2d044e77e613091a496d8f337854c09ee139e4bca87839d3562ba16a850daa60185a1c"`;
 
