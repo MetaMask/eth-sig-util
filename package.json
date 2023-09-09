@@ -45,6 +45,8 @@
   },
   "dependencies": {
     "@ethereumjs/util": "^8.0.6",
+    "@metamask/abi-utils": "^1.2.0",
+    "@metamask/utils": "^5.0.2",
     "bn.js": "^4.12.0",
     "ethereum-cryptography": "^2.0.0",
     "ethjs-util": "^0.1.6",
