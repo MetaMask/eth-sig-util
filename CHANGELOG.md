@@ -7,12 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [6.0.1]
-### Uncategorized
-- Swap out `ethereumjs-abi` for `@metamask/abi-utils` ([#319](https://github.com/MetaMask/eth-sig-util/pull/319))
-- Bump @metamask/auto-changelog from 3.1.0 to 3.2.0 ([#322](https://github.com/MetaMask/eth-sig-util/pull/322))
-- Bump word-wrap from 1.2.3 to 1.2.4 ([#327](https://github.com/MetaMask/eth-sig-util/pull/327))
-- Bump semver from 6.3.0 to 6.3.1 ([#321](https://github.com/MetaMask/eth-sig-util/pull/321))
-- Bump tough-cookie from 4.0.0 to 4.1.3 ([#320](https://github.com/MetaMask/eth-sig-util/pull/320))
+### Fixed
+- Swap out legacy `ethereumjs-abi` for `@metamask/abi-utils` ([#319](https://github.com/MetaMask/eth-sig-util/pull/319))
 
 ## [6.0.0]
 ### Changed
