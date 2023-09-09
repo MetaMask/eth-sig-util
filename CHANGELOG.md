@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.1]
+### Uncategorized
+- Swap out `ethereumjs-abi` for `@metamask/abi-utils` ([#319](https://github.com/MetaMask/eth-sig-util/pull/319))
+- Bump @metamask/auto-changelog from 3.1.0 to 3.2.0 ([#322](https://github.com/MetaMask/eth-sig-util/pull/322))
+- Bump word-wrap from 1.2.3 to 1.2.4 ([#327](https://github.com/MetaMask/eth-sig-util/pull/327))
+- Bump semver from 6.3.0 to 6.3.1 ([#321](https://github.com/MetaMask/eth-sig-util/pull/321))
+- Bump tough-cookie from 4.0.0 to 4.1.3 ([#320](https://github.com/MetaMask/eth-sig-util/pull/320))
+
 ## [6.0.0]
 ### Changed
 - **BREAKING**: Fix `normalize` for empty strings and `0` ([#315](https://github.com/MetaMask/eth-sig-util/pull/315))
@@ -119,7 +127,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.0...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.1...HEAD
+[6.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.0...v6.0.1
 [6.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v5.1.0...v6.0.0
 [5.1.0]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.3...v5.1.0
 [5.0.3]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.2...v5.0.3
