@@ -483,7 +483,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethereumjs/util@npm:^8.0.6, @ethereumjs/util@npm:^8.1.0":
+"@ethereumjs/util@npm:^8.1.0":
   version: 8.1.0
   resolution: "@ethereumjs/util@npm:8.1.0"
   dependencies:
@@ -892,7 +892,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@metamask/eth-sig-util@workspace:."
   dependencies:
-    "@ethereumjs/util": ^8.0.6
+    "@ethereumjs/util": ^8.1.0
     "@lavamoat/allow-scripts": ^2.3.1
     "@metamask/abi-utils": ^1.2.0
     "@metamask/auto-changelog": ^3.1.0

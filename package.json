@@ -44,7 +44,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@ethereumjs/util": "^8.0.6",
+    "@ethereumjs/util": "^8.1.0",
     "@metamask/abi-utils": "^1.2.0",
     "@metamask/utils": "^5.0.2",
     "ethereum-cryptography": "^2.1.2",
