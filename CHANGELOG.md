@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [6.0.1]
 ### Fixed
 - Swap out legacy `ethereumjs-abi` for `@metamask/abi-utils` ([#319](https://github.com/MetaMask/eth-sig-util/pull/319))
+- Bump `ethereum-cryptography` from `^2.0.0` to `^2.1.2` ([#302](https://github.com/MetaMask/eth-sig-util/pull/302))
+- Bump `ethereumjs/util` from `^8.0.6` to `^8.1.0` ([#302](https://github.com/MetaMask/eth-sig-util/pull/302))
+- Remove unused dependency `bn.js` (#334)  ([#302](https://github.com/MetaMask/eth-sig-util/pull/302))
 
 ## [6.0.0]
 ### Changed
