@@ -902,7 +902,7 @@ __metadata:
     "@metamask/eslint-config-typescript": ^11.1.0
     "@metamask/utils": ^5.0.2
     "@types/jest": ^27.0.6
-    "@types/node": ^14.14.25
+    "@types/node": ^16.18.50
     "@typescript-eslint/eslint-plugin": ^5.59.1
     "@typescript-eslint/parser": ^5.59.1
     ajv: ^8.11.0
@@ -1250,10 +1250,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^14.14.25":
-  version: 14.18.24
-  resolution: "@types/node@npm:14.18.24"
-  checksum: 631b86787a2110048bcd45d2555e6b9265594a6c65bcdc9947004cbdf1b4b9c8f84b7f0c4f03e4b0b1d24fd821c8d39b931073e21832c8c29dc74de060efd11d
+"@types/node@npm:^16.18.50":
+  version: 16.18.50
+  resolution: "@types/node@npm:16.18.50"
+  checksum: 8aec1eaf83407197ec2fe947182c238f49b82a7aace867cee1f81f72eb8a76c3c8b2adb1fd356e7443317cffb2546708da8934299a579edd25e3160bf7af30a1
   languageName: node
   linkType: hard
 
