@@ -46,7 +46,7 @@
   "dependencies": {
     "@ethereumjs/util": "^8.1.0",
     "@metamask/abi-utils": "^1.2.0",
-    "@metamask/utils": "^5.0.2",
+    "@metamask/utils": "^8.1.0",
     "ethereum-cryptography": "^2.1.2",
     "ethjs-util": "^0.1.6",
     "tweetnacl": "^1.0.3",
