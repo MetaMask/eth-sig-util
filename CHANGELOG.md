@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [7.0.0]
 ### Changed
+- **BREAKING**: Increase minimum Node.js version to v16 ([#332](https://github.com/MetaMask/eth-sig-util/pull/332))
 - **BREAKING**: Bump `@metamask/abi-utils` from `^1.0.2` to `^2.0.2` ([#326](https://github.com/MetaMask/eth-sig-util/pull/336))
+- Bump `@metamask/utils` from `^5.0.2` to `^8.1.0` ([#333](https://github.com/MetaMask/eth-sig-util/pull/333))
 
 ## [6.0.1]
 ### Changed
