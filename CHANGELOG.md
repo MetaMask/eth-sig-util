@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.0]
+### Changed
+- **BREAKING**: Increase minimum Node.js version to v16 ([#332](https://github.com/MetaMask/eth-sig-util/pull/332))
+- **BREAKING**: Bump `@metamask/abi-utils` from `^1.0.2` to `^2.0.2` ([#326](https://github.com/MetaMask/eth-sig-util/pull/336))
+- Bump `@metamask/utils` from `^5.0.2` to `^8.1.0` ([#333](https://github.com/MetaMask/eth-sig-util/pull/333))
+
 ## [6.0.1]
 ### Changed
 - Swap out legacy `ethereumjs-abi` for `@metamask/abi-utils` ([#319](https://github.com/MetaMask/eth-sig-util/pull/319))
@@ -128,7 +134,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.1...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.0...HEAD
+[7.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.1...v7.0.0
 [6.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.0...v6.0.1
 [6.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v5.1.0...v6.0.0
 [5.1.0]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.3...v5.1.0
