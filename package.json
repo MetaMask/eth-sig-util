@@ -26,10 +26,10 @@
   "files": [
     "dist",
     "!__snapshots__",
-    "!*.test.js",
-    "!*.test.js.map",
-    "!*.test.ts",
-    "!*.test.d.ts"
+    "!**/*.test.js",
+    "!**/*.test.js.map",
+    "!**/*.test.ts",
+    "!**/*.test.d.ts"
   ],
   "scripts": {
     "build": "tsc --project .",
