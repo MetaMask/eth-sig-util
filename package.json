@@ -48,7 +48,6 @@
     "@metamask/abi-utils": "^2.0.2",
     "@metamask/utils": "^8.1.0",
     "ethereum-cryptography": "^2.1.2",
-    "ethjs-util": "^0.1.6",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1"
   },
