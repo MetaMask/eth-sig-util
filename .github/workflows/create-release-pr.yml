@@ -8,7 +8,7 @@ on:
         default: 'main'
         required: true
       release-type:
-        description: 'A SemVer version diff, i.e. major, minor, patch, prerelease etc. Mutually exclusive with "release-version".'
+        description: 'A SemVer version diff, i.e. major, minor, or patch. Mutually exclusive with "release-version".'
         required: false
       release-version:
         description: 'A specific version to bump to. Mutually exclusive with "release-type".'
@@ -33,7 +33,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
-      - uses: MetaMask/action-create-release-pr@v1
+      - uses: MetaMask/action-create-release-pr@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

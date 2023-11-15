@@ -12,3 +12,5 @@ jobs:
     uses: ./.github/workflows/publish-docs.yml
     with:
       destination_dir: staging
+    secrets:
+      PUBLISH_DOCS_TOKEN: ${{ secrets.PUBLISH_DOCS_TOKEN }}

@@ -1,17 +1,13 @@
 {
   "compilerOptions": {
-    "declaration": true,
     "esModuleInterop": true,
-    "inlineSources": true,
     "lib": ["ES2020"],
     "module": "CommonJS",
-    "moduleResolution": "Node",
-    "outDir": "dist",
-    "rootDir": "src",
-    "sourceMap": true,
+    "moduleResolution": "node",
+    "noEmit": true,
+    "noErrorTruncation": true,
     "strictNullChecks": true,
-    "target": "ES2017",
-    "typeRoots": ["./node_modules/@types"]
+    "target": "es2017"
   },
-  "include": ["./src/**/*.ts"]
+  "exclude": ["./dist/**/*", "**/node_modules"]
 }

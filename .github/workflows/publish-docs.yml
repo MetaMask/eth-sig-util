@@ -6,11 +6,15 @@ on:
       destination_dir:
         required: true
         type: string
+    secrets:
+      PUBLISH_DOCS_TOKEN:
+        required: true
 
 jobs:
   publish-docs-to-gh-pages:
     name: Publish docs to GitHub Pages
     runs-on: ubuntu-latest
+    environment: github-pages
     permissions:
       contents: write
     steps:
@@ -19,28 +23,20 @@ jobs:
         run: exit 1
       - name: Checkout the repository
         uses: actions/checkout@v3
-      - name: Setup Node.js
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
-      - name: Get Yarn cache directory
-        run: echo "YARN_CACHE_DIR=$(yarn config get cacheFolder)" >> "$GITHUB_OUTPUT"
-        id: yarn-cache-dir
-      - name: Get Yarn version
-        run: echo "YARN_VERSION=$(yarn --version)" >> "$GITHUB_OUTPUT"
-        id: yarn-version
-      - name: Cache yarn dependencies
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.yarn-cache-dir.outputs.YARN_CACHE_DIR }}
-          key: yarn-cache-${{ runner.os }}-${{ steps.yarn-version.outputs.YARN_VERSION }}-${{ hashFiles('yarn.lock') }}
+          cache: 'yarn'
       - name: Install npm dependencies
         run: yarn --immutable
       - name: Run build script
         run: yarn build:docs
       - name: Deploy to `${{ inputs.destination_dir }}` directory of `gh-pages` branch
-        uses: peaceiris/actions-gh-pages@068dc23d9710f1ba62e86896f84735d869951305
+        uses: peaceiris/actions-gh-pages@de7ea6f8efb354206b205ef54722213d99067935
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # This `PUBLISH_DOCS_TOKEN` needs to be manually set per-repository.
+          # Look in the repository settings under "Environments", and set this token in the `github-pages` environment.
+          personal_token: ${{ secrets.PUBLISH_DOCS_TOKEN }}
           publish_dir: ./docs
           destination_dir: ${{ inputs.destination_dir }}

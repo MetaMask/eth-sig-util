@@ -79,7 +79,7 @@ export type MessageTypes = {
  * This is the message format used for `signTypeData`, for all versions
  * except `V1`.
  *
- * @template T - The custom types used by this message.
+ * @template CustomMessageTypes - The custom types used by this message.
  * @property types - The custom types used by this message.
  * @property primaryType - The type of the message.
  * @property domain - Signing domain metadata. The signing domain is the intended context for the
@@ -92,9 +92,9 @@ export type MessageTypes = {
  * @property domain.salt - A disambiguating salt for the protocol.
  * @property message - The message to be signed.
  */
-export type TypedMessage<T extends MessageTypes> = {
-  types: T;
-  primaryType: keyof T;
+export type TypedMessage<CustomMessageTypes extends MessageTypes> = {
+  types: CustomMessageTypes;
+  primaryType: keyof CustomMessageTypes;
   domain: {
     name?: string;
     version?: string;
@@ -489,10 +489,10 @@ function hashType(
  * @param data - The typed message object.
  * @returns The typed message object with only allowed fields.
  */
-function sanitizeData<T extends MessageTypes>(
-  data: TypedMessage<T>,
-): TypedMessage<T> {
-  const sanitizedData: Partial<TypedMessage<T>> = {};
+function sanitizeData<CustomMessageTypes extends MessageTypes>(
+  data: TypedMessage<CustomMessageTypes>,
+): TypedMessage<CustomMessageTypes> {
+  const sanitizedData: Partial<TypedMessage<CustomMessageTypes>> = {};
   for (const key in TYPED_MESSAGE_SCHEMA.properties) {
     if (data[key]) {
       sanitizedData[key] = data[key];
@@ -503,7 +503,7 @@ function sanitizeData<T extends MessageTypes>(
     // TODO: Fix types
     sanitizedData.types = { EIP712Domain: [], ...sanitizedData.types } as any;
   }
-  return sanitizedData as Required<TypedMessage<T>>;
+  return sanitizedData as Required<TypedMessage<CustomMessageTypes>>;
 }
 
 /**
@@ -514,8 +514,8 @@ function sanitizeData<T extends MessageTypes>(
  * @param version - The EIP-712 version the encoding should comply with.
  * @returns The hash of the domain object.
  */
-function eip712DomainHash<T extends MessageTypes>(
-  typedData: TypedMessage<T>,
+function eip712DomainHash<CustomMessageTypes extends MessageTypes>(
+  typedData: TypedMessage<CustomMessageTypes>,
   version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
 ): Buffer {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
@@ -538,8 +538,8 @@ function eip712DomainHash<T extends MessageTypes>(
  * @param version - The EIP-712 version the encoding should comply with.
  * @returns The hash of the typed message.
  */
-function eip712Hash<T extends MessageTypes>(
-  typedData: TypedMessage<T>,
+function eip712Hash<CustomMessageTypes extends MessageTypes>(
+  typedData: TypedMessage<CustomMessageTypes>,
   version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
 ): Buffer {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
@@ -813,16 +813,18 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
  * @returns The '0x'-prefixed hex encoded signature.
  */
 export function signTypedData<
-  V extends SignTypedDataVersion,
-  T extends MessageTypes,
+  CustomSignTypedDataVersion extends SignTypedDataVersion,
+  CustomMessageTypes extends MessageTypes,
 >({
   privateKey,
   data,
   version,
 }: {
   privateKey: Buffer;
-  data: V extends 'V1' ? TypedDataV1 : TypedMessage<T>;
-  version: V;
+  data: CustomSignTypedDataVersion extends 'V1'
+    ? TypedDataV1
+    : TypedMessage<CustomMessageTypes>;
+  version: CustomSignTypedDataVersion;
 }): string {
   validateVersion(version);
   if (isNullish(data)) {
@@ -834,7 +836,10 @@ export function signTypedData<
   const messageHash =
     version === SignTypedDataVersion.V1
       ? _typedSignatureHash(data as TypedDataV1)
-      : TypedDataUtils.eip712Hash(data as TypedMessage<T>, version);
+      : TypedDataUtils.eip712Hash(
+          data as TypedMessage<CustomMessageTypes>,
+          version,
+        );
   const sig = ecsign(messageHash, privateKey);
   return concatSig(arrToBufArr(bigIntToBytes(sig.v)), sig.r, sig.s);
 }
@@ -851,16 +856,18 @@ export function signTypedData<
  * @returns The '0x'-prefixed hex address of the signer.
  */
 export function recoverTypedSignature<
-  V extends SignTypedDataVersion,
-  T extends MessageTypes,
+  CustomSignTypedDataVersion extends SignTypedDataVersion,
+  CustomMessageTypes extends MessageTypes,
 >({
   data,
   signature,
   version,
 }: {
-  data: V extends 'V1' ? TypedDataV1 : TypedMessage<T>;
+  data: CustomSignTypedDataVersion extends 'V1'
+    ? TypedDataV1
+    : TypedMessage<CustomMessageTypes>;
   signature: string;
-  version: V;
+  version: CustomSignTypedDataVersion;
 }): string {
   validateVersion(version);
   if (isNullish(data)) {
@@ -872,7 +879,10 @@ export function recoverTypedSignature<
   const messageHash =
     version === SignTypedDataVersion.V1
       ? _typedSignatureHash(data as TypedDataV1)
-      : TypedDataUtils.eip712Hash(data as TypedMessage<T>, version);
+      : TypedDataUtils.eip712Hash(
+          data as TypedMessage<CustomMessageTypes>,
+          version,
+        );
   const publicKey = recoverPublicKey(messageHash, signature);
   const sender = publicToAddress(publicKey);
   return bytesToHex(sender);
