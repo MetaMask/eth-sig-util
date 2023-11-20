@@ -3,12 +3,18 @@ import {
   ecrecover,
   fromRpcSig,
   fromSigned,
+  isHexString,
   toBuffer,
   ToBufferInputTypes,
   toUnsigned,
 } from '@ethereumjs/util';
-import { add0x, bytesToHex, numberToBytes } from '@metamask/utils';
-import { intToHex, isHexString, stripHexPrefix } from 'ethjs-util';
+import {
+  numberToHex,
+  remove0x,
+  add0x,
+  bytesToHex,
+  numberToBytes,
+} from '@metamask/utils';
 
 /**
  * Pads the front of the given hex string with zeroes until it reaches the
@@ -76,7 +82,7 @@ export function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
   const vSig = bufferToInt(v);
   const rStr = padWithZeroes(toUnsigned(rSig).toString('hex'), 64);
   const sStr = padWithZeroes(toUnsigned(sSig).toString('hex'), 64);
-  const vStr = stripHexPrefix(intToHex(vSig));
+  const vStr = remove0x(numberToHex(vSig));
   return add0x(rStr.concat(sStr, vStr));
 }
 
