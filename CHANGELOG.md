@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.1]
+### Uncategorized
+- fix: interpret 0x as hex in bytes encodeField ([#354](https://github.com/MetaMask/eth-sig-util/pull/354))
+- deps: remove ethjs-util ([#349](https://github.com/MetaMask/eth-sig-util/pull/349))
+- fix: actually exclude test files from published release ([#350](https://github.com/MetaMask/eth-sig-util/pull/350))
+- chore(ci): unpin node 20.5 ([#338](https://github.com/MetaMask/eth-sig-util/pull/338))
+- Bump @babel/traverse from 7.21.5 to 7.23.2 ([#341](https://github.com/MetaMask/eth-sig-util/pull/341))
+- Bump @metamask/auto-changelog from 3.2.0 to 3.3.0 ([#339](https://github.com/MetaMask/eth-sig-util/pull/339))
+
 ## [7.0.0]
 ### Changed
 - **BREAKING**: Increase minimum Node.js version to v16 ([#332](https://github.com/MetaMask/eth-sig-util/pull/332))
@@ -134,7 +143,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.0...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.1...HEAD
+[7.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.0...v7.0.1
 [7.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.1...v7.0.0
 [6.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.0...v6.0.1
 [6.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v5.1.0...v6.0.0
