@@ -253,6 +253,8 @@ const encodeDataExamples = {
     '0xa22cb465000000000000000000000000a9079d872d10185b54c5db2c36cc978cbd3f72b70000000000000000000000000000000000000000000000000000000000000001', // even number of characters hex string with value greater than MAX_SAFE_INTEGER
     MAX_SAFE_INTEGER_AS_HEX,
     MAX_SAFE_INTEGER_PLUS_ONE_CHAR_AS_HEX,
+    '0x',
+    '0x0',
   ],
   string: [
     'Hello!',
