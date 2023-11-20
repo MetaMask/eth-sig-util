@@ -1,20 +1,31 @@
+import { arrToBufArr, ecsign, publicToAddress } from '@ethereumjs/util';
+import { encode, encodePacked } from '@metamask/abi-utils';
 import {
-  arrToBufArr,
-  bufferToHex,
-  ecsign,
-  publicToAddress,
-  toBuffer,
-} from '@ethereumjs/util';
+  getArrayType,
+  getByteLength,
+  getLength,
+  isArrayType,
+} from '@metamask/abi-utils/dist/parsers';
+import { padStart } from '@metamask/abi-utils/dist/utils';
+import {
+  add0x,
+  assert,
+  bigIntToBytes,
+  bytesToHex,
+  concatBytes,
+  hexToBytes,
+  isStrictHexString,
+  numberToBytes,
+  signedBigIntToBytes,
+  stringToBytes,
+} from '@metamask/utils';
 import { keccak256 } from 'ethereum-cryptography/keccak';
-import { isHexString } from 'ethjs-util';
 
-import { rawEncode, solidityPack } from './ethereumjs-abi-utils';
 import {
   concatSig,
   isNullish,
   legacyToBuffer,
   recoverPublicKey,
-  numberToBuffer,
 } from './utils';
 
 /**
@@ -38,7 +49,8 @@ export type TypedDataV1Field = {
 /**
  * Represents the version of `signTypedData` being used.
  *
- * V1 is based upon [an early version of EIP-712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca)
+ * V1 is based upon [an early version of
+ * EIP-712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca)
  * that lacked some later security improvements, and should generally be neglected in favor of
  * later versions.
  *
@@ -140,6 +152,75 @@ function validateVersion(
 }
 
 /**
+ * Parse a string, number, or bigint value into a `Uint8Array`.
+ *
+ * @param type - The type of the value.
+ * @param value - The value to parse.
+ * @returns The parsed value.
+ */
+function parseNumber(type: string, value: string | number | bigint) {
+  assert(
+    value !== null,
+    `Unable to encode value: Invalid number. Expected a valid number value, but received "${value}".`,
+  );
+
+  const bigIntValue = BigInt(value);
+
+  const length = getLength(type);
+  const maxValue = BigInt(2) ** BigInt(length) - BigInt(1);
+
+  // Note that this is not accurate, since the actual maximum value for unsigned
+  // integers is `2 ^ (length - 1) - 1`, but this is required for backwards
+  // compatibility with the old implementation.
+  assert(
+    bigIntValue >= -maxValue && bigIntValue <= maxValue,
+    `Unable to encode value: Number "${value}" is out of range for type "${type}".`,
+  );
+
+  return bigIntValue;
+}
+
+/**
+ * Parse an address string to a `Uint8Array`. The behaviour of this is quite
+ * strange, in that it does not parse the address as hexadecimal string, nor as
+ * UTF-8. It does some weird stuff with the string and char codes, and then
+ * returns the result as a `Uint8Array`.
+ *
+ * This is based on the old `ethereumjs-abi` implementation, which essentially
+ * calls `new BN(address, 10)` on the address string, the equivalent of calling
+ * `parseInt(address, 10)` in JavaScript. This is not a valid way to parse an
+ * address and would result in `NaN` in plain JavaScript, but it is the
+ * behaviour of the old implementation, and so we must preserve it for backwards
+ * compatibility.
+ *
+ * @param address - The address to parse.
+ * @returns The parsed address.
+ */
+function reallyStrangeAddressToBytes(address: string): Uint8Array {
+  let addressValue = BigInt(0);
+
+  for (let i = 0; i < address.length; i++) {
+    const character = BigInt(address.charCodeAt(i) - 48);
+    addressValue *= BigInt(10);
+
+    // 'a'
+    if (character >= 49) {
+      addressValue += character - BigInt(49) + BigInt(0xa);
+
+      // 'A'
+    } else if (character >= 17) {
+      addressValue += character - BigInt(17) + BigInt(0xa);
+
+      // '0' - '9'
+    } else {
+      addressValue += character;
+    }
+  }
+
+  return padStart(bigIntToBytes(addressValue), 20);
+}
+
+/**
  * Encode a single field.
  *
  * @param types - All type definitions.
@@ -156,7 +237,7 @@ function encodeField(
   // TODO: constrain type on `value`
   value: any,
   version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-): [type: string, value: Buffer | string] {
+): [type: string, value: bigint | Buffer | boolean | string | Uint8Array] {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
   if (types[type] !== undefined) {
@@ -169,27 +250,69 @@ function encodeField(
     ];
   }
 
+  // `function` is supported in `@metamask/abi-utils`, but not allowed by
+  // EIP-712, so we throw an error here.
+  if (type === 'function') {
+    throw new Error('Unsupported or invalid type: "function"');
+  }
+
   if (value === undefined) {
     throw new Error(`missing value for field ${name} of type ${type}`);
   }
 
+  if (type === 'address') {
+    if (typeof value === 'number') {
+      return ['address', padStart(numberToBytes(value), 20)];
+    } else if (isStrictHexString(value)) {
+      return ['address', add0x(value)];
+    } else if (typeof value === 'string') {
+      return ['address', reallyStrangeAddressToBytes(value).subarray(0, 20)];
+    }
+  }
+
+  if (type === 'bool') {
+    return ['bool', Boolean(value)];
+  }
+
   if (type === 'bytes') {
     if (typeof value === 'number') {
-      value = numberToBuffer(value);
-    } else if (isHexString(value)) {
-      const prepend = value.length % 2 ? '0' : '';
-      value = Buffer.from(prepend + (value as string).slice(2), 'hex');
-    } else {
-      value = Buffer.from(value, 'utf8');
+      value = numberToBytes(value);
+    } else if (isStrictHexString(value)) {
+      value = hexToBytes(value);
+    } else if (typeof value === 'string') {
+      value = stringToBytes(value);
     }
     return ['bytes32', arrToBufArr(keccak256(value))];
   }
 
+  if (type.startsWith('bytes') && type !== 'bytes' && !type.includes('[')) {
+    if (typeof value === 'number') {
+      if (value < 0) {
+        return ['bytes32', new Uint8Array(32)];
+      }
+
+      return ['bytes32', bigIntToBytes(BigInt(value))];
+    } else if (isStrictHexString(value)) {
+      return ['bytes32', hexToBytes(value)];
+    }
+
+    return ['bytes32', value];
+  }
+
+  if (type.startsWith('int') && !type.includes('[')) {
+    const bigIntValue = parseNumber(type, value);
+    if (bigIntValue >= BigInt(0)) {
+      return ['uint256', bigIntValue];
+    }
+
+    return ['int256', bigIntValue];
+  }
+
   if (type === 'string') {
     if (typeof value === 'number') {
-      value = numberToBuffer(value);
+      value = numberToBytes(value);
     } else {
-      value = Buffer.from(value ?? '', 'utf8');
+      value = stringToBytes(value ?? '');
     }
     return ['bytes32', arrToBufArr(keccak256(value))];
   }
@@ -201,14 +324,14 @@ function encodeField(
       );
     }
     const parsedType = type.slice(0, type.lastIndexOf('['));
-    const typeValuePairs = value.map((item) =>
+    const typeValuePairs = value.map((item: any) =>
       encodeField(types, name, parsedType, item, version),
     );
     return [
       'bytes32',
       arrToBufArr(
         keccak256(
-          rawEncode(
+          encode(
             typeValuePairs.map(([t]) => t),
             typeValuePairs.map(([, v]) => v),
           ),
@@ -238,7 +361,9 @@ function encodeData(
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
   const encodedTypes = ['bytes32'];
-  const encodedValues: (Buffer | string)[] = [hashType(primaryType, types)];
+  const encodedValues: (string | bigint | boolean | Uint8Array | Buffer)[] = [
+    hashType(primaryType, types),
+  ];
 
   for (const field of types[primaryType]) {
     if (version === SignTypedDataVersion.V3 && data[field.name] === undefined) {
@@ -255,7 +380,7 @@ function encodeData(
     encodedValues.push(value);
   }
 
-  return rawEncode(encodedTypes, encodedValues);
+  return arrToBufArr(encode(encodedTypes, encodedValues));
 }
 
 /**
@@ -354,7 +479,7 @@ function hashType(
   primaryType: string,
   types: Record<string, MessageTypeProperty[]>,
 ): Buffer {
-  const encodedHashType = Buffer.from(encodeType(primaryType, types), 'utf-8');
+  const encodedHashType = stringToBytes(encodeType(primaryType, types));
   return arrToBufArr(keccak256(encodedHashType));
 }
 
@@ -420,7 +545,7 @@ function eip712Hash<T extends MessageTypes>(
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
   const sanitizedData = sanitizeData(typedData);
-  const parts = [Buffer.from('1901', 'hex')];
+  const parts = [hexToBytes('1901')];
   parts.push(eip712DomainHash(typedData, version));
 
   if (sanitizedData.primaryType !== 'EIP712Domain') {
@@ -434,7 +559,7 @@ function eip712Hash<T extends MessageTypes>(
       ),
     );
   }
-  return arrToBufArr(keccak256(Buffer.concat(parts)));
+  return arrToBufArr(keccak256(concatBytes(parts)));
 }
 
 /**
@@ -462,7 +587,129 @@ export const TypedDataUtils = {
  */
 export function typedSignatureHash(typedData: TypedDataV1Field[]): string {
   const hashBuffer = _typedSignatureHash(typedData);
-  return bufferToHex(hashBuffer);
+  return bytesToHex(hashBuffer);
+}
+
+/**
+ * Normalize a value, so that `@metamask/abi-utils` can handle it. This
+ * matches the behaviour of the `ethereumjs-abi` library.
+ *
+ * @param type - The type of the value to normalize.
+ * @param value - The value to normalize.
+ * @returns The normalized value.
+ */
+function normalizeValue(type: string, value: unknown): any {
+  if (isArrayType(type) && Array.isArray(value)) {
+    const [innerType] = getArrayType(type);
+    return value.map((item) => normalizeValue(innerType, item));
+  }
+
+  if (type === 'address') {
+    if (typeof value === 'number') {
+      return padStart(numberToBytes(value), 20);
+    }
+
+    if (isStrictHexString(value)) {
+      return padStart(hexToBytes(value).subarray(0, 20), 20);
+    }
+
+    if (value instanceof Uint8Array) {
+      return padStart(value.subarray(0, 20), 20);
+    }
+  }
+
+  if (type === 'bool') {
+    return Boolean(value);
+  }
+
+  if (type.startsWith('bytes') && type !== 'bytes') {
+    const length = getByteLength(type);
+    if (typeof value === 'number') {
+      if (value < 0) {
+        // `solidityPack(['bytesN'], [-1])` returns `0x00..00`.
+        return new Uint8Array();
+      }
+
+      return numberToBytes(value).subarray(0, length);
+    }
+
+    if (isStrictHexString(value)) {
+      return hexToBytes(value).subarray(0, length);
+    }
+
+    if (value instanceof Uint8Array) {
+      return value.subarray(0, length);
+    }
+  }
+
+  if (type.startsWith('uint')) {
+    if (typeof value === 'number') {
+      return Math.abs(value);
+    }
+  }
+
+  if (type.startsWith('int')) {
+    if (typeof value === 'number') {
+      const length = getLength(type);
+      return BigInt.asIntN(length, BigInt(value));
+    }
+  }
+
+  return value;
+}
+
+/**
+ * For some reason `ethereumjs-abi` treats `address` and `address[]` differently
+ * so we need to normalize `address[]` differently.
+ *
+ * @param values - The values to normalize.
+ * @returns The normalized values.
+ */
+function normalizeAddresses(values: unknown[]) {
+  return values.map((value) => {
+    if (typeof value === 'number') {
+      return padStart(numberToBytes(value), 32);
+    }
+
+    if (isStrictHexString(value)) {
+      return padStart(hexToBytes(value).subarray(0, 32), 32);
+    }
+
+    if (value instanceof Uint8Array) {
+      return padStart(value.subarray(0, 32), 32);
+    }
+
+    return value;
+  });
+}
+
+/**
+ * For some reason `ethereumjs-abi` treats `intN` and `intN[]` differently
+ * so we need to normalize `intN[]` differently.
+ *
+ * @param type - The type of the value to normalize.
+ * @param values - The values to normalize.
+ * @returns The normalized values.
+ */
+function normalizeIntegers(type: string, values: unknown[]) {
+  return values.map((value) => {
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'bigint'
+    ) {
+      const bigIntValue = parseNumber(type, value);
+      if (bigIntValue >= BigInt(0)) {
+        return padStart(bigIntToBytes(bigIntValue), 32);
+      }
+
+      const length = getLength(type);
+      const asIntN = BigInt.asIntN(length, bigIntValue);
+      return signedBigIntToBytes(asIntN, 32);
+    }
+
+    return value;
+  });
 }
 
 /**
@@ -484,17 +731,48 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
     throw error;
   }
 
-  const data = typedData.map(function (e) {
+  const normalizedData = typedData.map(({ name, type, value }) => {
+    // Handle an edge case with `address[]` types.
+    if (type === 'address[]') {
+      return {
+        name,
+        type: 'bytes32[]',
+        value: normalizeAddresses(value),
+      };
+    }
+
+    // Handle an edge case with `intN[]` types.
+    if (type.startsWith('int') && isArrayType(type)) {
+      const [innerType, length] = getArrayType(type);
+      return {
+        name,
+        type: `bytes32[${length ?? ''}]`,
+        value: normalizeIntegers(innerType, value),
+      };
+    }
+
+    return {
+      name,
+      type,
+      value: normalizeValue(type, value),
+    };
+  });
+
+  const data = normalizedData.map((e) => {
     if (e.type !== 'bytes') {
       return e.value;
     }
 
     return legacyToBuffer(e.value);
   });
-  const types = typedData.map(function (e) {
+  const types = normalizedData.map((e) => {
+    if (e.type === 'function') {
+      throw new Error('Unsupported or invalid type: "function"');
+    }
+
     return e.type;
   });
-  const schema = typedData.map(function (e) {
+  const schema = typedData.map((e) => {
     if (!e.name) {
       throw error;
     }
@@ -503,13 +781,11 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
 
   return arrToBufArr(
     keccak256(
-      solidityPack(
+      encodePacked(
         ['bytes32', 'bytes32'],
         [
-          keccak256(
-            solidityPack(new Array(typedData.length).fill('string'), schema),
-          ),
-          keccak256(solidityPack(types, data)),
+          keccak256(encodePacked(['string[]'], [schema], true)),
+          keccak256(encodePacked(types, data, true)),
         ],
       ),
     ),
@@ -519,7 +795,8 @@ function _typedSignatureHash(typedData: TypedDataV1): Buffer {
 /**
  * Sign typed data according to EIP-712. The signing differs based upon the `version`.
  *
- * V1 is based upon [an early version of EIP-712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca)
+ * V1 is based upon [an early version of
+ * EIP-712](https://github.com/ethereum/EIPs/pull/712/commits/21abe254fe0452d8583d5b132b1d7be87c0439ca)
  * that lacked some later security improvements, and should generally be neglected in favor of
  * later versions.
  *
@@ -559,7 +836,7 @@ export function signTypedData<
       ? _typedSignatureHash(data as TypedDataV1)
       : TypedDataUtils.eip712Hash(data as TypedMessage<T>, version);
   const sig = ecsign(messageHash, privateKey);
-  return concatSig(toBuffer(sig.v), sig.r, sig.s);
+  return concatSig(arrToBufArr(bigIntToBytes(sig.v)), sig.r, sig.s);
 }
 
 /**
@@ -598,5 +875,5 @@ export function recoverTypedSignature<
       : TypedDataUtils.eip712Hash(data as TypedMessage<T>, version);
   const publicKey = recoverPublicKey(messageHash, signature);
   const sender = publicToAddress(publicKey);
-  return bufferToHex(sender);
+  return bytesToHex(sender);
 }

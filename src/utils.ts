@@ -1,6 +1,4 @@
 import {
-  addHexPrefix,
-  bufferToHex,
   bufferToInt,
   ecrecover,
   fromRpcSig,
@@ -9,6 +7,7 @@ import {
   ToBufferInputTypes,
   toUnsigned,
 } from '@ethereumjs/util';
+import { add0x, bytesToHex, numberToBytes } from '@metamask/utils';
 import { intToHex, isHexString, stripHexPrefix } from 'ethjs-util';
 
 /**
@@ -78,7 +77,7 @@ export function concatSig(v: Buffer, r: Buffer, s: Buffer): string {
   const rStr = padWithZeroes(toUnsigned(rSig).toString('hex'), 64);
   const sStr = padWithZeroes(toUnsigned(sSig).toString('hex'), 64);
   const vStr = stripHexPrefix(intToHex(vSig));
-  return addHexPrefix(rStr.concat(sStr, vStr));
+  return add0x(rStr.concat(sStr, vStr));
 }
 
 /**
@@ -103,7 +102,7 @@ export function recoverPublicKey(
  * @returns The normalized value.
  */
 export function normalize(input: number | string): string | undefined {
-  if (!input) {
+  if (isNullish(input)) {
     return undefined;
   }
 
@@ -111,8 +110,8 @@ export function normalize(input: number | string): string | undefined {
     if (input < 0) {
       return '0x';
     }
-    const buffer = toBuffer(input);
-    input = bufferToHex(buffer);
+    const buffer = numberToBytes(input);
+    input = bytesToHex(buffer);
   }
 
   if (typeof input !== 'string') {
@@ -121,18 +120,5 @@ export function normalize(input: number | string): string | undefined {
     throw new Error(msg);
   }
 
-  return addHexPrefix(input.toLowerCase());
-}
-
-/**
- * Node's Buffer.from() method does not seem to buffer numbers correctly out of the box.
- * This helper method formats the number correct for Buffer.from to return correct buffer.
- *
- * @param num - The number to convert to buffer.
- * @returns The number in buffer form.
- */
-export function numberToBuffer(num: number) {
-  const hexVal = num.toString(16);
-  const prepend = hexVal.length % 2 ? '0' : '';
-  return Buffer.from(prepend + hexVal, 'hex');
+  return add0x(input.toLowerCase());
 }
