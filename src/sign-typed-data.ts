@@ -277,7 +277,7 @@ function encodeField(
   if (type === 'bytes') {
     if (typeof value === 'number') {
       value = numberToBytes(value);
-    } else if (isStrictHexString(value)) {
+    } else if (isStrictHexString(value) || value === '0x') {
       value = hexToBytes(value);
     } else if (typeof value === 'string') {
       value = stringToBytes(value);
