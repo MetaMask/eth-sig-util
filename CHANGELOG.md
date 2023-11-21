@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.2]
+### Uncategorized
+- [v6.x]  fix: interpret 0x as hex in bytes encodeField  ([#356](https://github.com/MetaMask/eth-sig-util/pull/356))
+
 ## [6.0.1]
 ### Changed
 - Swap out legacy `ethereumjs-abi` for `@metamask/abi-utils` ([#319](https://github.com/MetaMask/eth-sig-util/pull/319))
@@ -128,7 +132,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.1...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.2...HEAD
+[6.0.2]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.1...v6.0.2
 [6.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.0...v6.0.1
 [6.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v5.1.0...v6.0.0
 [5.1.0]: https://github.com/MetaMask/eth-sig-util/compare/v5.0.3...v5.1.0
