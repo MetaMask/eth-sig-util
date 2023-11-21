@@ -7,13 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [7.0.1]
-### Uncategorized
-- fix: interpret 0x as hex in bytes encodeField ([#354](https://github.com/MetaMask/eth-sig-util/pull/354))
-- deps: remove ethjs-util ([#349](https://github.com/MetaMask/eth-sig-util/pull/349))
-- fix: actually exclude test files from published release ([#350](https://github.com/MetaMask/eth-sig-util/pull/350))
-- chore(ci): unpin node 20.5 ([#338](https://github.com/MetaMask/eth-sig-util/pull/338))
-- Bump @babel/traverse from 7.21.5 to 7.23.2 ([#341](https://github.com/MetaMask/eth-sig-util/pull/341))
-- Bump @metamask/auto-changelog from 3.2.0 to 3.3.0 ([#339](https://github.com/MetaMask/eth-sig-util/pull/339))
+### Changed
+- Remove dependency `ethjs-util` ([#349](https://github.com/MetaMask/eth-sig-util/pull/349))
+
+### Fixed
+- **BREAKING**: fix: interpret 0x as hex in bytes encodeField ([#354](https://github.com/MetaMask/eth-sig-util/pull/354))
+  - This fixes a regression introduced in `6.0.1` which caused inconsistent signatures when data was supplied as literal `0x`.
+- fix: Exclude test files from published release ([#350](https://github.com/MetaMask/eth-sig-util/pull/350))
+- fix: Bump @babel/traverse from 7.21.5 to 7.23.2 ([#341](https://github.com/MetaMask/eth-sig-util/pull/341))
 
 ## [7.0.0]
 ### Changed
