@@ -7,8 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [6.0.2]
-### Uncategorized
-- [v6.x]  fix: interpret 0x as hex in bytes encodeField  ([#356](https://github.com/MetaMask/eth-sig-util/pull/356))
+### Fixed
+- **BREAKING**: fix: interpret 0x as hex in bytes encodeField ([#356](https://github.com/MetaMask/eth-sig-util/pull/356))
+  - This fixes a regression introduced in `6.0.1` which caused inconsistent signatures when data was supplied as literal `0x`.
 
 ## [6.0.1]
 ### Changed
