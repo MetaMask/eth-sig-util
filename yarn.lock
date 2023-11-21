@@ -472,7 +472,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethereumjs/tx@npm:^4.1.2":
+"@ethereumjs/tx@npm:^4.2.0":
   version: 4.2.0
   resolution: "@ethereumjs/tx@npm:4.2.0"
   dependencies:
@@ -929,16 +929,18 @@ __metadata:
   linkType: soft
 
 "@metamask/utils@npm:^8.0.0, @metamask/utils@npm:^8.1.0":
-  version: 8.1.0
-  resolution: "@metamask/utils@npm:8.1.0"
+  version: 8.2.1
+  resolution: "@metamask/utils@npm:8.2.1"
   dependencies:
-    "@ethereumjs/tx": ^4.1.2
+    "@ethereumjs/tx": ^4.2.0
     "@noble/hashes": ^1.3.1
+    "@scure/base": ^1.1.3
     "@types/debug": ^4.1.7
     debug: ^4.3.4
+    pony-cause: ^2.1.10
     semver: ^7.5.4
     superstruct: ^1.0.3
-  checksum: 4cbee36d0c227f3e528930e83f75a0c6b71b55b332c3e162f0e87f3dd86ae017d0b20405d76ea054ab99e4d924d3d9b8b896ed12a12aae57b090350e5a625999
+  checksum: 36a714a17e4949d2040bedb28d4373a22e7e86bb797aa2d59223f9799fd76e662443bcede113719c4e200f5e9d90a9d62feafad5028fff8b9a7a85fface097ca
   languageName: node
   linkType: hard
 
@@ -1038,6 +1040,13 @@ __metadata:
     read-package-json-fast: ^3.0.0
     which: ^3.0.0
   checksum: dcc99755f67a535d57d95f25cdaecf414d1adffba4058cbf940fbffce27a953c6d95e40aed127e913ed14c8ac3d9b6223ef002beebd525574750a4be861425d7
+  languageName: node
+  linkType: hard
+
+"@scure/base@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "@scure/base@npm:1.1.3"
+  checksum: 1606ab8a4db898cb3a1ada16c15437c3bce4e25854fadc8eb03ae93cbbbac1ed90655af4b0be3da37e12056fef11c0374499f69b9e658c9e5b7b3e06353c630c
   languageName: node
   linkType: hard
 
@@ -4957,6 +4966,13 @@ __metadata:
   dependencies:
     find-up: ^4.0.0
   checksum: 9863e3f35132bf99ae1636d31ff1e1e3501251d480336edb1c211133c8d58906bed80f154a1d723652df1fda91e01c7442c2eeaf9dc83157c7ae89087e43c8d6
+  languageName: node
+  linkType: hard
+
+"pony-cause@npm:^2.1.10":
+  version: 2.1.10
+  resolution: "pony-cause@npm:2.1.10"
+  checksum: 8b61378f213e61056312dc274a1c79980154e9d864f6ad86e0c8b91a50d3ce900d430995ee24147c9f3caa440dfe7d51c274b488d7f033b65b206522536d7217
   languageName: node
   linkType: hard
 
