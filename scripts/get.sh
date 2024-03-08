@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
-set -x
 set -e
 set -u
 set -o pipefail
+
+if [[ ${RUNNER_DEBUG:-0} == 1 ]]; then
+  set -x
+fi
 
 KEY="${1}"
 OUTPUT="${2}"

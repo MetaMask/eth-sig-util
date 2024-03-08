@@ -1,10 +1,10 @@
+import type { ToBufferInputTypes } from '@ethereumjs/util';
 import {
   bufferToHex,
   ecsign,
   hashPersonalMessage,
   publicToAddress,
   toBuffer,
-  ToBufferInputTypes,
 } from '@ethereumjs/util';
 
 import {

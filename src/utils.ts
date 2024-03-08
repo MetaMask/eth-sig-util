@@ -1,3 +1,4 @@
+import type { ToBufferInputTypes } from '@ethereumjs/util';
 import {
   bufferToInt,
   ecrecover,
@@ -5,7 +6,6 @@ import {
   fromSigned,
   isHexString,
   toBuffer,
-  ToBufferInputTypes,
   toUnsigned,
 } from '@ethereumjs/util';
 import {
