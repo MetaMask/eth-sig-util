@@ -17,11 +17,11 @@ describe('encryption', function () {
   const secretMessage = 'My name is Satoshi Buterin';
 
   const encryptedData = {
-    version: 'x25519-xsalsa20-poly1305',
+    version: 'x25519-xsalsa20-poly1305' as const,
     nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
     ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
     ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
-  };
+  } as const;
 
   it("getting bob's encryptionPublicKey", async function () {
     const result = getEncryptionPublicKey(bob.ethereumPrivateKey);
@@ -84,7 +84,7 @@ describe('encryption', function () {
 
   it('decryption failed because version is wrong or missing', function () {
     const badVersionData = {
-      version: 'x256k1-aes256cbc',
+      version: 'x256k1-aes256cbc' as const,
       nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
       ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
       ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
@@ -92,7 +92,7 @@ describe('encryption', function () {
 
     expect(() =>
       decrypt({
-        encryptedData: badVersionData,
+        encryptedData: badVersionData as never,
         privateKey: bob.ethereumPrivateKey,
       }),
     ).toThrow('Encryption type/version not supported.');
@@ -101,7 +101,7 @@ describe('encryption', function () {
   it('decryption failed because nonce is wrong or missing', function () {
     // encrypted data
     const badNonceData = {
-      version: 'x25519-xsalsa20-poly1305',
+      version: 'x25519-xsalsa20-poly1305' as const,
       nonce: '',
       ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
       ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
@@ -118,7 +118,7 @@ describe('encryption', function () {
   it('decryption failed because ephemPublicKey is wrong or missing', function () {
     // encrypted data
     const badEphemData = {
-      version: 'x25519-xsalsa20-poly1305',
+      version: 'x25519-xsalsa20-poly1305' as const,
       nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
       ephemPublicKey: 'FFFF/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
       ciphertext: 'f8kBcl/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
@@ -135,7 +135,7 @@ describe('encryption', function () {
   it('decryption failed because cyphertext is wrong or missing', function () {
     // encrypted data
     const badEphemData = {
-      version: 'x25519-xsalsa20-poly1305',
+      version: 'x25519-xsalsa20-poly1305' as const,
       nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
       ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
       ciphertext: 'ffffff/NCyf3sybfbwAKk/np2Bzt9lRVkZejr6uh5FgnNlH/ic62DZzy',
@@ -165,7 +165,7 @@ describe('encryption', function () {
         expect(() =>
           encrypt({
             publicKey: undefined as any,
-            data: secretMessage,
+            data: secretMessage as never,
             version: 'x25519-xsalsa20-poly1305',
           }),
         ).toThrow('Missing publicKey parameter');
@@ -175,7 +175,7 @@ describe('encryption', function () {
         expect(() =>
           encrypt({
             publicKey: bob.encryptionPublicKey,
-            data: null,
+            data: null as never,
             version: 'x25519-xsalsa20-poly1305',
           }),
         ).toThrow('Missing data parameter');
@@ -185,7 +185,7 @@ describe('encryption', function () {
         expect(() =>
           encrypt({
             publicKey: bob.encryptionPublicKey,
-            data: undefined,
+            data: undefined as never,
             version: 'x25519-xsalsa20-poly1305',
           }),
         ).toThrow('Missing data parameter');

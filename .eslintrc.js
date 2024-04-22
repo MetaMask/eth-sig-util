@@ -27,5 +27,5 @@ module.exports = {
     'id-length': 'off',
     'no-param-reassign': 'off',
   },
-  ignorePatterns: ['!.eslintrc.js', 'test/*.js', 'dist'],
+  ignorePatterns: ['!.eslintrc.js', 'test/*.js', 'dist', 'docs'],
 };

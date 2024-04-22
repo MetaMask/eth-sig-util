@@ -33,7 +33,7 @@ Run `yarn lint` to run the linter, or run `yarn lint:fix` to run the linter and 
 
 ### Documentation
 
-The API documentation can be generated with the command `yarn docs`, which saves it in the `./docs` directory. Open the `./docs/index.html` file to browse the documentation.
+The API documentation can be generated with the command `yarn build:docs`, which saves it in the `./docs` directory. Open the `./docs/index.html` file to browse the documentation.
 
 ### Release & Publishing
 

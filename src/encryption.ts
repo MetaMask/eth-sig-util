@@ -4,7 +4,7 @@ import * as naclUtil from 'tweetnacl-util';
 import { isNullish } from './utils';
 
 export type EthEncryptedData = {
-  version: string;
+  version: 'x25519-xsalsa20-poly1305';
   nonce: string;
   ephemPublicKey: string;
   ciphertext: string;
@@ -25,8 +25,8 @@ export function encrypt({
   version,
 }: {
   publicKey: string;
-  data: unknown;
-  version: string;
+  data: string;
+  version: 'x25519-xsalsa20-poly1305';
 }): EthEncryptedData {
   if (isNullish(publicKey)) {
     throw new Error('Missing publicKey parameter');
@@ -65,7 +65,7 @@ export function encrypt({
 
       // handle encrypted data
       const output = {
-        version: 'x25519-xsalsa20-poly1305',
+        version: 'x25519-xsalsa20-poly1305' as const,
         nonce: naclUtil.encodeBase64(nonce),
         ephemPublicKey: naclUtil.encodeBase64(ephemeralKeyPair.publicKey),
         ciphertext: naclUtil.encodeBase64(encryptedMessage),
@@ -98,7 +98,7 @@ export function encryptSafely({
 }: {
   publicKey: string;
   data: unknown;
-  version: string;
+  version: 'x25519-xsalsa20-poly1305';
 }): EthEncryptedData {
   if (isNullish(publicKey)) {
     throw new Error('Missing publicKey parameter');
