@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.2]
+### Uncategorized
+- deps: replace tweetnacl-util with @scure/base ([#358](https://github.com/MetaMask/eth-sig-util/pull/358))
+- Bump tar from 6.1.11 to 6.2.1 ([#365](https://github.com/MetaMask/eth-sig-util/pull/365))
+- Bump @metamask/auto-changelog from 3.3.0 to 3.4.4 ([#359](https://github.com/MetaMask/eth-sig-util/pull/359))
+- Bump @metamask/utils from 8.1.0 to 8.4.0 ([#364](https://github.com/MetaMask/eth-sig-util/pull/364))
+- Bump ip from 2.0.0 to 2.0.1 ([#361](https://github.com/MetaMask/eth-sig-util/pull/361))
+- Update security code scanner file ([#363](https://github.com/MetaMask/eth-sig-util/pull/363))
+- Enabling security code scanner ([#362](https://github.com/MetaMask/eth-sig-util/pull/362))
+
 ## [7.0.1]
 ### Changed
 - Remove dependency `ethjs-util` ([#349](https://github.com/MetaMask/eth-sig-util/pull/349))
@@ -144,7 +154,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.1...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.2...HEAD
+[7.0.2]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.1...v7.0.2
 [7.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.0...v7.0.1
 [7.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.1...v7.0.0
 [6.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.0...v6.0.1
