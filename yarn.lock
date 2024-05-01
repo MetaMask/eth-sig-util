@@ -903,6 +903,7 @@ __metadata:
     "@metamask/eslint-config-nodejs": ^11.1.0
     "@metamask/eslint-config-typescript": ^11.1.0
     "@metamask/utils": ^8.1.0
+    "@noble/ciphers": ^0.5.2
     "@scure/base": ~1.1.6
     "@types/jest": ^27.0.6
     "@types/node": ^16.18.50
@@ -943,6 +944,13 @@ __metadata:
     superstruct: ^1.0.3
     uuid: ^9.0.1
   checksum: b0397e97bac7192f6189a8625a2dfcb56d3c2cf4dd2cb3d4e012a7e9786f04f59f6917805544bc131a6dacd2c8344e237ae43ad47429bb5eb35c6cf1248440b4
+  languageName: node
+  linkType: hard
+
+"@noble/ciphers@npm:^0.5.2":
+  version: 0.5.2
+  resolution: "@noble/ciphers@npm:0.5.2"
+  checksum: b3b32c8cb9ef4450358116edf97900d20465eaf76c3103cbb72851da0b6b5815cb2a65b24f5a1d1abd8658064cb29d75b17512dbe97bc546273a63fc3306a599
   languageName: node
   linkType: hard
 

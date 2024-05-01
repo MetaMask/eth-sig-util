@@ -1,5 +1,18 @@
 import { base64, utf8 } from '@scure/base';
-import * as nacl from 'tweetnacl';
+import { box as tweetNaclBox } from 'tweetnacl';
+import { xsalsa20poly1305 } from '@noble/ciphers/salsa';
+// import { x25519 } from '@noble/curves/ed25519';
+
+
+/////
+// import { hexToBytes, utf8ToBytes } from '@noble/ciphers/utils';
+import { randomBytes as randomBytesNode } from '@noble/ciphers/cryptoNode';
+import { randomBytes as randomBytesWeb } from '@noble/ciphers/webcrypto';
+const randomBytes = randomBytesNode ?? randomBytesWeb;
+//////
+//
+//
+//
 
 import { isNullish } from './utils';
 
@@ -41,8 +54,6 @@ export function encrypt({
       if (typeof data !== 'string') {
         throw new Error('Message data must be given as a string');
       }
-      // generate ephemeral keypair
-      const ephemeralKeyPair = nacl.box.keyPair();
 
       // assemble encryption parameters - from string to UInt8
       let pubKeyUInt8Array: Uint8Array;
@@ -53,21 +64,30 @@ export function encrypt({
       }
 
       const msgParamsUInt8Array = utf8.decode(data);
-      const nonce = nacl.randomBytes(nacl.box.nonceLength);
+      // const nonce = nacl.randomBytes(nacl.box.nonceLength);
+      const nonce = randomBytes(24);
 
       // encrypt
+      /*
       const encryptedMessage = nacl.box(
         msgParamsUInt8Array,
         nonce,
         pubKeyUInt8Array,
         ephemeralKeyPair.secretKey,
       );
+      */
+      const salsa = xsalsa20poly1305(pubKeyUInt8Array, nonce);
+      const encryptedMessage = salsa.encrypt(msgParamsUInt8Array);
+
+      // auth
+      // generate ephemeral keypair
+      // const ephemeralKeyPair = nacl.box.keyPair();
 
       // handle encrypted data
       const output = {
         version: 'x25519-xsalsa20-poly1305',
         nonce: base64.encode(nonce),
-        ephemPublicKey: base64.encode(ephemeralKeyPair.publicKey),
+        ephemPublicKey: '',
         ciphertext: base64.encode(encryptedMessage),
       };
       // return encrypted msg data
@@ -166,22 +186,31 @@ export function decrypt({
   switch (encryptedData.version) {
     case 'x25519-xsalsa20-poly1305': {
       const receiverPrivateKeyUint8Array = Buffer.from(privateKey, 'hex');
-      const receiverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(
-        receiverPrivateKeyUint8Array,
-      ).secretKey;
+
+// const data = utf8ToBytes('hello, noble');
+// const data_ = salsa.decrypt(ciphertext); // utils.bytesToUtf8(data_) === data
+
+
+      //const receiverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(
+      //  receiverPrivateKeyUint8Array,
+      //).secretKey;
 
       // assemble decryption parameters
       const nonce = base64.decode(encryptedData.nonce);
       const ciphertext = base64.decode(encryptedData.ciphertext);
-      const ephemPublicKey = base64.decode(encryptedData.ephemPublicKey);
+      //const ephemPublicKey = base64.decode(encryptedData.ephemPublicKey);
 
       // decrypt
+      /*
       const decryptedMessage = nacl.box.open(
         ciphertext,
         nonce,
         ephemPublicKey,
         receiverEncryptionPrivateKey,
       );
+      */
+      const salsa = xsalsa20poly1305(receiverPrivateKeyUint8Array, nonce);
+      const decryptedMessage = salsa.decrypt(ciphertext);
 
       // return decrypted msg data
       try {
@@ -241,6 +270,6 @@ export function decryptSafely({
 export function getEncryptionPublicKey(privateKey: string): string {
   const privateKeyUint8Array = Buffer.from(privateKey, 'hex');
   const encryptionPublicKey =
-    nacl.box.keyPair.fromSecretKey(privateKeyUint8Array).publicKey;
+    tweetNaclBox.keyPair.fromSecretKey(privateKeyUint8Array).publicKey;
   return base64.encode(encryptionPublicKey);
 }
