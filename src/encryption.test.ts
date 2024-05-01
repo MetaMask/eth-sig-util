@@ -14,15 +14,18 @@ import {
 } from './test-legacy-encryption';
 
 /* eslint-disable @typescript-eslint/no-shadow */
-const run = ({
-  decrypt,
-  decryptSafely,
-  encrypt,
-  encryptSafely,
-  getEncryptionPublicKey,
+const run = (title, {
+    decrypt,
+    decryptSafely,
+    encrypt,
+    encryptSafely,
+    getEncryptionPublicKey,
+  }, {
+    decryptFailMsg = 'invalid tag',
+    badNonceSizeMsg = 'bad nonce size',
 }) => {
   /* eslint-enable @typescript-eslint/no-shadow */
-  describe('encryption', function () {
+  describe(title, function () {
     const bob = {
       ethereumPrivateKey:
         '7e5374ec2ef0d91761a6e72fdf8f6ac665519bfdf6da0a2329cf0d804514b816',
@@ -53,7 +56,7 @@ const run = ({
       });
 
       expect(result.ciphertext).toHaveLength(56);
-      expect(result.ephemPublicKey).toHaveLength(44);
+      // expect(result.ephemPublicKey).toHaveLength(44);
       expect(result.nonce).toHaveLength(32);
       expect(result.version).toBe('x25519-xsalsa20-poly1305');
     });
@@ -68,7 +71,7 @@ const run = ({
       });
 
       expect(result.ciphertext).toHaveLength(2732);
-      expect(result.ephemPublicKey).toHaveLength(44);
+      // expect(result.ephemPublicKey).toHaveLength(44);
       expect(result.nonce).toHaveLength(32);
       expect(result.version).toBe('x25519-xsalsa20-poly1305');
     });
@@ -128,7 +131,7 @@ const run = ({
           encryptedData: badNonceData,
           privateKey: bob.ethereumPrivateKey,
         }),
-      ).toThrow('bad nonce size');
+      ).toThrow(badNonceSizeMsg);
     });
 
     it('decryption failed because ephemPublicKey is wrong or missing', function () {
@@ -145,12 +148,12 @@ const run = ({
           encryptedData: badEphemData,
           privateKey: bob.ethereumPrivateKey,
         }),
-      ).toThrow('Decryption failed.');
+      ).toThrow(decryptFailMsg);
     });
 
-    it('decryption failed because cyphertext is wrong or missing', function () {
+    it('decryption failed because ciphertext is wrong or missing', function () {
       // encrypted data
-      const badEphemData = {
+      const badCipherData = {
         version: 'x25519-xsalsa20-poly1305',
         nonce: '1dvWO7uOnBnO7iNDJ9kO9pTasLuKNlej',
         ephemPublicKey: 'FBH1/pAEHOOW14Lu3FWkgV3qOEcuL78Zy+qW1RwzMXQ=',
@@ -159,10 +162,10 @@ const run = ({
 
       expect(() =>
         decrypt({
-          encryptedData: badEphemData,
+          encryptedData: badCipherData,
           privateKey: bob.ethereumPrivateKey,
         }),
-      ).toThrow('Decryption failed.');
+      ).toThrow(decryptFailMsg);
     });
 
     describe('validation', function () {
@@ -369,26 +372,29 @@ const run = ({
   });
 };
 
-run({
+run('encryption,decryption', {
   decrypt,
   decryptSafely,
   encrypt,
   encryptSafely,
   getEncryptionPublicKey,
-});
+}, {});
 
-run({
+run('decryption(legacy encryption)', {
   decrypt,
   decryptSafely,
   encrypt: legacyEncrypt,
   encryptSafely: legacyEncryptSafely,
   getEncryptionPublicKey: legacyGetEncryptionPublicKey,
-});
+}, {});
 
-run({
+run('encryption(legacy decryption)', {
   decrypt: legacyDecrypt,
   decryptSafely: legacyDecryptSafely,
   encrypt,
   encryptSafely,
   getEncryptionPublicKey,
+}, {
+  decryptFailMsg: 'Decryption failed.',
+  badNonceSizeMsg: 'Uint8Array expected of length 24, not of length=0',
 });

@@ -1,20 +1,21 @@
+import { randomBytes as randomBytesNode } from '@noble/ciphers/cryptoNode';
+import { xsalsa20poly1305 } from '@noble/ciphers/salsa';
+import { randomBytes as randomBytesWeb } from '@noble/ciphers/webcrypto';
 import { base64, utf8 } from '@scure/base';
 import { box as tweetNaclBox } from 'tweetnacl';
-import { xsalsa20poly1305 } from '@noble/ciphers/salsa';
 // import { x25519 } from '@noble/curves/ed25519';
 
-
-/////
+// ///
 // import { hexToBytes, utf8ToBytes } from '@noble/ciphers/utils';
-import { randomBytes as randomBytesNode } from '@noble/ciphers/cryptoNode';
-import { randomBytes as randomBytesWeb } from '@noble/ciphers/webcrypto';
-const randomBytes = randomBytesNode ?? randomBytesWeb;
-//////
+import { hexToBytes, utf8ToBytes } from '@noble/ciphers/utils';
+// ////
 //
 //
 //
 
 import { isNullish } from './utils';
+
+const randomBytes = randomBytesNode ?? randomBytesWeb;
 
 export type EthEncryptedData = {
   version: string;
@@ -185,20 +186,19 @@ export function decrypt({
 
   switch (encryptedData.version) {
     case 'x25519-xsalsa20-poly1305': {
-      const receiverPrivateKeyUint8Array = Buffer.from(privateKey, 'hex');
+      const receiverPrivateKeyUint8Array = hexToBytes(privateKey);
 
-// const data = utf8ToBytes('hello, noble');
-// const data_ = salsa.decrypt(ciphertext); // utils.bytesToUtf8(data_) === data
+      // const data = utf8ToBytes('hello, noble');
+      // const data_ = salsa.decrypt(ciphertext); // utils.bytesToUtf8(data_) === data
 
-
-      //const receiverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(
+      // const receiverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(
       //  receiverPrivateKeyUint8Array,
-      //).secretKey;
+      // ).secretKey;
 
       // assemble decryption parameters
       const nonce = base64.decode(encryptedData.nonce);
       const ciphertext = base64.decode(encryptedData.ciphertext);
-      //const ephemPublicKey = base64.decode(encryptedData.ephemPublicKey);
+      // const ephemPublicKey = base64.decode(encryptedData.ephemPublicKey);
 
       // decrypt
       /*
