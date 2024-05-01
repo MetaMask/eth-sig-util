@@ -5,14 +5,23 @@ import {
   encryptSafely,
   getEncryptionPublicKey,
 } from './encryption';
+import {
+  decrypt as legacyDecrypt,
+  decryptSafely as legacyDecryptSafely,
+  encrypt as legacyEncrypt,
+  encryptSafely as legacyEncryptSafely,
+  getEncryptionPublicKey as legacyGetEncryptionPublicKey,
+} from './test-legacy-encryption';
 
+/* eslint-disable @typescript-eslint/no-shadow */
 const run = ({
-    decrypt,
-    decryptSafely,
-    encrypt,
-    encryptSafely,
-    getEncryptionPublicKey,
-  }) => {
+  decrypt,
+  decryptSafely,
+  encrypt,
+  encryptSafely,
+  getEncryptionPublicKey,
+}) => {
+  /* eslint-enable @typescript-eslint/no-shadow */
   describe('encryption', function () {
     const bob = {
       ethereumPrivateKey:
@@ -363,6 +372,22 @@ const run = ({
 run({
   decrypt,
   decryptSafely,
+  encrypt,
+  encryptSafely,
+  getEncryptionPublicKey,
+});
+
+run({
+  decrypt,
+  decryptSafely,
+  encrypt: legacyEncrypt,
+  encryptSafely: legacyEncryptSafely,
+  getEncryptionPublicKey: legacyGetEncryptionPublicKey,
+});
+
+run({
+  decrypt: legacyDecrypt,
+  decryptSafely: legacyDecryptSafely,
   encrypt,
   encryptSafely,
   getEncryptionPublicKey,
