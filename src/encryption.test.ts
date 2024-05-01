@@ -378,7 +378,9 @@ run('encryption,decryption', {
   encrypt,
   encryptSafely,
   getEncryptionPublicKey,
-}, {});
+}, {
+  badNonceSizeMsg: 'Uint8Array expected of length 24, not of length=0',
+});
 
 run('decryption(legacy encryption)', {
   decrypt,
@@ -386,7 +388,9 @@ run('decryption(legacy encryption)', {
   encrypt: legacyEncrypt,
   encryptSafely: legacyEncryptSafely,
   getEncryptionPublicKey: legacyGetEncryptionPublicKey,
-}, {});
+}, {
+  badNonceSizeMsg: 'Uint8Array expected of length 24, not of length=0',
+});
 
 run('encryption(legacy decryption)', {
   decrypt: legacyDecrypt,
@@ -396,5 +400,5 @@ run('encryption(legacy decryption)', {
   getEncryptionPublicKey,
 }, {
   decryptFailMsg: 'Decryption failed.',
-  badNonceSizeMsg: 'Uint8Array expected of length 24, not of length=0',
+  badNonceSizeMsg: 'bad nonce size',
 });
