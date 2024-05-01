@@ -7,14 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [7.0.2]
-### Uncategorized
-- deps: replace tweetnacl-util with @scure/base ([#358](https://github.com/MetaMask/eth-sig-util/pull/358))
-- Bump tar from 6.1.11 to 6.2.1 ([#365](https://github.com/MetaMask/eth-sig-util/pull/365))
-- Bump @metamask/auto-changelog from 3.3.0 to 3.4.4 ([#359](https://github.com/MetaMask/eth-sig-util/pull/359))
-- Bump @metamask/utils from 8.1.0 to 8.4.0 ([#364](https://github.com/MetaMask/eth-sig-util/pull/364))
-- Bump ip from 2.0.0 to 2.0.1 ([#361](https://github.com/MetaMask/eth-sig-util/pull/361))
-- Update security code scanner file ([#363](https://github.com/MetaMask/eth-sig-util/pull/363))
-- Enabling security code scanner ([#362](https://github.com/MetaMask/eth-sig-util/pull/362))
+### Fixed
+- Replace dependency `tweetnacl-util` with `@scure/base` ([#358](https://github.com/MetaMask/eth-sig-util/pull/358))
 
 ## [7.0.1]
 ### Changed
