@@ -1,21 +1,11 @@
-import { randomBytes as randomBytesNode } from '@noble/ciphers/cryptoNode';
-import { xsalsa20poly1305 } from '@noble/ciphers/salsa';
-import { randomBytes as randomBytesWeb } from '@noble/ciphers/webcrypto';
-import { base64, utf8 } from '@scure/base';
-import { box as tweetNaclBox } from 'tweetnacl';
-// import { x25519 } from '@noble/curves/ed25519';
+// This is a copy of encryption.ts from eth-sig-util v7.0.1.
+// It is here for the sake of compatibility testing as the library moves from tweetnacl
+// Implementation bugs in this file should in general not be addressed (unless backported to a @metamask/eth-sig-util v7.x release)
 
-// ///
-// import { hexToBytes, utf8ToBytes } from '@noble/ciphers/utils';
-import { hexToBytes, utf8ToBytes } from '@noble/ciphers/utils';
-// ////
-//
-//
-//
+import * as nacl from 'tweetnacl';
+import * as naclUtil from 'tweetnacl-util';
 
 import { isNullish } from './utils';
-
-const randomBytes = randomBytesNode ?? randomBytesWeb;
 
 export type EthEncryptedData = {
   version: string;
@@ -55,41 +45,34 @@ export function encrypt({
       if (typeof data !== 'string') {
         throw new Error('Message data must be given as a string');
       }
+      // generate ephemeral keypair
+      const ephemeralKeyPair = nacl.box.keyPair();
 
       // assemble encryption parameters - from string to UInt8
       let pubKeyUInt8Array: Uint8Array;
       try {
-        pubKeyUInt8Array = base64.decode(publicKey);
+        pubKeyUInt8Array = naclUtil.decodeBase64(publicKey);
       } catch (err) {
         throw new Error('Bad public key');
       }
 
-      const msgParamsUInt8Array = utf8.decode(data);
-      // const nonce = nacl.randomBytes(nacl.box.nonceLength);
-      const nonce = randomBytes(24);
+      const msgParamsUInt8Array = naclUtil.decodeUTF8(data);
+      const nonce = nacl.randomBytes(nacl.box.nonceLength);
 
       // encrypt
-      /*
       const encryptedMessage = nacl.box(
         msgParamsUInt8Array,
         nonce,
         pubKeyUInt8Array,
         ephemeralKeyPair.secretKey,
       );
-      */
-      const salsa = xsalsa20poly1305(pubKeyUInt8Array, nonce);
-      const encryptedMessage = salsa.encrypt(msgParamsUInt8Array);
-
-      // auth
-      // generate ephemeral keypair
-      // const ephemeralKeyPair = nacl.box.keyPair();
 
       // handle encrypted data
       const output = {
         version: 'x25519-xsalsa20-poly1305',
-        nonce: base64.encode(nonce),
-        ephemPublicKey: '',
-        ciphertext: base64.encode(encryptedMessage),
+        nonce: naclUtil.encodeBase64(nonce),
+        ephemPublicKey: naclUtil.encodeBase64(ephemeralKeyPair.publicKey),
+        ciphertext: naclUtil.encodeBase64(encryptedMessage),
       };
       // return encrypted msg data
       return output;
@@ -186,38 +169,33 @@ export function decrypt({
 
   switch (encryptedData.version) {
     case 'x25519-xsalsa20-poly1305': {
-      const receiverPrivateKeyUint8Array = hexToBytes(privateKey);
-
-      // const data = utf8ToBytes('hello, noble');
-      // const data_ = salsa.decrypt(ciphertext); // utils.bytesToUtf8(data_) === data
-
-      // const receiverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(
-      //  receiverPrivateKeyUint8Array,
-      // ).secretKey;
+      // string to buffer to UInt8Array
+      const receiverPrivateKeyUint8Array = naclDecodeHex(privateKey);
+      const receiverEncryptionPrivateKey = nacl.box.keyPair.fromSecretKey(
+        receiverPrivateKeyUint8Array,
+      ).secretKey;
 
       // assemble decryption parameters
-      const nonce = base64.decode(encryptedData.nonce);
-      const ciphertext = base64.decode(encryptedData.ciphertext);
-      // const ephemPublicKey = base64.decode(encryptedData.ephemPublicKey);
+      const nonce = naclUtil.decodeBase64(encryptedData.nonce);
+      const ciphertext = naclUtil.decodeBase64(encryptedData.ciphertext);
+      const ephemPublicKey = naclUtil.decodeBase64(
+        encryptedData.ephemPublicKey,
+      );
 
       // decrypt
-      /*
       const decryptedMessage = nacl.box.open(
         ciphertext,
         nonce,
         ephemPublicKey,
         receiverEncryptionPrivateKey,
       );
-      */
-      const salsa = xsalsa20poly1305(receiverPrivateKeyUint8Array, nonce);
-      const decryptedMessage = salsa.decrypt(ciphertext);
 
       // return decrypted msg data
       try {
         if (!decryptedMessage) {
           throw new Error();
         }
-        const output = utf8.encode(decryptedMessage);
+        const output = naclUtil.encodeUTF8(decryptedMessage);
         // TODO: This is probably extraneous but was kept to minimize changes during refactor
         if (!output) {
           throw new Error();
@@ -268,8 +246,19 @@ export function decryptSafely({
  * @returns The encryption public key.
  */
 export function getEncryptionPublicKey(privateKey: string): string {
-  const privateKeyUint8Array = Buffer.from(privateKey, 'hex');
+  const privateKeyUint8Array = naclDecodeHex(privateKey);
   const encryptionPublicKey =
-    tweetNaclBox.keyPair.fromSecretKey(privateKeyUint8Array).publicKey;
-  return base64.encode(encryptionPublicKey);
+    nacl.box.keyPair.fromSecretKey(privateKeyUint8Array).publicKey;
+  return naclUtil.encodeBase64(encryptionPublicKey);
+}
+
+/**
+ * Convert a hex string to the UInt8Array format used by nacl.
+ *
+ * @param msgHex - The string to convert.
+ * @returns The converted string.
+ */
+function naclDecodeHex(msgHex: string): Uint8Array {
+  const msgBase64 = Buffer.from(msgHex, 'hex').toString('base64');
+  return naclUtil.decodeBase64(msgBase64);
 }
