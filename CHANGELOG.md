@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.3]
+### Uncategorized
+- Bump `@metamask/utils` from `^8.1.0` to `^9.0.0`, bump `@metamask/abi-utils` from `^2.0.2` to `^2.0.4` ([#381](https://github.com/MetaMask/eth-sig-util/pull/381))
+
 ## [7.0.2]
 ### Fixed
 - Replace dependency `tweetnacl-util` with `@scure/base` ([#358](https://github.com/MetaMask/eth-sig-util/pull/358))
@@ -148,7 +152,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.2...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.3...HEAD
+[7.0.3]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.2...v7.0.3
 [7.0.2]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.1...v7.0.2
 [7.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.0...v7.0.1
 [7.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v6.0.1...v7.0.0
