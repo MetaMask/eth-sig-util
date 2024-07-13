@@ -7,8 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [7.0.3]
-### Uncategorized
-- Bump `@metamask/utils` from `^8.1.0` to `^9.0.0`, bump `@metamask/abi-utils` from `^2.0.2` to `^2.0.4` ([#381](https://github.com/MetaMask/eth-sig-util/pull/381))
+### Changed
+- Bump `@metamask/abi-utils` to `^2.0.4` ([#381](https://github.com/MetaMask/eth-sig-util/pull/381))
+- Bump `@metamask/utils` from `^9.0.0` ([#381](https://github.com/MetaMask/eth-sig-util/pull/381))
 
 ## [7.0.2]
 ### Fixed
