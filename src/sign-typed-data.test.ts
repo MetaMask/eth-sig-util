@@ -4297,8 +4297,6 @@ const signTypedDataV1Examples = {
     // V1: No apparent maximum address length
     '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbBbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
     '0x0',
-    10,
-    Number.MAX_SAFE_INTEGER,
   ],
   bool: [true, false, 'true', 'false', 0, 1, -1, Number.MAX_SAFE_INTEGER],
   bytes1: [

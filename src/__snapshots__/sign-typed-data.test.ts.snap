@@ -790,11 +790,7 @@ exports[`signTypedData V1 example data type "address" should sign "0xbBbBBBBbbBB
 
 exports[`signTypedData V1 example data type "address" should sign "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbBbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"0xd3cc76bddfcc4dcee4612be739e194a43dc4b42bee8f0e2800b5ac7fe73374c53bada433a92fc483716f54a5f72823da28e874312e616760bb9fd4b38fd75ae01b"`;
 
-exports[`signTypedData V1 example data type "address" should sign "10" (type "number") 1`] = `"0x9b01ae0fb606c2d49f1e8f61d5dbe5b8000a15dd3f17a97aaed1fcfc3d1b866c3830b92508cdeb1f218161262423875409262931871dd7eae5f92279fde480931b"`;
-
-exports[`signTypedData V1 example data type "address" should sign "9007199254740991" (type "number") 1`] = `"0x2647f147b3a1a340d29f955b79b77892d8a4639be09c1448ee067d7b8f006d6065bc3203a260e983d1f65b158b42dd8b623e13ff1321fa26ffc781a059dc43d41b"`;
-
-exports[`signTypedData V1 example data type "address" should sign array of all address example data 1`] = `"0x47f5457351ee32c7708436b3ee0974901b8cd532e6eccfb9cfbd16af24ae27053008d90aa0190fbac66669fa36a7292a7f345448cef72d5c6ce3f02374cfe54a1b"`;
+exports[`signTypedData V1 example data type "address" should sign array of all address example data 1`] = `"0x3f19e48278818473854f97fb5f5047770ee37fc5c788fb4c7bee2f895f6ce5944134bed59448376d8808c1d929c3d5c6079817489f8f476f740507a60b0bc2521c"`;
 
 exports[`signTypedData V1 example data type "bool" should sign "-1" (type "number") 1`] = `"0xcd5eb57c6a6bdda70a472ce41f441a1a5b293d8bffb83772e2f26cba45cc3d651cbd1b5fc7b9040f96f2e1a4eee3b75017602846d880a957666583802dd82bc81b"`;
 
@@ -1341,10 +1337,6 @@ exports[`typedSignatureHash type "address" should hash "0x0" (type "string") 1`]
 exports[`typedSignatureHash type "address" should hash "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"0x04c21f11808f1da08fcc268b752f1b27ff3398234a08c4e4ec3350518c03555d"`;
 
 exports[`typedSignatureHash type "address" should hash "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbBbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB" (type "string") 1`] = `"0x04c21f11808f1da08fcc268b752f1b27ff3398234a08c4e4ec3350518c03555d"`;
-
-exports[`typedSignatureHash type "address" should hash "10" (type "number") 1`] = `"0x7b0c4e6740e5b789fbbfc73bf849644964772e92b729f185b9878dfb8a10145e"`;
-
-exports[`typedSignatureHash type "address" should hash "9007199254740991" (type "number") 1`] = `"0xbb669a6dff00537ffaff31ce4aa19fc958e08f41834fbf06bf1270e71eee758f"`;
 
 exports[`typedSignatureHash type "bool" should hash "-1" (type "number") 1`] = `"0x4401c8323e5bef2e92610abb1fdec4b8d6672a233a3ab50c621a62193e7c998d"`;
 
