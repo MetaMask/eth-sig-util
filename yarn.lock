@@ -804,29 +804,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lavamoat/aa@npm:^4.2.0":
-  version: 4.2.0
-  resolution: "@lavamoat/aa@npm:4.2.0"
+"@lavamoat/aa@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "@lavamoat/aa@npm:4.3.0"
   dependencies:
     resolve: 1.22.8
   bin:
     lavamoat-ls: src/cli.js
-  checksum: bfc21f7d3f3310c1faddbb08f69d5f4cb23b819f85aceccfa516d3e8abcc8bcd547cf5d0ecf44fe195b8d7e61cc0566ebc564e532f1250d70b57a9db18d9a983
+  checksum: 41d83b512a88db71bbb3634febd5840614f1f39fa0b614499af2d6e9963180891b0350d8c38ce8d499142c9a6663711f983a3960f232f0d20f601c2a64912c30
   languageName: node
   linkType: hard
 
-"@lavamoat/allow-scripts@npm:^3.0.4":
-  version: 3.0.4
-  resolution: "@lavamoat/allow-scripts@npm:3.0.4"
+"@lavamoat/allow-scripts@npm:^3.3.0":
+  version: 3.3.0
+  resolution: "@lavamoat/allow-scripts@npm:3.3.0"
   dependencies:
-    "@lavamoat/aa": ^4.2.0
-    "@npmcli/run-script": 7.0.4
-    bin-links: 4.0.3
+    "@lavamoat/aa": ^4.3.0
+    "@npmcli/run-script": 8.1.0
+    bin-links: 4.0.4
     npm-normalize-package-bin: 3.0.1
     yargs: 17.7.2
+  peerDependencies:
+    "@lavamoat/preinstall-always-fail": "*"
   bin:
     allow-scripts: src/cli.js
-  checksum: ae40af4f152833d15f106aa0223c44abb8d7ba650e0c7e2189634860b8e7d3aaa6a6882ce278bfe17a1e33e77579c2fded36e935d57825ea852148324c7d5848
+  checksum: 566b2810decce7e2a3d47fe29cc1ddcb6ba70c90b41b09f8b2bd994a942c1b09201e3df7635d57cf0eb4d07cc14014f2f3595b6f1f7a63d1e1d032fa9941bf34
   languageName: node
   linkType: hard
 
@@ -909,7 +911,7 @@ __metadata:
   resolution: "@metamask/eth-sig-util@workspace:."
   dependencies:
     "@ethereumjs/util": ^8.1.0
-    "@lavamoat/allow-scripts": ^3.0.4
+    "@lavamoat/allow-scripts": ^3.3.0
     "@metamask/abi-utils": ^2.0.4
     "@metamask/auto-changelog": ^3.1.0
     "@metamask/eslint-config": ^11.1.0
@@ -1105,16 +1107,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@npmcli/run-script@npm:7.0.4":
-  version: 7.0.4
-  resolution: "@npmcli/run-script@npm:7.0.4"
+"@npmcli/run-script@npm:8.1.0":
+  version: 8.1.0
+  resolution: "@npmcli/run-script@npm:8.1.0"
   dependencies:
     "@npmcli/node-gyp": ^3.0.0
     "@npmcli/package-json": ^5.0.0
     "@npmcli/promise-spawn": ^7.0.0
     node-gyp: ^10.0.0
+    proc-log: ^4.0.0
     which: ^4.0.0
-  checksum: c44d6874cffb0a2f6d947e230083b605b6f253450e24aa185ef28391dc366b10807cd4ca113fe367057b8b5310add36391894f9d782af15424830658ee386dfb
+  checksum: 21adfb308b9064041d6d2f7f0d53924be0e1466d558de1c9802fab9eb84850bd8e04fdd5695924f331e1a36565461500d912e187909f91c03188cc763a106986
   languageName: node
   linkType: hard
 
@@ -1840,15 +1843,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bin-links@npm:4.0.3":
-  version: 4.0.3
-  resolution: "bin-links@npm:4.0.3"
+"bin-links@npm:4.0.4":
+  version: 4.0.4
+  resolution: "bin-links@npm:4.0.4"
   dependencies:
     cmd-shim: ^6.0.0
     npm-normalize-package-bin: ^3.0.0
     read-cmd-shim: ^4.0.0
     write-file-atomic: ^5.0.0
-  checksum: 3b3ee22efc38d608479d51675c8958a841b8b55b8975342ce86f28ac4e0bb3aef46e9dbdde976c6dc1fe1bd2aa00d42e00869ad35b57ee6d868f39f662858911
+  checksum: 9fca1fddaa3c1c9f7efd6fd7a6d991e3d8f6aaa9de5d0b9355469c2c594d8d06c9b2e0519bb0304202c14ddbe832d27b6d419d55cea4340e2c26116f9190e5c9
   languageName: node
   linkType: hard
 
