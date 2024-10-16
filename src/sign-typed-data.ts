@@ -605,10 +605,6 @@ function normalizeValue(type: string, value: unknown): any {
   }
 
   if (type === 'address') {
-    if (typeof value === 'number') {
-      return padStart(numberToBytes(value), 20);
-    }
-
     if (isStrictHexString(value)) {
       return padStart(hexToBytes(value).subarray(0, 20), 20);
     }
