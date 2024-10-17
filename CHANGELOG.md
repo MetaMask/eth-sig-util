@@ -195,7 +195,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.3...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v8.0.0...HEAD
+[8.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.3...v8.0.0
 [7.0.3]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.2...v7.0.3
 [7.0.2]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.1...v7.0.2
 [7.0.1]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.0...v7.0.1
