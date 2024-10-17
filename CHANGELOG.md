@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Bypass numerical address cast ([#391](https://github.com/MetaMask/eth-sig-util/pull/391))
 - Bump `@metamask/utils` from `^9.0.0` to `^9.3.0` ([#392](https://github.com/MetaMask/eth-sig-util/pull/392))
-- Drop support for Node.js versions 16, 21 ([#390](https://github.com/MetaMask/eth-sig-util/pull/390))
+- **BREAKING**: Drop support for Node.js versions 16, 21 ([#390](https://github.com/MetaMask/eth-sig-util/pull/390))
 
 ## [7.0.3]
 
