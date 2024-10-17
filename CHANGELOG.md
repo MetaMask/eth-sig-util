@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [7.0.3]
+## [8.0.0]
 
 - Remove numerical address cast ([#391](https://github.com/MetaMask/eth-sig-util/pull/391))
 
