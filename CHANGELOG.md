@@ -7,11 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [8.0.0]
+## [7.0.3]
+
+- Remove numerical address cast ([#391](https://github.com/MetaMask/eth-sig-util/pull/391))
+
+## [7.0.3]
 
 ### Changed
 
-- Remove numerical address cast ([#391](https://github.com/MetaMask/eth-sig-util/pull/391))
 - Bump `@metamask/abi-utils` to `^2.0.4` ([#381](https://github.com/MetaMask/eth-sig-util/pull/381))
 - Bump `@metamask/utils` from `^9.0.0` ([#381](https://github.com/MetaMask/eth-sig-util/pull/381))
 
