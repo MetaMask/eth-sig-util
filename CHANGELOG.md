@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [8.0.0]
 ### Changed
 - **BREAKING**: Values of type `number` are not accepted as address parameter anymore. Valid values are `string` and `Uint8Array`. ([#391](https://github.com/MetaMask/eth-sig-util/pull/391))
+- **BREAKING**: Drop support for Node.js versions 16, 21. ([#390](https://github.com/MetaMask/eth-sig-util/pull/390))
 
 ## [7.0.3]
 ### Changed
