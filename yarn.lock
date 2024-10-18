@@ -841,14 +841,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/eslint-config-jest@npm:^11.1.0":
-  version: 11.1.0
-  resolution: "@metamask/eslint-config-jest@npm:11.1.0"
+"@metamask/eslint-config-jest@npm:^13.0.0":
+  version: 13.0.0
+  resolution: "@metamask/eslint-config-jest@npm:13.0.0"
   peerDependencies:
-    "@metamask/eslint-config": ^11.0.0
-    eslint: ^8.27.0
-    eslint-plugin-jest: ^27.1.5
-  checksum: a649cf317327532d0d18795ac3bc74766e649e821ca3130dac288b16d5243ae72b5bda4eb85c678f1b4f9c073904ac6162b740c237b67921e64ce4f40c6ceb77
+    "@metamask/eslint-config": ^13.0.0
+    eslint: ^8.57.0
+    eslint-plugin-jest: ^27.9.0
+  checksum: 1680646add66f3da2e802d41babcbd9c2c164e3eeb4cec8b37ba322591ba2e25937616362a83a8e72cba98932b746a9b8bd414d2787e0ee08da91e75fde6bff3
   languageName: node
   linkType: hard
 
@@ -899,7 +899,7 @@ __metadata:
     "@metamask/abi-utils": ^2.0.4
     "@metamask/auto-changelog": ^3.1.0
     "@metamask/eslint-config": ^11.1.0
-    "@metamask/eslint-config-jest": ^11.1.0
+    "@metamask/eslint-config-jest": ^13.0.0
     "@metamask/eslint-config-nodejs": ^11.1.0
     "@metamask/eslint-config-typescript": ^11.1.0
     "@metamask/utils": ^9.0.0
