@@ -11,8 +11,6 @@ jobs:
   publish-docs-to-gh-pages:
     name: Publish docs to GitHub Pages
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Ensure `destination_dir` is not empty
         if: ${{ inputs.destination_dir == '' }}
