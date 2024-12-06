@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [8.1.1]
+### Fixed
+- Revert "fix: Add Permit type schema" ([#401](https://github.com/MetaMask/eth-sig-util/pull/401))
 
 ## [8.1.0]
 ### Added
