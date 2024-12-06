@@ -105,22 +105,6 @@ export type TypedMessage<T extends MessageTypes> = {
   message: Record<string, unknown>;
 };
 
-const PERMIT_TYPE_SCHEMA = {
-  properties: {
-    message: {
-      type: 'object',
-      properties: {
-        owner: { type: 'string' },
-        spender: { type: 'string' },
-        value: { type: 'string' },
-        nonce: { type: 'string' },
-        deadline: { type: 'string' },
-      },
-      required: ['owner', 'spender', 'value', 'nonce', 'deadline'],
-    },
-  },
-};
-
 export const TYPED_MESSAGE_SCHEMA = {
   type: 'object',
   properties: {
@@ -143,10 +127,6 @@ export const TYPED_MESSAGE_SCHEMA = {
     message: { type: 'object' },
   },
   required: ['types', 'primaryType', 'domain', 'message'],
-  if: {
-    properties: { primaryType: { const: 'Permit' } },
-  },
-  then: PERMIT_TYPE_SCHEMA,
 };
 
 /**
