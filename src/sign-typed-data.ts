@@ -105,6 +105,18 @@ export type TypedMessage<T extends MessageTypes> = {
   message: Record<string, unknown>;
 };
 
+// 'value' is not required, allow it to be undefined but if it is provided, it must be a string
+const PERMIT_TYPE_SCHEMA = {
+  properties: {
+    message: {
+      type: 'object',
+      properties: {
+        value: { type: 'string' },
+      },
+    },
+  },
+};
+
 export const TYPED_MESSAGE_SCHEMA = {
   type: 'object',
   properties: {
@@ -127,6 +139,10 @@ export const TYPED_MESSAGE_SCHEMA = {
     message: { type: 'object' },
   },
   required: ['types', 'primaryType', 'domain', 'message'],
+  if: {
+    properties: { primaryType: { const: 'Permit' } },
+  },
+  then: PERMIT_TYPE_SCHEMA,
 };
 
 /**
