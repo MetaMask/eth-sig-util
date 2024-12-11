@@ -105,6 +105,18 @@ export type TypedMessage<T extends MessageTypes> = {
   message: Record<string, unknown>;
 };
 
+enum MetricFeedbackType {
+  VIOLATION = 'violation',
+  UNNECESSARY_CASTING = 'unnecessary_casting',
+}
+
+type MetricFeedback = {
+  typeOfFeedback: MetricFeedbackType;
+  name: string;
+  type: string;
+  actual: string;
+};
+
 export const TYPED_MESSAGE_SCHEMA = {
   type: 'object',
   properties: {
@@ -237,7 +249,11 @@ function encodeField(
   // TODO: constrain type on `value`
   value: any,
   version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
-): [type: string, value: bigint | Buffer | boolean | string | Uint8Array] {
+): [
+  type: string,
+  value: bigint | Buffer | boolean | string | Uint8Array,
+  metricFeedback?: MetricFeedback,
+] {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
   if (types[type] !== undefined) {
@@ -262,18 +278,50 @@ function encodeField(
 
   if (type === 'address') {
     if (typeof value === 'number') {
-      return ['address', padStart(numberToBytes(value), 20)];
+      // Unnecessary casting - Request value could have been a hex string
+      return [
+        'address',
+        padStart(numberToBytes(value), 20),
+        {
+          typeOfFeedback: MetricFeedbackType.VIOLATION,
+          type,
+          name,
+          actual: 'number',
+        },
+      ];
     } else if (isStrictHexString(value)) {
-      return ['address', add0x(value)];
+      // Unnecessary casting - Request value could have been a hex string - This is already checking for a hex string, so add0x is redundant
+      return [
+        'address',
+        add0x(value),
+        {
+          typeOfFeedback: MetricFeedbackType.UNNECESSARY_CASTING,
+          type,
+          name,
+          actual: 'hex string',
+        },
+      ];
     } else if (typeof value === 'string') {
+      // Necessary casting - See note above function - TLDR: It's here for backwards compatibility
       return ['address', reallyStrangeAddressToBytes(value).subarray(0, 20)];
     }
   }
 
   if (type === 'bool') {
-    return ['bool', Boolean(value)];
+    // Unnecessary casting - Request value could have been a boolean
+    return [
+      'bool',
+      Boolean(value),
+      {
+        typeOfFeedback: MetricFeedbackType.UNNECESSARY_CASTING,
+        type,
+        name,
+        actual: typeof value,
+      },
+    ];
   }
 
+  // Necessary casting - Byte type is lost in JSON stringification on while passing request between JSON RPC handlers and the signer
   if (type === 'bytes') {
     if (typeof value === 'number') {
       value = numberToBytes(value);
@@ -285,6 +333,8 @@ function encodeField(
     return ['bytes32', arrToBufArr(keccak256(value))];
   }
 
+  // Necessary casting - Byte type is lost in JSON stringification on while passing request between JSON RPC handlers and the signer
+  // Specifically handling `bytes<M>` types
   if (type.startsWith('bytes') && type !== 'bytes' && !type.includes('[')) {
     if (typeof value === 'number') {
       if (value < 0) {
@@ -299,24 +349,38 @@ function encodeField(
     return ['bytes32', value];
   }
 
+  // Necessary casting
   if (type.startsWith('int') && !type.includes('[')) {
+    // This function call converts the value to a BigInt, ensuring it is within the valid range for the specified integer type.
     const bigIntValue = parseNumber(type, value);
     if (bigIntValue >= BigInt(0)) {
+      // This is a semantic indication that the value is treated as an unsigned integer.
       return ['uint256', bigIntValue];
     }
 
+    // If the bigIntValue is negative, it is returned as an int256. This indicates that the value is treated as a signed integer.
     return ['int256', bigIntValue];
   }
 
+  // Neutral casting - string must be converted to bytes32 but contains unnecessary casting
   if (type === 'string') {
+    let metricFeedback;
     if (typeof value === 'number') {
+      // Unnecessary casting - Request value could have been a string
       value = numberToBytes(value);
+      metricFeedback = {
+        typeOfFeedback: MetricFeedbackType.UNNECESSARY_CASTING,
+        type: 'string',
+        name,
+        actual: 'number',
+      };
     } else {
       value = stringToBytes(value ?? '');
     }
-    return ['bytes32', arrToBufArr(keccak256(value))];
+    return ['bytes32', arrToBufArr(keccak256(value)), metricFeedback];
   }
 
+  // Recursive casting - this is needed for array types
   if (type.endsWith(']')) {
     if (version === SignTypedDataVersion.V3) {
       throw new Error(
@@ -357,6 +421,7 @@ function encodeData(
   data: Record<string, unknown>,
   types: Record<string, MessageTypeProperty[]>,
   version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+  collectMetricFeedbackAndReturn = false,
 ): Buffer {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
@@ -364,12 +429,13 @@ function encodeData(
   const encodedValues: (string | bigint | boolean | Uint8Array | Buffer)[] = [
     hashType(primaryType, types),
   ];
+  const metricFeedbacks: MetricFeedback[] = [];
 
   for (const field of types[primaryType]) {
     if (version === SignTypedDataVersion.V3 && data[field.name] === undefined) {
       continue;
     }
-    const [type, value] = encodeField(
+    const [type, value, metricFeedback] = encodeField(
       types,
       field.name,
       field.type,
@@ -378,6 +444,15 @@ function encodeData(
     );
     encodedTypes.push(type);
     encodedValues.push(value);
+    if (collectMetricFeedbackAndReturn && metricFeedback) {
+      metricFeedbacks.push(metricFeedback);
+    }
+  }
+
+  if (collectMetricFeedbackAndReturn) {
+    // This is a temporary solution to return the violations and unnecessary castings
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    return metricFeedbacks as unknown as any;
   }
 
   return arrToBufArr(encode(encodedTypes, encodedValues));
