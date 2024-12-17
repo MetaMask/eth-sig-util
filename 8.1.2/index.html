@@ -1,0 +1,134 @@
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@metamask/eth-sig-util</title><meta name="description" content="Documentation for @metamask/eth-sig-util"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container">
+<div class="table-cell" id="tsd-search" data-base=".">
+<div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
+<div class="field">
+<div id="tsd-toolbar-links"></div></div>
+<ul class="results">
+<li class="state loading">Preparing search index...</li>
+<li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">@metamask/eth-sig-util</a></div>
+<div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="7" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="11" width="14" height="2" fill="var(--color-text)"></rect></svg></a></div></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<h2>@metamask/eth-sig-util</h2></div>
+<div class="tsd-panel tsd-typography"><a id="md:metamasketh-sig-util" class="tsd-anchor"></a><h1><a href="#md:metamasketh-sig-util"><code>@metamask/eth-sig-util</code></a></h1><p>A small collection of Ethereum signing functions.</p>
+<p><a href="https://www.npmjs.com/package/@metamask/eth-sig-util">Available on NPM</a></p>
+<a id="md:installation" class="tsd-anchor"></a><h2><a href="#md:installation">Installation</a></h2><p><code>yarn add @metamask/eth-sig-util</code></p>
+<p>or</p>
+<p><code>npm install @metamask/eth-sig-util</code></p>
+<a id="md:api" class="tsd-anchor"></a><h2><a href="#md:api">API</a></h2><p>The full API documentation for the latest published version of this library is <a href="https://metamask.github.io/eth-sig-util/latest/index.html">available here</a>.</p>
+<a id="md:contributing" class="tsd-anchor"></a><h2><a href="#md:contributing">Contributing</a></h2><a id="md:setup" class="tsd-anchor"></a><h3><a href="#md:setup">Setup</a></h3><ul>
+<li>Install <a href="https://nodejs.org">Node.js</a> version 18<ul>
+<li>If you are using <a href="https://github.com/creationix/nvm#installation">nvm</a> (recommended) running <code>nvm use</code> will automatically choose the right node version for you.</li>
+</ul>
+</li>
+<li>Install <a href="https://yarnpkg.com/getting-started/install">Yarn v3</a></li>
+<li>Run <code>yarn install</code> to install dependencies and run any required post-install scripts</li>
+</ul>
+<a id="md:testing-and-linting" class="tsd-anchor"></a><h3><a href="#md:testing-and-linting">Testing and Linting</a></h3><p>Run <code>yarn test</code> to run the tests once. To run tests on file changes, run <code>yarn test:watch</code>.</p>
+<p>Run <code>yarn lint</code> to run the linter, or run <code>yarn lint:fix</code> to run the linter and fix any automatically fixable issues.</p>
+<a id="md:documentation" class="tsd-anchor"></a><h3><a href="#md:documentation">Documentation</a></h3><p>The API documentation can be generated with the command <code>yarn docs</code>, which saves it in the <code>./docs</code> directory. Open the <code>./docs/index.html</code> file to browse the documentation.</p>
+<a id="md:release-amp-publishing" class="tsd-anchor"></a><h3><a href="#md:release-amp-publishing">Release &amp; Publishing</a></h3><p>The project follows the same release process as the other libraries in the MetaMask organization. The GitHub Actions <a href="https://github.com/MetaMask/action-create-release-pr"><code>action-create-release-pr</code></a> and <a href="https://github.com/MetaMask/action-publish-release"><code>action-publish-release</code></a> are used to automate the release process; see those repositories for more information about how they work.</p>
+<ol>
+<li><p>Choose a release version.</p>
+<ul>
+<li>The release version should be chosen according to SemVer. Analyze the changes to see whether they include any breaking changes, new features, or deprecations, then choose the appropriate SemVer version. See <a href="https://semver.org/">the SemVer specification</a> for more information.</li>
+</ul>
+</li>
+<li><p>If this release is backporting changes onto a previous release, then ensure there is a major version branch for that version (e.g. <code>1.x</code> for a <code>v1</code> backport release).</p>
+<ul>
+<li>The major version branch should be set to the most recent release with that major version. For example, when backporting a <code>v1.0.2</code> release, you&#39;d want to ensure there was a <code>1.x</code> branch that was set to the <code>v1.0.1</code> tag.</li>
+</ul>
+</li>
+<li><p>Trigger the <a href="https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch"><code>workflow_dispatch</code></a> event <a href="https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow">manually</a> for the <code>Create Release Pull Request</code> action to create the release PR.</p>
+<ul>
+<li>For a backport release, the base branch should be the major version branch that you ensured existed in step 2. For a normal release, the base branch should be the main branch for that repository (which should be the default value).</li>
+<li>This should trigger the <a href="https://github.com/MetaMask/action-create-release-pr"><code>action-create-release-pr</code></a> workflow to create the release PR.</li>
+</ul>
+</li>
+<li><p>Update the changelog to move each change entry into the appropriate change category (<a href="https://keepachangelog.com/en/1.0.0/#types">See here</a> for the full list of change categories, and the correct ordering), and edit them to be more easily understood by users of the package.</p>
+<ul>
+<li>Generally any changes that don&#39;t affect consumers of the package (e.g. lockfile changes or development environment changes) are omitted. Exceptions may be made for changes that might be of interest despite not having an effect upon the published package (e.g. major test improvements, security improvements, improved documentation, etc.).</li>
+<li>Try to explain each change in terms that users of the package would understand (e.g. avoid referencing internal variables/concepts).</li>
+<li>Consolidate related changes into one change entry if it makes it easier to explain.</li>
+<li>Run <code>yarn auto-changelog validate --rc</code> to check that the changelog is correctly formatted.</li>
+</ul>
+</li>
+<li><p>Review and QA the release.</p>
+<ul>
+<li>If changes are made to the base branch, the release branch will need to be updated with these changes and review/QA will need to restart again. As such, it&#39;s probably best to avoid merging other PRs into the base branch while review is underway.</li>
+</ul>
+</li>
+<li><p>Squash &amp; Merge the release.</p>
+<ul>
+<li>This should trigger the <a href="https://github.com/MetaMask/action-publish-release"><code>action-publish-release</code></a> workflow to tag the final release commit and publish the release on GitHub.</li>
+</ul>
+</li>
+<li><p>Publish the release on npm.</p>
+<ul>
+<li>Wait for the <code>publish-release</code> GitHub Action workflow to finish. This should trigger a second job (<code>publish-npm</code>), which will wait for a run approval by the <a href="https://github.com/orgs/MetaMask/teams/npm-publishers"><code>npm publishers</code></a> team.</li>
+<li>Approve the <code>publish-npm</code> job (or ask somebody on the npm publishers team to approve it for you).</li>
+<li>Once the <code>publish-npm</code> job has finished, check npm to verify that it has been published.</li>
+</ul>
+</li>
+</ol>
+</div></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility">
+<h4 class="uppercase">Member Visibility</h4><form>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></form></div>
+<div class="tsd-theme-toggle">
+<h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg>On This Page</h3></summary>
+<div class="tsd-accordion-details">
+<ul>
+<li>
+<ul>
+<li><a href="#md:metamasketh-sig-util"><span>@metamask/eth-<wbr/>sig-<wbr/>util</span></a></li>
+<li>
+<ul>
+<li><a href="#md:installation"><span>Installation</span></a></li>
+<li><a href="#md:api"><span>API</span></a></li>
+<li><a href="#md:contributing"><span>Contributing</span></a></li>
+<li>
+<ul>
+<li><a href="#md:setup"><span>Setup</span></a></li>
+<li><a href="#md:testing-and-linting"><span>Testing and <wbr/>Linting</span></a></li>
+<li><a href="#md:documentation"><span>Documentation</span></a></li>
+<li><a href="#md:release-amp-publishing"><span>Release &amp; <wbr/>Publishing</span></a></li></ul></li></ul></li></ul></li></ul></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="modules.html" class="current"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-4-path"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)" id="icon-4-text"></path></svg><span>@metamask/eth-<wbr/>sig-<wbr/>util</span></a>
+<ul class="tsd-small-nested-navigation">
+<li><a href="enums/SignTypedDataVersion.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-enum)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-8-path"></rect><path d="M9.45 16V7.24H14.49V8.224H10.518V10.936H14.07V11.908H10.518V15.016H14.49V16H9.45Z" fill="var(--color-text)" id="icon-8-text"></path></svg><span>Sign<wbr/>Typed<wbr/>Data<wbr/>Version</span></a></li>
+<li><a href="types/EthEncryptedData.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-type-alias)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-4194304-path"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)" id="icon-4194304-text"></path></svg><span>Eth<wbr/>Encrypted<wbr/>Data</span></a></li>
+<li><a href="types/MessageTypeProperty.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg><span>Message<wbr/>Type<wbr/>Property</span></a></li>
+<li><a href="types/MessageTypes.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg><span>Message<wbr/>Types</span></a></li>
+<li><a href="types/TypedDataV1.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg><span>Typed<wbr/>Data<wbr/>V1</span></a></li>
+<li><a href="types/TypedDataV1Field.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg><span>Typed<wbr/>Data<wbr/>V1<wbr/>Field</span></a></li>
+<li><a href="types/TypedMessage.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg><span>Typed<wbr/>Message</span></a></li>
+<li><a href="variables/TYPED_MESSAGE_SCHEMA.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-variable)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-32-path"></rect><path d="M11.106 16L8.85 7.24H9.966L11.454 13.192C11.558 13.608 11.646 13.996 11.718 14.356C11.79 14.708 11.842 14.976 11.874 15.16C11.906 14.976 11.954 14.708 12.018 14.356C12.09 13.996 12.178 13.608 12.282 13.192L13.758 7.24H14.85L12.582 16H11.106Z" fill="var(--color-text)" id="icon-32-text"></path></svg><span>TYPED_<wbr/>MESSAGE_<wbr/>SCHEMA</span></a></li>
+<li><a href="variables/TypedDataUtils.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-32-path"></use><use href="#icon-32-text"></use></svg><span>Typed<wbr/>Data<wbr/>Utils</span></a></li>
+<li><a href="functions/concatSig.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-64-path"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)" id="icon-64-text"></path></svg><span>concat<wbr/>Sig</span></a></li>
+<li><a href="functions/decrypt.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>decrypt</span></a></li>
+<li><a href="functions/decryptSafely.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>decrypt<wbr/>Safely</span></a></li>
+<li><a href="functions/encrypt.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>encrypt</span></a></li>
+<li><a href="functions/encryptSafely.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>encrypt<wbr/>Safely</span></a></li>
+<li><a href="functions/extractPublicKey.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>extract<wbr/>Public<wbr/>Key</span></a></li>
+<li><a href="functions/getEncryptionPublicKey.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>get<wbr/>Encryption<wbr/>Public<wbr/>Key</span></a></li>
+<li><a href="functions/normalize.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>normalize</span></a></li>
+<li><a href="functions/personalSign.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>personal<wbr/>Sign</span></a></li>
+<li><a href="functions/recoverPersonalSignature.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>recover<wbr/>Personal<wbr/>Signature</span></a></li>
+<li><a href="functions/recoverTypedSignature.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>recover<wbr/>Typed<wbr/>Signature</span></a></li>
+<li><a href="functions/signTypedData.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>sign<wbr/>Typed<wbr/>Data</span></a></li>
+<li><a href="functions/typedSignatureHash.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>typed<wbr/>Signature<wbr/>Hash</span></a></li></ul></nav></div></div></div>
+<div class="overlay"></div></body></html>
