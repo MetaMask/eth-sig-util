@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [8.1.2]
-### Uncategorized
-- Bump micromatch from 4.0.5 to 4.0.8 in the npm_and_yarn group ([#393](https://github.com/MetaMask/eth-sig-util/pull/393))
-- Bump `@metamask/utils` from `^9.0.0` to `^11.0.1` and `@metamask/abi-utils` from `^2.0.4` to `^3.0.0` ([#405](https://github.com/MetaMask/eth-sig-util/pull/405))
+### Changed
+- Bump `@metamask/abi-utils` from `^2.0.4` to `^3.0.0` ([#405](https://github.com/MetaMask/eth-sig-util/pull/405))
+- Bump `@metamask/utils` from `^9.0.0` to `^11.0.1` ([#405](https://github.com/MetaMask/eth-sig-util/pull/405))
 
 ## [8.1.1]
 ### Fixed
