@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.1.2]
+### Uncategorized
+- Bump micromatch from 4.0.5 to 4.0.8 in the npm_and_yarn group ([#393](https://github.com/MetaMask/eth-sig-util/pull/393))
+- Bump `@metamask/utils` from `^9.0.0` to `^11.0.1` and `@metamask/abi-utils` from `^2.0.4` to `^3.0.0` ([#405](https://github.com/MetaMask/eth-sig-util/pull/405))
+
 ## [8.1.1]
 ### Fixed
 - Revert "fix: Add Permit type schema" ([#401](https://github.com/MetaMask/eth-sig-util/pull/401))
@@ -166,7 +171,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.1...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.2...HEAD
+[8.1.2]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.1...v8.1.2
 [8.1.1]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.0...v8.1.1
 [8.1.0]: https://github.com/MetaMask/eth-sig-util/compare/v8.0.0...v8.1.0
 [8.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v7.0.3...v8.0.0
