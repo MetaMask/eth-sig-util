@@ -1,6 +1,6 @@
 {
   "name": "@metamask/eth-sig-util",
-  "version": "8.0.0",
+  "version": "8.1.1",
   "description": "A few useful functions for signing ethereum data",
   "keywords": [
     "ethereum",
@@ -45,8 +45,8 @@
   },
   "dependencies": {
     "@ethereumjs/util": "^8.1.0",
-    "@metamask/abi-utils": "^2.0.4",
-    "@metamask/utils": "^9.0.0",
+    "@metamask/abi-utils": "^3.0.0",
+    "@metamask/utils": "^11.0.1",
     "@scure/base": "~1.1.3",
     "ethereum-cryptography": "^2.1.2",
     "tweetnacl": "^1.0.3"
