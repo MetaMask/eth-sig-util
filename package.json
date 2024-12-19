@@ -44,6 +44,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@ethereumjs/rlp": "^4.0.1",
     "@ethereumjs/util": "^8.1.0",
     "@metamask/abi-utils": "^3.0.0",
     "@metamask/utils": "^11.0.1",

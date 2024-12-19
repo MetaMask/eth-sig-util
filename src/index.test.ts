@@ -21,6 +21,9 @@ Array [
   "decrypt",
   "decryptSafely",
   "getEncryptionPublicKey",
+  "signAuthorization",
+  "recoverAuthorization",
+  "hashAuthorization",
 ]
 `);
   });
