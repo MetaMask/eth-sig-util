@@ -46,7 +46,6 @@ function validateAuthorization(authorization: Authorization) {
 
 /**
  * Sign an authorization message with the provided private key.
- * The signature format follows EIP-155 for chain-specific signatures.
  *
  * @param options - The signing options.
  * @param options.privateKey - The private key to sign with.
