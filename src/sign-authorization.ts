@@ -1,8 +1,9 @@
+import { encode } from '@ethereumjs/rlp';
 import { ecsign, publicToAddress, toBuffer } from '@ethereumjs/util';
 import { bytesToHex } from '@metamask/utils';
 import { keccak256 } from 'ethereum-cryptography/keccak';
+
 import { concatSig, isNullish, recoverPublicKey } from './utils';
-import { encode } from '@ethereumjs/rlp';
 
 /**
  * The authorization struct as defined in EIP-7702.

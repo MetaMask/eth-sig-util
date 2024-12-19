@@ -1,4 +1,5 @@
 import { bufferToHex, privateToAddress } from '@ethereumjs/util';
+
 import {
   signAuthorization,
   recoverAuthorization,
@@ -118,7 +119,7 @@ describe('signAuthorization', () => {
     it('should produce the correct hash', () => {
       const hash = hashAuthorization(testAuthorization);
 
-      expect(hash).toEqual(expectedAuthorizationHash);
+      expect(hash).toStrictEqual(expectedAuthorizationHash);
     });
 
     it('should throw if authorization is null', () => {
@@ -213,16 +214,12 @@ describe('signAuthorization', () => {
 
   describe('sign-and-recover', () => {
     const testCases = {
-      'zero chainId': [0, '0x1234567890123456789012345678901234567890', 1],
-      'high chainId': [98765, '0x1234567890123456789012345678901234567890', 1],
-      'zero nonce': [8545, '0x1234567890123456789012345678901234567890', 0],
-      'high nonce': [8545, '0x1234567890123456789012345678901234567890', 98765],
-      'zero contractAddress': [
-        1,
-        '0x0000000000000000000000000000000000000000',
-        1,
-      ],
-      'all zero values': [0, '0x0000000000000000000000000000000000000000', 0],
+      zeroChainId: [0, '0x1234567890123456789012345678901234567890', 1],
+      highChainId: [98765, '0x1234567890123456789012345678901234567890', 1],
+      zeroNonce: [8545, '0x1234567890123456789012345678901234567890', 0],
+      highNonce: [8545, '0x1234567890123456789012345678901234567890', 98765],
+      zeroContractAddress: [1, '0x0000000000000000000000000000000000000000', 1],
+      allZeroValues: [0, '0x0000000000000000000000000000000000000000', 0],
     } as { [key: string]: Authorization };
 
     for (const [label, authorization] of Object.entries(testCases)) {
