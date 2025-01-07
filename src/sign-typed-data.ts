@@ -242,7 +242,7 @@ function reallyStrangeAddressToBytes(address: string): Uint8Array {
  * @param version - The EIP-712 version the encoding should comply with.
  * @returns Encoded representation of the field.
  */
-function encodeField(
+export function encodeField(
   types: Record<string, MessageTypeProperty[]>,
   name: string,
   type: string,
