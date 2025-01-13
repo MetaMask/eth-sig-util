@@ -12,37 +12,11 @@ import { concatSig, isNullish, recoverPublicKey } from './utils';
  * @property contractAddress - The address of the contract being authorized.
  * @property nonce - The nonce of the signing account (at the time of submission).
  */
-export type Authorization = [
+export type EIP7702Authorization = [
   chainId: number,
   contractAddress: string,
   nonce: number,
 ];
-
-/**
- * Validates an authorization object to ensure all required parameters are present.
- *
- * @param authorization - The authorization object to validate.
- * @throws {Error} If the authorization object or any of its required parameters are missing.
- */
-function validateAuthorization(authorization: Authorization) {
-  if (isNullish(authorization)) {
-    throw new Error('Missing authorization parameter');
-  }
-
-  const [chainId, contractAddress, nonce] = authorization;
-
-  if (isNullish(chainId)) {
-    throw new Error('Missing chainId parameter');
-  }
-
-  if (isNullish(contractAddress)) {
-    throw new Error('Missing contractAddress parameter');
-  }
-
-  if (isNullish(nonce)) {
-    throw new Error('Missing nonce parameter');
-  }
-}
 
 /**
  * Sign an authorization message with the provided private key.
@@ -52,20 +26,20 @@ function validateAuthorization(authorization: Authorization) {
  * @param options.authorization - The authorization data to sign.
  * @returns The '0x'-prefixed hex encoded signature.
  */
-export function signAuthorization({
+export function signEIP7702Authorization({
   privateKey,
   authorization,
 }: {
   privateKey: Buffer;
-  authorization: Authorization;
+  authorization: EIP7702Authorization;
 }): string {
-  validateAuthorization(authorization);
+  validateEIP7702Authorization(authorization);
 
   if (isNullish(privateKey)) {
     throw new Error('Missing privateKey parameter');
   }
 
-  const messageHash = hashAuthorization(authorization);
+  const messageHash = hashEIP7702Authorization(authorization);
 
   const { r, s, v } = ecsign(messageHash, privateKey);
 
@@ -84,20 +58,20 @@ export function signAuthorization({
  * @param options.authorization - The authorization data that was signed.
  * @returns The '0x'-prefixed hex address of the signer.
  */
-export function recoverAuthorization({
+export function recoverEIP7702Authorization({
   signature,
   authorization,
 }: {
   signature: string;
-  authorization: Authorization;
+  authorization: EIP7702Authorization;
 }): string {
-  validateAuthorization(authorization);
+  validateEIP7702Authorization(authorization);
 
   if (isNullish(signature)) {
     throw new Error('Missing signature parameter');
   }
 
-  const messageHash = hashAuthorization(authorization);
+  const messageHash = hashEIP7702Authorization(authorization);
 
   const publicKey = recoverPublicKey(messageHash, signature);
 
@@ -113,8 +87,10 @@ export function recoverAuthorization({
  * @param authorization - The authorization data to hash.
  * @returns The hash of the authorization message as a Buffer.
  */
-export function hashAuthorization(authorization: Authorization): Buffer {
-  validateAuthorization(authorization);
+export function hashEIP7702Authorization(
+  authorization: EIP7702Authorization,
+): Buffer {
+  validateEIP7702Authorization(authorization);
 
   const encodedAuthorization = encode(authorization);
 
@@ -124,4 +100,30 @@ export function hashAuthorization(authorization: Authorization): Buffer {
   ]);
 
   return Buffer.from(keccak256(message));
+}
+
+/**
+ * Validates an authorization object to ensure all required parameters are present.
+ *
+ * @param authorization - The authorization object to validate.
+ * @throws {Error} If the authorization object or any of its required parameters are missing.
+ */
+function validateEIP7702Authorization(authorization: EIP7702Authorization) {
+  if (isNullish(authorization)) {
+    throw new Error('Missing authorization parameter');
+  }
+
+  const [chainId, contractAddress, nonce] = authorization;
+
+  if (isNullish(chainId)) {
+    throw new Error('Missing chainId parameter');
+  }
+
+  if (isNullish(contractAddress)) {
+    throw new Error('Missing contractAddress parameter');
+  }
+
+  if (isNullish(nonce)) {
+    throw new Error('Missing nonce parameter');
+  }
 }
