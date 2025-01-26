@@ -21,6 +21,9 @@ Array [
   "decrypt",
   "decryptSafely",
   "getEncryptionPublicKey",
+  "signEIP7702Authorization",
+  "recoverEIP7702Authorization",
+  "hashEIP7702Authorization",
 ]
 `);
   });
