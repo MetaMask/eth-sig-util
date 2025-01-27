@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [8.2.0]
-### Uncategorized
+### Added
 - Adds `signAuthorization` method for EIP-7702 ([#407](https://github.com/MetaMask/eth-sig-util/pull/407))
 
 ## [8.1.2]
