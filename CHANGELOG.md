@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.2.0]
+### Uncategorized
+- Adds `signAuthorization` method for EIP-7702 ([#407](https://github.com/MetaMask/eth-sig-util/pull/407))
+
 ## [8.1.2]
 ### Changed
 - Bump `@metamask/abi-utils` from `^2.0.4` to `^3.0.0` ([#405](https://github.com/MetaMask/eth-sig-util/pull/405))
@@ -171,7 +175,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.2...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v8.2.0...HEAD
+[8.2.0]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.2...v8.2.0
 [8.1.2]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.1...v8.1.2
 [8.1.1]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.0...v8.1.1
 [8.1.0]: https://github.com/MetaMask/eth-sig-util/compare/v8.0.0...v8.1.0
