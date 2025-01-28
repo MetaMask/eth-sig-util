@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>personalSign | @metamask/eth-sig-util</title><meta name="description" content="Documentation for @metamask/eth-sig-util"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>hashEIP7702Authorization | @metamask/eth-sig-util</title><meta name="description" content="Documentation for @metamask/eth-sig-util"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -13,36 +13,26 @@
 <div class="tsd-page-title">
 <ul class="tsd-breadcrumb">
 <li><a href="../modules.html">@metamask/eth-sig-util</a></li>
-<li><a href="personalSign.html">personalSign</a></li></ul>
-<h1>Function personalSign</h1></div>
+<li><a href="hashEIP7702Authorization.html">hashEIP7702Authorization</a></li></ul>
+<h1>Function hashEIP7702Authorization</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="personalSign"><span class="tsd-kind-call-signature">personal<wbr/>Sign</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">options</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><a href="#personalSign" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="hashEIP7702Authorization"><span class="tsd-kind-call-signature">hashEIP7702<wbr/>Authorization</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">authorization</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Buffer</span><a href="#hashEIP7702Authorization" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Create an Ethereum-specific signature for a message.</p>
-<p>This function is equivalent to the <code>eth_sign</code> Ethereum JSON-RPC method as specified in EIP-1417,
-as well as the MetaMask&#39;s <code>personal_sign</code> method.</p>
+<div class="tsd-comment tsd-typography"><p>Hash an authorization message according to the signing scheme.
+The message is encoded according to EIP-7702.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">options</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">data</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">ToBufferInputTypes</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">privateKey</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Buffer</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
-<div class="tsd-comment tsd-typography"><p>The personal sign options.</p>
-</div>
-<ul class="tsd-parameters">
-<li class="tsd-parameter">
-<h5><span class="tsd-kind-property">data</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">ToBufferInputTypes</span></h5>
-<div class="tsd-comment tsd-typography"><p>The hex data to sign.</p>
-</div></li>
-<li class="tsd-parameter">
-<h5><span class="tsd-kind-property">private<wbr/>Key</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Buffer</span></h5>
-<div class="tsd-comment tsd-typography"><p>The key to sign with.</p>
-</div></li></ul></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><p>The &#39;0x&#39;-prefixed hex encoded signature.</p>
+<h5><span class="tsd-kind-parameter">authorization</span>: <a href="../types/EIP7702Authorization.html" class="tsd-signature-type tsd-kind-type-alias">EIP7702Authorization</a></h5>
+<div class="tsd-comment tsd-typography"><p>The authorization data to hash.</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Buffer</span></h4><p>The hash of the authorization message as a Buffer.</p>
 <aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/MetaMask/eth-sig-util/blob/9fc30fc/src/personal-sign.ts#L28">personal-sign.ts:28</a></li></ul></aside></li></ul></section></div>
+<li>Defined in <a href="https://github.com/MetaMask/eth-sig-util/blob/9fc30fc/src/sign-eip7702-authorization.ts#L90">sign-eip7702-authorization.ts:90</a></li></ul></aside></li></ul></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -77,9 +67,9 @@ as well as the MetaMask&#39;s <code>personal_sign</code> method.</p>
 <li><a href="encryptSafely.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>encrypt<wbr/>Safely</span></a></li>
 <li><a href="extractPublicKey.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>extract<wbr/>Public<wbr/>Key</span></a></li>
 <li><a href="getEncryptionPublicKey.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>get<wbr/>Encryption<wbr/>Public<wbr/>Key</span></a></li>
-<li><a href="hashEIP7702Authorization.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>hashEIP7702<wbr/>Authorization</span></a></li>
+<li><a href="hashEIP7702Authorization.html" class="current"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>hashEIP7702<wbr/>Authorization</span></a></li>
 <li><a href="normalize.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>normalize</span></a></li>
-<li><a href="personalSign.html" class="current"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>personal<wbr/>Sign</span></a></li>
+<li><a href="personalSign.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>personal<wbr/>Sign</span></a></li>
 <li><a href="recoverEIP7702Authorization.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>recoverEIP7702<wbr/>Authorization</span></a></li>
 <li><a href="recoverPersonalSignature.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>recover<wbr/>Personal<wbr/>Signature</span></a></li>
 <li><a href="recoverTypedSignature.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>recover<wbr/>Typed<wbr/>Signature</span></a></li>
