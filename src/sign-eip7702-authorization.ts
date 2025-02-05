@@ -2,6 +2,7 @@ import { encode } from '@ethereumjs/rlp';
 import { ecsign, publicToAddress, toBuffer } from '@ethereumjs/util';
 import { bytesToHex, Hex, isValidHexAddress } from '@metamask/utils';
 import { keccak256 } from 'ethereum-cryptography/keccak';
+
 import { concatSig, isNullish, recoverPublicKey } from './utils';
 
 const CHAIN_ID_MAX_BITLENGTH = 256;
