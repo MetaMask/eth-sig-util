@@ -216,6 +216,19 @@ describe('signAuthorization', () => {
       ).toThrow('Invalid contractAddress: must be a 20 byte hex string');
     });
 
+    it('should throw if contractAddress is too long', () => {
+      expect(() =>
+        signEIP7702Authorization({
+          privateKey: TEST_PRIVATE_KEY,
+          authorization: [
+            TEST_AUTHORIZATION[0],
+            `${TEST_AUTHORIZATION[1]}00`,
+            TEST_AUTHORIZATION[2],
+          ],
+        }),
+      ).toThrow('Invalid contractAddress: must be a 20 byte hex string');
+    });
+
     it('should throw if contractAddress is not valid hex', () => {
       expect(() =>
         signEIP7702Authorization({
@@ -243,7 +256,7 @@ describe('signAuthorization', () => {
     });
   });
 
-  describe('hashAuthorization()', () => {
+  describe('hashEIP7702Authorization()', () => {
     it('should produce the correct hash', () => {
       const hash = hashEIP7702Authorization(TEST_AUTHORIZATION);
 
@@ -293,7 +306,7 @@ describe('signAuthorization', () => {
     });
   });
 
-  describe('recoverAuthorization()', () => {
+  describe('recoverEIP7702Authorization()', () => {
     it('should recover the address from a signature', () => {
       const recoveredAddress = recoverEIP7702Authorization({
         authorization: TEST_AUTHORIZATION,
