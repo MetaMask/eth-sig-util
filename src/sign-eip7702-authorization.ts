@@ -1,9 +1,12 @@
 import { encode } from '@ethereumjs/rlp';
 import { ecsign, publicToAddress, toBuffer } from '@ethereumjs/util';
-import { bytesToHex } from '@metamask/utils';
+import { bytesToHex, Hex, isValidHexAddress } from '@metamask/utils';
 import { keccak256 } from 'ethereum-cryptography/keccak';
-
 import { concatSig, isNullish, recoverPublicKey } from './utils';
+
+const CHAIN_ID_MAX_BITLENGTH = 256;
+const NONCE_MAX_BITLENGTH = 64;
+const ADDRESS_BYTE_LENGTH = 20;
 
 /**
  * The authorization struct as defined in EIP-7702.
@@ -125,5 +128,31 @@ function validateEIP7702Authorization(authorization: EIP7702Authorization) {
 
   if (isNullish(nonce)) {
     throw new Error('Missing nonce parameter');
+  }
+
+  if (
+    typeof chainId !== 'number' ||
+    chainId >= 2 ** CHAIN_ID_MAX_BITLENGTH ||
+    chainId < 0
+  ) {
+    throw new Error(
+      `Invalid chainId: must be a non-negative number less than 2^${CHAIN_ID_MAX_BITLENGTH}`,
+    );
+  }
+
+  if (
+    typeof nonce !== 'number' ||
+    nonce >= 2 ** NONCE_MAX_BITLENGTH ||
+    nonce < 0
+  ) {
+    throw new Error(
+      `Invalid nonce: must be a non-negative number less than 2^${NONCE_MAX_BITLENGTH}`,
+    );
+  }
+
+  if (!isValidHexAddress(contractAddress as Hex)) {
+    throw new Error(
+      `Invalid contractAddress: must be a ${ADDRESS_BYTE_LENGTH} byte hex string`,
+    );
   }
 }
