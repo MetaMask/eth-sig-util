@@ -108,7 +108,7 @@ describe('signAuthorization', () => {
         signEIP7702Authorization({
           privateKey: TEST_PRIVATE_KEY,
           authorization: [
-            2 ** 257,
+            2 ** 256,
             TEST_AUTHORIZATION[1],
             TEST_AUTHORIZATION[2],
           ],
@@ -171,7 +171,7 @@ describe('signAuthorization', () => {
           authorization: [
             TEST_AUTHORIZATION[0],
             TEST_AUTHORIZATION[1],
-            2 ** 65,
+            2 ** 64,
           ],
         }),
       ).toThrow('Invalid nonce: must be a non-negative number less than 2^64');
