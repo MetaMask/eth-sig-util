@@ -208,6 +208,78 @@ export function decrypt({
 }
 
 /**
+ * Decrypt a message using a shared secret rather than a private key.
+ *
+ * @param options - The decryption options.
+ * @param options.encryptedData - The encrypted data.
+ * @param options.sharedSecret - The shared secret to decrypt with.
+ * @returns The decrypted message.
+ */
+export function decryptWithSharedSecret({
+  encryptedData,
+  sharedSecret,
+}: {
+  encryptedData: EthEncryptedData;
+  sharedSecret: string;
+}): string {
+  if (isNullish(encryptedData)) {
+    throw new Error('Missing encryptedData parameter');
+  } else if (isNullish(sharedSecret)) {
+    throw new Error('Missing sharedSecret parameter');
+  }
+
+  switch (encryptedData.version) {
+    case 'x25519-xsalsa20-poly1305': {
+      // assemble decryption parameters
+      const nonce = naclUtil.decodeBase64(encryptedData.nonce);
+      const ciphertext = naclUtil.decodeBase64(encryptedData.ciphertext);
+      const secret = naclUtil.decodeBase64(sharedSecret);
+
+      // Hsalsa20 constant
+      const sigma = new Uint8Array([
+        101, 120, 112, 97, 110, 100, 32, 51, 50, 45, 98, 121, 116, 101, 32, 107,
+      ]);
+      const _0 = new Uint8Array(16);
+
+      // Hsalsa20 result
+      const privateKey = new Uint8Array(32);
+
+      // Calculate private key
+      // We use any conversion here because lowlevel function of nacl are not typed
+      (nacl as any).lowlevel.crypto_core_hsalsa20(
+        privateKey,
+        _0,
+        secret,
+        sigma,
+      );
+
+      // decrypt
+      const decryptedMessage = nacl.secretbox.open(
+        ciphertext,
+        nonce,
+        privateKey,
+      );
+
+      // return decrypted msg data
+      let output;
+      try {
+        output = naclUtil.encodeUTF8(decryptedMessage);
+      } catch (err) {
+        throw new Error('Decryption failed.');
+      }
+
+      if (output) {
+        return output;
+      }
+      throw new Error('Decryption failed.');
+    }
+
+    default:
+      throw new Error('Encryption type/version not supported.');
+  }
+}
+
+/**
  * Decrypt a message that has been encrypted using `encryptSafely`.
  *
  * @param options - The decryption options.
