@@ -318,7 +318,7 @@ const encodeDataErrorExamples = {
     {
       input: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB0',
       errorMessage:
-        'Unable to encode value: Invalid address value. Expected address to be 20 bytes long, but received 21 bytes.',
+        'Unable to encode field: Invalid address value. Expected address to be 20 bytes long, but received 21 bytes.',
     },
   ],
   int8: [

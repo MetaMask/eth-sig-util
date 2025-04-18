@@ -8,7 +8,6 @@ import {
 } from '@metamask/abi-utils/dist/parsers';
 import { padStart } from '@metamask/abi-utils/dist/utils';
 import {
-  add0x,
   assert,
   bigIntToBytes,
   bytesToHex,
@@ -26,6 +25,7 @@ import {
   isNullish,
   legacyToBuffer,
   recoverPublicKey,
+  isValidEVMAddress,
 } from './utils';
 
 /**
@@ -221,6 +221,52 @@ function reallyStrangeAddressToBytes(address: string): Uint8Array {
 }
 
 /**
+ * Validates and normalizes an address value to ensure it's a valid EVM address.
+ *
+ * @param value - The address value to validate and normalize.
+ * @returns The normalized address as a Uint8Array.
+ * @throws Error if the address is invalid.
+ */
+function normalizeAndValidateAddress(value: unknown): Uint8Array {
+  let addressBytes: Uint8Array | undefined;
+  let addressHex: string | undefined;
+
+  if (typeof value === 'number') {
+    addressBytes = padStart(numberToBytes(value), 20);
+    addressHex = bytesToHex(addressBytes);
+  }
+
+  if (typeof value === 'string') {
+    if (isStrictHexString(value)) {
+      addressHex = value;
+      addressBytes = hexToBytes(value);
+    } else {
+      // For non-hex strings, use legacy conversion
+      addressBytes = reallyStrangeAddressToBytes(value).subarray(0, 20);
+      addressHex = bytesToHex(addressBytes);
+    }
+  }
+
+  if (!addressBytes) {
+    throw new Error(
+      `Invalid address value. Address must be a number or a string.`,
+    );
+  }
+  if (addressBytes.length > 20) {
+    throw new Error(
+      `Invalid address value. Expected address to be 20 bytes long, but received ${addressBytes.length} bytes.`,
+    );
+  }
+  if (!isValidEVMAddress(addressHex)) {
+    throw new Error(
+      `Invalid address value. Address must be a 0x-prefixed hex string with no more than 40 characters.`,
+    );
+  }
+
+  return addressBytes;
+}
+
+/**
  * Encode a single field.
  *
  * @param types - All type definitions.
@@ -261,12 +307,11 @@ function encodeField(
   }
 
   if (type === 'address') {
-    if (typeof value === 'number') {
-      return ['address', padStart(numberToBytes(value), 20)];
-    } else if (isStrictHexString(value)) {
-      return ['address', add0x(value)];
-    } else if (typeof value === 'string') {
-      return ['address', reallyStrangeAddressToBytes(value).subarray(0, 20)];
+    try {
+      const addressBytes = normalizeAndValidateAddress(value);
+      return ['address', addressBytes];
+    } catch (error) {
+      throw new Error(`Unable to encode field: ${String(error.message)}`);
     }
   }
 
