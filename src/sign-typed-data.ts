@@ -247,16 +247,13 @@ function normalizeAndValidateAddress(value: unknown): Uint8Array {
       const invalidChar = invalidCharMatch[0];
       assert(
         !invalidChar.match(/[g-zG-Z]/u),
-        `Invalid address value. Contains invalid letter "${invalidChar}". Only a-f and A-F are valid hex letters.`,
+        `Contains invalid letter "${invalidChar}". Only a-f and A-F are valid hex letters.`,
       );
       assert(
         !invalidChar.match(/[\s\n\r\t\f\v]/u),
-        `Invalid address value. Contains whitespace character "${invalidChar}".`,
+        `Contains whitespace character "${invalidChar}".`,
       );
-      assert(
-        false,
-        `Invalid address value. Contains invalid character "${invalidChar}".`,
-      );
+      assert(false, `Contains invalid character "${invalidChar}".`);
     }
 
     if (isStrictHexString(value)) {
@@ -269,17 +266,14 @@ function normalizeAndValidateAddress(value: unknown): Uint8Array {
     }
   }
 
-  assert(
-    addressBytes,
-    'Invalid address value. Address must be a number or a string.',
-  );
+  assert(addressBytes, 'Address must be a number or a string.');
   assert(
     addressBytes.length <= 20,
-    `Invalid address value. Expected address to be 20 bytes long, but received ${addressBytes.length} bytes.`,
+    `Expected address to be 20 bytes long, but received ${addressBytes.length} bytes.`,
   );
   assert(
     addressHex?.match(/^0[xX]([a-fA-F0-9]{0,40})$/u) !== null,
-    `Invalid address value. Address must be a 0x-prefixed hex string with no more than 40 characters.`,
+    `Address must be a 0x-prefixed hex string with no more than 40 characters.`,
   );
 
   return addressBytes;
@@ -329,8 +323,15 @@ function encodeField(
     try {
       const addressBytes = normalizeAndValidateAddress(value);
       return ['address', addressBytes];
-    } catch (error) {
-      throw new Error(`Unable to encode field: ${String(error.message)}`);
+    } catch (err) {
+      if (typeof err?.message === 'string' && err.message.length) {
+        throw new Error(
+          `Unable to encode field: Invalid address value. ${
+            err.message as string
+          }`,
+        );
+      }
+      throw new Error(`Unable to encode field: Invalid address value.`);
     }
   }
 
