@@ -56,27 +56,6 @@ export function isNullish(value) {
 }
 
 /**
- * Validates if a string is a valid EVM address.
- * A valid EVM address is a 0x-prefixed hex string of 40 characters (20 bytes).
- * We have an exception for addresses with less than 40 characters in case we need to
- * support addresses which may be padded with leading 0s.
- *
- * @param address - The address to validate.
- * @returns True if the address is valid, false otherwise.
- */
-export function isValidEVMAddress(address: unknown): boolean {
-  if (typeof address !== 'string') {
-    return false;
-  }
-
-  if (address.length > 42) {
-    return false;
-  }
-
-  return /^0[xX][a-fA-F0-9]{1,40}$/u.test(address);
-}
-
-/**
  * Convert a value to a Buffer. This function should be equivalent to the `toBuffer` function in
  * `ethereumjs-util@5.2.1`.
  *

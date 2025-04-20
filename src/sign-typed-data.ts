@@ -25,7 +25,6 @@ import {
   isNullish,
   legacyToBuffer,
   recoverPublicKey,
-  isValidEVMAddress,
 } from './utils';
 
 /**
