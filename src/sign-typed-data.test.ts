@@ -269,6 +269,11 @@ const encodeDataExamples = {
   // atomic types supported by EIP-712:
   address: [
     '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+    '0XbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+
+    // backward compatibility for non-standard Ethereum address values
+    '0x',
+    '0X',
     '0x0', // odd
     '0x10', // even
     10,
@@ -318,7 +323,34 @@ const encodeDataErrorExamples = {
     {
       input: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB0',
       errorMessage:
-        'Unable to encode value: Invalid address value. Expected address to be 20 bytes long, but received 21 bytes.',
+        'Unable to encode field: Invalid address value. Expected address to be 20 bytes long, but received 21 bytes.',
+    },
+    {
+      input: true,
+      errorMessage:
+        'Invalid address value. Address must be a number or a string.',
+    },
+    {
+      input: '0xa+ddress+$ymbols#',
+      errorMessage: 'Invalid address value. Contains invalid character "+".',
+    },
+    {
+      input: '0x12345你好67890',
+      errorMessage: 'Invalid address value. Contains invalid character "你".',
+    },
+    {
+      input: '0xbBzZBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+      errorMessage:
+        'Invalid address value. Contains invalid letter "z". Only a-f and A-F are valid hex letters.',
+    },
+    {
+      input: '0xbBzZBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+      errorMessage:
+        'Invalid address value. Contains invalid letter "z". Only a-f and A-F are valid hex letters.',
+    },
+    {
+      input: '0xbBbbBBB bbBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+      errorMessage: 'Invalid address value. Contains whitespace character " ".',
     },
   ],
   int8: [

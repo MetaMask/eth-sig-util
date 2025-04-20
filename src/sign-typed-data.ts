@@ -8,7 +8,6 @@ import {
 } from '@metamask/abi-utils/dist/parsers';
 import { padStart } from '@metamask/abi-utils/dist/utils';
 import {
-  add0x,
   assert,
   bigIntToBytes,
   bytesToHex,
@@ -181,6 +180,33 @@ function parseNumber(type: string, value: string | number | bigint) {
 }
 
 /**
+ * Asserts that the given value does not contain any invalid hex characters.
+ *
+ * @param value - The value to validate.
+ * @throws Error if the value contains any invalid hex characters.
+ */
+function assertHexAddressChars(value: string) {
+  const has0xPrefix = value.toLowerCase().startsWith('0x');
+  const valueWithoutPrefix = has0xPrefix ? value.slice(2) : value;
+
+  // find any invalid characters including unicode characters
+  // eslint-disable-next-line require-unicode-regexp
+  const invalidCharMatch = valueWithoutPrefix.match(/[^0-9a-fA-F]/gu);
+  if (invalidCharMatch) {
+    const invalidChar = invalidCharMatch[0];
+    assert(
+      !invalidChar.match(/[g-zG-Z]/u),
+      `Contains invalid letter "${invalidChar}". Only a-f and A-F are valid hex letters.`,
+    );
+    assert(
+      !invalidChar.match(/[\s\n\r\t\f\v]/u),
+      `Contains whitespace character "${invalidChar}".`,
+    );
+    assert(false, `Contains invalid character "${invalidChar}".`);
+  }
+}
+
+/**
  * Parse an address string to a `Uint8Array`. The behaviour of this is quite
  * strange, in that it does not parse the address as hexadecimal string, nor as
  * UTF-8. It does some weird stuff with the string and char codes, and then
@@ -218,6 +244,48 @@ function reallyStrangeAddressToBytes(address: string): Uint8Array {
   }
 
   return padStart(bigIntToBytes(addressValue), 20);
+}
+
+/**
+ * Validates and normalizes an address value to ensure it's a valid EVM address.
+ *
+ * @param value - The address value to validate and normalize.
+ * @returns The normalized address as a Uint8Array.
+ * @throws Error if the address is invalid.
+ */
+function validateAndNormalizeAddress(value: unknown): Uint8Array {
+  let addressBytes: Uint8Array | undefined;
+  let addressHex: string | undefined;
+
+  if (typeof value === 'number') {
+    addressBytes = padStart(numberToBytes(value), 20);
+    addressHex = bytesToHex(addressBytes);
+  }
+
+  if (typeof value === 'string') {
+    assertHexAddressChars(value);
+
+    if (isStrictHexString(value)) {
+      addressHex = value;
+      addressBytes = hexToBytes(value);
+    } else {
+      // For non-hex strings, use legacy conversion
+      addressBytes = reallyStrangeAddressToBytes(value).subarray(0, 20);
+      addressHex = bytesToHex(addressBytes);
+    }
+  }
+
+  assert(addressBytes, 'Address must be a number or a string.');
+  assert(
+    addressBytes.length <= 20,
+    `Expected address to be 20 bytes long, but received ${addressBytes.length} bytes.`,
+  );
+  assert(
+    addressHex?.match(/^0[xX]([a-fA-F0-9]{0,40})$/u) !== null,
+    `Address must be a 0x-prefixed hex string with no more than 40 characters.`,
+  );
+
+  return addressBytes;
 }
 
 /**
@@ -261,12 +329,18 @@ function encodeField(
   }
 
   if (type === 'address') {
-    if (typeof value === 'number') {
-      return ['address', padStart(numberToBytes(value), 20)];
-    } else if (isStrictHexString(value)) {
-      return ['address', add0x(value)];
-    } else if (typeof value === 'string') {
-      return ['address', reallyStrangeAddressToBytes(value).subarray(0, 20)];
+    try {
+      const addressBytes = validateAndNormalizeAddress(value);
+      return ['address', addressBytes];
+    } catch (err) {
+      if (typeof err?.message === 'string' && err.message.length) {
+        throw new Error(
+          `Unable to encode field: Invalid address value. ${
+            err.message as string
+          }`,
+        );
+      }
+      throw new Error(`Unable to encode field: Invalid address value.`);
     }
   }
 
