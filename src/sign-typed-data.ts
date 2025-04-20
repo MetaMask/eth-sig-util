@@ -180,6 +180,33 @@ function parseNumber(type: string, value: string | number | bigint) {
 }
 
 /**
+ * Asserts that the given value does not contain any invalid hex characters.
+ *
+ * @param value - The value to validate.
+ * @throws Error if the value contains any invalid hex characters.
+ */
+function assertHexAddressChars(value: string) {
+  const has0xPrefix = value.toLowerCase().startsWith('0x');
+  const valueWithoutPrefix = has0xPrefix ? value.slice(2) : value;
+
+  // find any invalid characters including unicode characters
+  // eslint-disable-next-line require-unicode-regexp
+  const invalidCharMatch = valueWithoutPrefix.match(/[^0-9a-fA-F]/gu);
+  if (invalidCharMatch) {
+    const invalidChar = invalidCharMatch[0];
+    assert(
+      !invalidChar.match(/[g-zG-Z]/u),
+      `Contains invalid letter "${invalidChar}". Only a-f and A-F are valid hex letters.`,
+    );
+    assert(
+      !invalidChar.match(/[\s\n\r\t\f\v]/u),
+      `Contains whitespace character "${invalidChar}".`,
+    );
+    assert(false, `Contains invalid character "${invalidChar}".`);
+  }
+}
+
+/**
  * Parse an address string to a `Uint8Array`. The behaviour of this is quite
  * strange, in that it does not parse the address as hexadecimal string, nor as
  * UTF-8. It does some weird stuff with the string and char codes, and then
@@ -236,24 +263,7 @@ function normalizeAndValidateAddress(value: unknown): Uint8Array {
   }
 
   if (typeof value === 'string') {
-    const has0xPrefix = value.toLowerCase().startsWith('0x');
-    const valueWithoutPrefix = has0xPrefix ? value.slice(2) : value;
-
-    // find any invalid characters including unicode characters
-    // eslint-disable-next-line require-unicode-regexp
-    const invalidCharMatch = valueWithoutPrefix.match(/[^0-9a-fA-F]/gu);
-    if (invalidCharMatch) {
-      const invalidChar = invalidCharMatch[0];
-      assert(
-        !invalidChar.match(/[g-zG-Z]/u),
-        `Contains invalid letter "${invalidChar}". Only a-f and A-F are valid hex letters.`,
-      );
-      assert(
-        !invalidChar.match(/[\s\n\r\t\f\v]/u),
-        `Contains whitespace character "${invalidChar}".`,
-      );
-      assert(false, `Contains invalid character "${invalidChar}".`);
-    }
+    assertHexAddressChars(value);
 
     if (isStrictHexString(value)) {
       addressHex = value;
