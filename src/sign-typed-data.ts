@@ -253,7 +253,7 @@ function reallyStrangeAddressToBytes(address: string): Uint8Array {
  * @returns The normalized address as a Uint8Array.
  * @throws Error if the address is invalid.
  */
-function normalizeAndValidateAddress(value: unknown): Uint8Array {
+function validateAndNormalizeAddress(value: unknown): Uint8Array {
   let addressBytes: Uint8Array | undefined;
   let addressHex: string | undefined;
 
@@ -330,7 +330,7 @@ function encodeField(
 
   if (type === 'address') {
     try {
-      const addressBytes = normalizeAndValidateAddress(value);
+      const addressBytes = validateAndNormalizeAddress(value);
       return ['address', addressBytes];
     } catch (err) {
       if (typeof err?.message === 'string' && err.message.length) {
