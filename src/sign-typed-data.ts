@@ -237,6 +237,28 @@ function normalizeAndValidateAddress(value: unknown): Uint8Array {
   }
 
   if (typeof value === 'string') {
+    const has0xPrefix = value.toLowerCase().startsWith('0x');
+    const valueWithoutPrefix = has0xPrefix ? value.slice(2) : value;
+
+    // find any invalid characters including unicode characters
+    // eslint-disable-next-line require-unicode-regexp
+    const invalidCharMatch = valueWithoutPrefix.match(/[^0-9a-fA-F]/gu);
+    if (invalidCharMatch) {
+      const invalidChar = invalidCharMatch[0];
+      assert(
+        !invalidChar.match(/[g-zG-Z]/u),
+        `Invalid address value. Contains invalid letter "${invalidChar}". Only a-f and A-F are valid hex letters.`,
+      );
+      assert(
+        !invalidChar.match(/[\s\n\r\t\f\v]/u),
+        `Invalid address value. Contains whitespace character "${invalidChar}".`,
+      );
+      assert(
+        false,
+        `Invalid address value. Contains invalid character "${invalidChar}".`,
+      );
+    }
+
     if (isStrictHexString(value)) {
       addressHex = value;
       addressBytes = hexToBytes(value);
@@ -247,21 +269,18 @@ function normalizeAndValidateAddress(value: unknown): Uint8Array {
     }
   }
 
-  if (!addressBytes) {
-    throw new Error(
-      `Invalid address value. Address must be a number or a string.`,
-    );
-  }
-  if (addressBytes.length > 20) {
-    throw new Error(
-      `Invalid address value. Expected address to be 20 bytes long, but received ${addressBytes.length} bytes.`,
-    );
-  }
-  if (!isValidEVMAddress(addressHex)) {
-    throw new Error(
-      `Invalid address value. Address must be a 0x-prefixed hex string with no more than 40 characters.`,
-    );
-  }
+  assert(
+    addressBytes,
+    'Invalid address value. Address must be a number or a string.',
+  );
+  assert(
+    addressBytes.length <= 20,
+    `Invalid address value. Expected address to be 20 bytes long, but received ${addressBytes.length} bytes.`,
+  );
+  assert(
+    addressHex?.match(/^0[xX]([a-fA-F0-9]{0,40})$/u) !== null,
+    `Invalid address value. Address must be a 0x-prefixed hex string with no more than 40 characters.`,
+  );
 
   return addressBytes;
 }
