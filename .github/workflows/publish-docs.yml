@@ -11,8 +11,7 @@ jobs:
   publish-docs-to-gh-pages:
     name: Publish docs to GitHub Pages
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    environment: github-pages
     steps:
       - name: Ensure `destination_dir` is not empty
         if: ${{ inputs.destination_dir == '' }}
@@ -41,6 +40,6 @@ jobs:
       - name: Deploy to `${{ inputs.destination_dir }}` directory of `gh-pages` branch
         uses: peaceiris/actions-gh-pages@068dc23d9710f1ba62e86896f84735d869951305
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          personal_token: ${{ secrets.DEPLOY_TOKEN }}
           publish_dir: ./docs
           destination_dir: ${{ inputs.destination_dir }}
