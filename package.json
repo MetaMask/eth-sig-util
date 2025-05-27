@@ -1,6 +1,6 @@
 {
   "name": "@metamask/eth-sig-util",
-  "version": "8.1.2",
+  "version": "8.2.0",
   "description": "A few useful functions for signing ethereum data",
   "keywords": [
     "ethereum",
@@ -44,6 +44,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@ethereumjs/rlp": "^4.0.1",
     "@ethereumjs/util": "^8.1.0",
     "@metamask/abi-utils": "^3.0.0",
     "@metamask/utils": "^11.0.1",
