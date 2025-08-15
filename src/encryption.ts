@@ -130,11 +130,11 @@ export function encryptSafely({
     JSON.stringify(dataWithPadding),
     'utf-8',
   );
-  const modVal = dataLength % DEFAULT_PADDING_LENGTH;
+  const modVal = (dataLength + NACL_EXTRA_BYTES) % DEFAULT_PADDING_LENGTH;
   let padLength = 0;
   // Only pad if necessary
   if (modVal > 0) {
-    padLength = DEFAULT_PADDING_LENGTH - modVal - NACL_EXTRA_BYTES; // nacl extra bytes
+    padLength = DEFAULT_PADDING_LENGTH - modVal;
   }
   dataWithPadding.padding = '0'.repeat(padLength);
 

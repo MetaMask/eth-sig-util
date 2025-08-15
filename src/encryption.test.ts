@@ -57,6 +57,22 @@ describe('encryption', function () {
     expect(result.version).toBe('x25519-xsalsa20-poly1305');
   });
 
+  it('encryption of message which is [1..NACL_EXTRA_BYTES) smaller than DEFAULT_PADDING_LENGTH in JSON', async function () {
+    const jsonOverhead = '{"data":"","padding":""}'.length;
+    const message = '0'.repeat(2 ** 11 - jsonOverhead - 10); // DEFAULT_PADDING_LENGTH - jsonOverhead - 10; 10 < NACL_EXTRA_BYTES
+    const version = 'x25519-xsalsa20-poly1305';
+    const result = encryptSafely({
+      publicKey: bob.encryptionPublicKey,
+      data: message,
+      version,
+    });
+
+    expect(result.ciphertext).toHaveLength(5464);
+    expect(result.ephemPublicKey).toHaveLength(44);
+    expect(result.nonce).toHaveLength(32);
+    expect(result.version).toBe('x25519-xsalsa20-poly1305');
+  });
+
   // safe decryption test
   it('bob decryptSafely message that Alice encryptSafely for him', async function () {
     const version = 'x25519-xsalsa20-poly1305';
