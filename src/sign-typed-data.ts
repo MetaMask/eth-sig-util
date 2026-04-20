@@ -483,6 +483,16 @@ function hashType(
   return arrToBufArr(keccak256(encodedHashType));
 }
 
+/**
+ * Validates that the given typed message contains no keys beyond those defined
+ * in {@link TYPED_MESSAGE_SCHEMA}. Throws if any extraneous key is found,
+ * and ensures `types.EIP712Domain` is present.
+ *
+ * @param data - The typed message object to validate.
+ * @returns The typed message object, with `EIP712Domain` added to `types` if
+ * it was absent.
+ * @throws If the data contains any key not defined in the EIP-712 schema.
+ */
 function sanitizeData<T extends MessageTypes>(
   data: TypedMessage<T>,
 ): TypedMessage<T> {
