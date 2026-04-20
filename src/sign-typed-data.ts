@@ -484,26 +484,49 @@ function hashType(
 }
 
 /**
- * Removes properties from a message object that are not defined per EIP-712.
+ * The set of keys that are allowed at the top level of an EIP-712 typed
+ * message. Any key outside this set is considered extraneous and will cause
+ * the message to be rejected.
+ */
+const EIP_712_ALLOWED_KEYS = new Set([
+  'primaryType',
+  'domain',
+  'types',
+  'message',
+]);
+
+/**
+ * Validates that the given typed message contains no keys beyond the four
+ * canonical EIP-712 top-level keys: `primaryType`, `domain`, `types`, and
+ * `message`. Throws if any extraneous key is found.
  *
- * @param data - The typed message object.
- * @returns The typed message object with only allowed fields.
+ * @param data - The typed message object to validate.
+ * @throws If the data contains any key not in the EIP-712 specification.
  */
 function sanitizeData<T extends MessageTypes>(
   data: TypedMessage<T>,
 ): TypedMessage<T> {
-  const sanitizedData: Partial<TypedMessage<T>> = {};
-  for (const key in TYPED_MESSAGE_SCHEMA.properties) {
-    if (data[key]) {
-      sanitizedData[key] = data[key];
-    }
+  const extraneousKeys = Object.keys(data).filter(
+    (key) => !EIP_712_ALLOWED_KEYS.has(key),
+  );
+
+  if (extraneousKeys.length > 0) {
+    throw new Error(
+      `Invalid EIP-712 data: extraneous key(s) detected: ${extraneousKeys
+        .map((k) => `"${k}"`)
+        .join(', ')}`,
+    );
   }
 
-  if ('types' in sanitizedData) {
+  if (data.types && !('EIP712Domain' in data.types)) {
     // TODO: Fix types
-    sanitizedData.types = { EIP712Domain: [], ...sanitizedData.types } as any;
+    return {
+      ...data,
+      types: { ...data.types, EIP712Domain: [] } as any,
+    };
   }
-  return sanitizedData as Required<TypedMessage<T>>;
+
+  return data;
 }
 
 /**

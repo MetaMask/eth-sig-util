@@ -3460,8 +3460,8 @@ describe('TypedDataUtils.sanitizeData', function () {
     expect(sanitizedTypedMessage).toStrictEqual({});
   });
 
-  it('should omit unrecognized properties', function () {
-    const expectedMessage = {
+  it('should throw when data has extraneous top-level keys', function () {
+    const validMessage = {
       domain: {},
       message: {},
       primaryType: 'Person' as const,
@@ -3473,11 +3473,11 @@ describe('TypedDataUtils.sanitizeData', function () {
         ],
       },
     };
-    const typedMessage = { ...expectedMessage, extraStuff: 'Extra stuff' };
+    const typedMessage = { ...validMessage, extraStuff: 'Extra stuff' };
 
-    const sanitizedTypedMessage = TypedDataUtils.sanitizeData(typedMessage);
-
-    expect(sanitizedTypedMessage).toStrictEqual(expectedMessage);
+    expect(() => TypedDataUtils.sanitizeData(typedMessage)).toThrow(
+      'Invalid EIP-712 data: extraneous key(s) detected: "extraStuff"',
+    );
   });
 
   it('should sanitize data when called unbound', function () {
@@ -3498,6 +3498,38 @@ describe('TypedDataUtils.sanitizeData', function () {
     const sanitizedTypedMessage = sanitizeData(typedMessage);
 
     expect(sanitizedTypedMessage).toStrictEqual(typedMessage);
+  });
+
+  it('should throw when data has multiple extraneous top-level keys', function () {
+    const typedMessage = {
+      domain: {},
+      message: {},
+      primaryType: 'Person' as const,
+      types: {
+        EIP712Domain: [],
+        Person: [{ name: 'name', type: 'string' }],
+      },
+      foo: 'bar',
+      baz: 42,
+    };
+
+    expect(() => TypedDataUtils.sanitizeData(typedMessage as any)).toThrow(
+      'Invalid EIP-712 data: extraneous key(s) detected: "foo", "baz"',
+    );
+  });
+
+  it('should not throw for valid data with all four canonical keys', function () {
+    const typedMessage = {
+      domain: {},
+      message: {},
+      primaryType: 'Person' as const,
+      types: {
+        EIP712Domain: [],
+        Person: [{ name: 'name', type: 'string' }],
+      },
+    };
+
+    expect(() => TypedDataUtils.sanitizeData(typedMessage)).not.toThrow();
   });
 });
 
@@ -3549,34 +3581,23 @@ describe('TypedDataUtils.eip712Hash', function () {
       );
     });
 
-    it('should ignore extra top-level properties', function () {
-      const minimalValidHash = TypedDataUtils.eip712Hash(
-        {
-          types: {
-            EIP712Domain: [],
-          },
-          primaryType: 'EIP712Domain',
-          domain: {},
-          message: {},
-        },
-        SignTypedDataVersion.V3,
-      );
-      const extraPropertiesHash = TypedDataUtils.eip712Hash(
-        {
-          types: {
-            EIP712Domain: [],
-          },
-          primaryType: 'EIP712Domain',
-          domain: {},
-          message: {},
-          extra: 'stuff',
-          moreExtra: 1,
-        } as any,
-        SignTypedDataVersion.V3,
-      );
-
-      expect(minimalValidHash.toString('hex')).toBe(
-        extraPropertiesHash.toString('hex'),
+    it('should throw when data has extra top-level properties', function () {
+      expect(() =>
+        TypedDataUtils.eip712Hash(
+          {
+            types: {
+              EIP712Domain: [],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {},
+            message: {},
+            extra: 'stuff',
+            moreExtra: 1,
+          } as any,
+          SignTypedDataVersion.V3,
+        ),
+      ).toThrow(
+        'Invalid EIP-712 data: extraneous key(s) detected: "extra", "moreExtra"',
       );
     });
 
@@ -3922,34 +3943,23 @@ describe('TypedDataUtils.eip712Hash', function () {
       );
     });
 
-    it('should ignore extra top-level properties', function () {
-      const minimalValidHash = TypedDataUtils.eip712Hash(
-        {
-          types: {
-            EIP712Domain: [],
-          },
-          primaryType: 'EIP712Domain',
-          domain: {},
-          message: {},
-        },
-        SignTypedDataVersion.V4,
-      );
-      const extraPropertiesHash = TypedDataUtils.eip712Hash(
-        {
-          types: {
-            EIP712Domain: [],
-          },
-          primaryType: 'EIP712Domain',
-          domain: {},
-          message: {},
-          extra: 'stuff',
-          moreExtra: 1,
-        } as any,
-        SignTypedDataVersion.V4,
-      );
-
-      expect(minimalValidHash.toString('hex')).toBe(
-        extraPropertiesHash.toString('hex'),
+    it('should throw when data has extra top-level properties', function () {
+      expect(() =>
+        TypedDataUtils.eip712Hash(
+          {
+            types: {
+              EIP712Domain: [],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {},
+            message: {},
+            extra: 'stuff',
+            moreExtra: 1,
+          } as any,
+          SignTypedDataVersion.V4,
+        ),
+      ).toThrow(
+        'Invalid EIP-712 data: extraneous key(s) detected: "extra", "moreExtra"',
       );
     });
 
@@ -4686,35 +4696,25 @@ describe('signTypedData', function () {
       expect(minimalSignature).toBe(minimalValidSignature);
     });
 
-    it('should ignore extra data properties', function () {
-      const minimalValidSignature = signTypedData({
-        privateKey,
-        data: {
-          types: {
-            EIP712Domain: [],
-          },
-          primaryType: 'EIP712Domain',
-          domain: {},
-          message: {},
-        },
-        version: SignTypedDataVersion.V3,
-      });
-      const extraPropertiesSignature = signTypedData({
-        privateKey,
-        data: {
-          types: {
-            EIP712Domain: [],
-          },
-          primaryType: 'EIP712Domain',
-          domain: {},
-          message: {},
-          extra: 'stuff',
-          moreExtra: 1,
-        } as any,
-        version: SignTypedDataVersion.V3,
-      });
-
-      expect(minimalValidSignature).toBe(extraPropertiesSignature);
+    it('should throw when data has extra top-level properties', function () {
+      expect(() =>
+        signTypedData({
+          privateKey,
+          data: {
+            types: {
+              EIP712Domain: [],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {},
+            message: {},
+            extra: 'stuff',
+            moreExtra: 1,
+          } as any,
+          version: SignTypedDataVersion.V3,
+        }),
+      ).toThrow(
+        'Invalid EIP-712 data: extraneous key(s) detected: "extra", "moreExtra"',
+      );
     });
 
     it('should sign a typed message with a domain separator that uses all fields', function () {
@@ -5533,35 +5533,25 @@ describe('signTypedData', function () {
       expect(minimalSignature).toBe(minimalValidSignature);
     });
 
-    it('should ignore extra data properties', function () {
-      const minimalValidSignature = signTypedData({
-        privateKey,
-        data: {
-          types: {
-            EIP712Domain: [],
-          },
-          primaryType: 'EIP712Domain',
-          domain: {},
-          message: {},
-        },
-        version: SignTypedDataVersion.V4,
-      });
-      const extraPropertiesSignature = signTypedData({
-        privateKey,
-        data: {
-          types: {
-            EIP712Domain: [],
-          },
-          primaryType: 'EIP712Domain',
-          domain: {},
-          message: {},
-          extra: 'stuff',
-          moreExtra: 1,
-        } as any,
-        version: SignTypedDataVersion.V4,
-      });
-
-      expect(minimalValidSignature).toBe(extraPropertiesSignature);
+    it('should throw when data has extra top-level properties', function () {
+      expect(() =>
+        signTypedData({
+          privateKey,
+          data: {
+            types: {
+              EIP712Domain: [],
+            },
+            primaryType: 'EIP712Domain',
+            domain: {},
+            message: {},
+            extra: 'stuff',
+            moreExtra: 1,
+          } as any,
+          version: SignTypedDataVersion.V4,
+        }),
+      ).toThrow(
+        'Invalid EIP-712 data: extraneous key(s) detected: "extra", "moreExtra"',
+      );
     });
 
     it('should sign a typed message with a domain separator that uses all fields', function () {
