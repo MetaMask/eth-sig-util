@@ -483,31 +483,12 @@ function hashType(
   return arrToBufArr(keccak256(encodedHashType));
 }
 
-/**
- * The set of keys that are allowed at the top level of an EIP-712 typed
- * message. Any key outside this set is considered extraneous and will cause
- * the message to be rejected.
- */
-const EIP_712_ALLOWED_KEYS = new Set([
-  'primaryType',
-  'domain',
-  'types',
-  'message',
-]);
-
-/**
- * Validates that the given typed message contains no keys beyond the four
- * canonical EIP-712 top-level keys: `primaryType`, `domain`, `types`, and
- * `message`. Throws if any extraneous key is found.
- *
- * @param data - The typed message object to validate.
- * @throws If the data contains any key not in the EIP-712 specification.
- */
 function sanitizeData<T extends MessageTypes>(
   data: TypedMessage<T>,
 ): TypedMessage<T> {
+  const allowedKeys = new Set(Object.keys(TYPED_MESSAGE_SCHEMA.properties));
   const extraneousKeys = Object.keys(data).filter(
-    (key) => !EIP_712_ALLOWED_KEYS.has(key),
+    (key) => !allowedKeys.has(key),
   );
 
   if (extraneousKeys.length > 0) {
