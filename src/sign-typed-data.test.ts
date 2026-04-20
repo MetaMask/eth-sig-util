@@ -3407,7 +3407,7 @@ describe('TypedDataUtils.findTypeDependencies', () => {
   });
 });
 
-describe('TypedDataUtils.sanitizeData', function () {
+describe('TypedDataUtils.validateTypedMessageData', function () {
   it('should return correctly formatted data unchanged', function () {
     const typedMessage = {
       domain: {},
@@ -3422,7 +3422,7 @@ describe('TypedDataUtils.sanitizeData', function () {
       },
     };
 
-    const sanitizedTypedMessage = TypedDataUtils.sanitizeData(typedMessage);
+    const sanitizedTypedMessage = TypedDataUtils.validateTypedMessageData(typedMessage);
 
     expect(sanitizedTypedMessage).toStrictEqual(typedMessage);
   });
@@ -3440,7 +3440,7 @@ describe('TypedDataUtils.sanitizeData', function () {
       },
     };
 
-    const sanitizedTypedMessage = TypedDataUtils.sanitizeData(
+    const sanitizedTypedMessage = TypedDataUtils.validateTypedMessageData(
       typedMessage as any,
     );
 
@@ -3453,7 +3453,7 @@ describe('TypedDataUtils.sanitizeData', function () {
   it('should sanitize empty object', function () {
     const typedMessage = {};
 
-    const sanitizedTypedMessage = TypedDataUtils.sanitizeData(
+    const sanitizedTypedMessage = TypedDataUtils.validateTypedMessageData(
       typedMessage as any,
     );
 
@@ -3475,7 +3475,7 @@ describe('TypedDataUtils.sanitizeData', function () {
     };
     const typedMessage = { ...validMessage, extraStuff: 'Extra stuff' };
 
-    expect(() => TypedDataUtils.sanitizeData(typedMessage)).toThrow(
+    expect(() => TypedDataUtils.validateTypedMessageData(typedMessage)).toThrow(
       'Invalid EIP-712 data: extraneous key(s) detected: "extraStuff"',
     );
   });
@@ -3493,9 +3493,9 @@ describe('TypedDataUtils.sanitizeData', function () {
         ],
       },
     };
-    const { sanitizeData } = TypedDataUtils;
+    const { validateTypedMessageData } = TypedDataUtils;
 
-    const sanitizedTypedMessage = sanitizeData(typedMessage);
+    const sanitizedTypedMessage = validateTypedMessageData(typedMessage);
 
     expect(sanitizedTypedMessage).toStrictEqual(typedMessage);
   });
@@ -3513,7 +3513,7 @@ describe('TypedDataUtils.sanitizeData', function () {
       baz: 42,
     };
 
-    expect(() => TypedDataUtils.sanitizeData(typedMessage as any)).toThrow(
+    expect(() => TypedDataUtils.validateTypedMessageData(typedMessage as any)).toThrow(
       'Invalid EIP-712 data: extraneous key(s) detected: "foo", "baz"',
     );
   });
@@ -3529,7 +3529,7 @@ describe('TypedDataUtils.sanitizeData', function () {
       },
     };
 
-    expect(() => TypedDataUtils.sanitizeData(typedMessage)).not.toThrow();
+    expect(() => TypedDataUtils.validateTypedMessageData(typedMessage)).not.toThrow();
   });
 });
 

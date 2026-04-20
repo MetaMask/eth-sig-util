@@ -493,7 +493,7 @@ function hashType(
  * it was absent.
  * @throws If the data contains any key not defined in the EIP-712 schema.
  */
-function sanitizeData<T extends MessageTypes>(
+function validateTypedMessageData<T extends MessageTypes>(
   data: TypedMessage<T>,
 ): TypedMessage<T> {
   const allowedKeys = new Set(Object.keys(TYPED_MESSAGE_SCHEMA.properties));
@@ -534,7 +534,7 @@ function eip712DomainHash<T extends MessageTypes>(
 ): Buffer {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
-  const sanitizedData = sanitizeData(typedData);
+  const sanitizedData = validateTypedMessageData(typedData);
   const { domain } = sanitizedData;
   const domainType = { EIP712Domain: sanitizedData.types.EIP712Domain };
   return hashStruct('EIP712Domain', domain, domainType, version);
@@ -558,7 +558,7 @@ function eip712Hash<T extends MessageTypes>(
 ): Buffer {
   validateVersion(version, [SignTypedDataVersion.V3, SignTypedDataVersion.V4]);
 
-  const sanitizedData = sanitizeData(typedData);
+  const sanitizedData = validateTypedMessageData(typedData);
   const parts = [hexToBytes('1901')];
   parts.push(eip712DomainHash(typedData, version));
 
@@ -585,7 +585,7 @@ export const TypedDataUtils = {
   findTypeDependencies,
   hashStruct,
   hashType,
-  sanitizeData,
+  validateTypedMessageData,
   eip712Hash,
   eip712DomainHash,
 };
