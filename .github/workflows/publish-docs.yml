@@ -23,6 +23,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
+      - name: Enable Corepack
+        run: corepack enable
       - name: Get Yarn cache directory
         run: echo "YARN_CACHE_DIR=$(yarn config get cacheFolder)" >> "$GITHUB_OUTPUT"
         id: yarn-cache-dir
