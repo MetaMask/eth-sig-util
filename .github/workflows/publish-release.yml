@@ -41,7 +41,12 @@ jobs:
       - uses: actions/cache@v3
         id: restore-build
         with:
-          path: ./dist
+          # `node_modules` (which includes Yarn's `.yarn-state.yml`) is required
+          # by `action-npm-publish@v6`, which runs `yarn pack`/`yarn npm publish`
+          # against the `node-modules` linker in the downstream jobs.
+          path: |
+            ./dist
+            ./node_modules
           key: ${{ github.sha }}
 
   publish-npm-dry-run:
@@ -60,7 +65,9 @@ jobs:
       - uses: actions/cache@v3
         id: restore-build
         with:
-          path: ./dist
+          path: |
+            ./dist
+            ./node_modules
           key: ${{ github.sha }}
       - name: Dry Run Publish
         uses: MetaMask/action-npm-publish@v6
@@ -89,7 +96,9 @@ jobs:
       - uses: actions/cache@v3
         id: restore-build
         with:
-          path: ./dist
+          path: |
+            ./dist
+            ./node_modules
           key: ${{ github.sha }}
       - name: Publish
         uses: MetaMask/action-npm-publish@v6
