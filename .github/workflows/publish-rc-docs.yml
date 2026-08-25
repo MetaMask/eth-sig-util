@@ -4,18 +4,24 @@ on:
   push:
     branches: 'release/**'
 
+permissions:
+  contents: read
+
 jobs:
   get-release-version:
     name: Get release version
     runs-on: ubuntu-latest
+    permissions: {}
     outputs:
       release-version: ${{ steps.release-name.outputs.RELEASE_VERSION }}
     steps:
       - name: Extract release version from branch name
         id: release-name
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
         run: |
-          BRANCH_NAME='${{ github.ref_name }}'
           echo "RELEASE_VERSION=v${BRANCH_NAME#release/}" >> "$GITHUB_OUTPUT"
+
   publish-to-gh-pages:
     name: Publish docs to `rc-${{ needs.get-release-version.outputs.release-version }}` directory of `gh-pages` branch
     permissions:

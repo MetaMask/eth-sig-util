@@ -11,37 +11,22 @@ jobs:
   publish-docs-to-gh-pages:
     name: Publish docs to GitHub Pages
     runs-on: ubuntu-latest
+    environment: github-pages
     permissions:
       contents: write
     steps:
       - name: Ensure `destination_dir` is not empty
         if: ${{ inputs.destination_dir == '' }}
         run: exit 1
-      - name: Checkout the repository
-        uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Checkout and setup environment
+        uses: MetaMask/action-checkout-and-setup@v3
         with:
-          node-version-file: '.nvmrc'
-      - name: Enable Corepack
-        run: corepack enable
-      - name: Get Yarn cache directory
-        run: echo "YARN_CACHE_DIR=$(yarn config get cacheFolder)" >> "$GITHUB_OUTPUT"
-        id: yarn-cache-dir
-      - name: Get Yarn version
-        run: echo "YARN_VERSION=$(yarn --version)" >> "$GITHUB_OUTPUT"
-        id: yarn-version
-      - name: Cache yarn dependencies
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.yarn-cache-dir.outputs.YARN_CACHE_DIR }}
-          key: yarn-cache-${{ runner.os }}-${{ steps.yarn-version.outputs.YARN_VERSION }}-${{ hashFiles('yarn.lock') }}
-      - name: Install npm dependencies
-        run: yarn --immutable
+          is-high-risk-environment: true
+          persist-credentials: false
       - name: Run build script
         run: yarn build:docs
       - name: Deploy to `${{ inputs.destination_dir }}` directory of `gh-pages` branch
-        uses: peaceiris/actions-gh-pages@068dc23d9710f1ba62e86896f84735d869951305
+        uses: peaceiris/actions-gh-pages@de7ea6f8efb354206b205ef54722213d99067935
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
