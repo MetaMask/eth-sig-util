@@ -7,14 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [9.0.0]
-### Uncategorized
-- Add additional validation to EIP7702 methods ([#410](https://github.com/MetaMask/eth-sig-util/pull/410))
-- chore: add workflow_dispatch to security-code-scanner ([#411](https://github.com/MetaMask/eth-sig-util/pull/411))
-
 ### Changed
 - **BREAKING**: Reject ambiguous `bool` values in `signTypedData` (all versions) instead of coercing them ([#419](https://github.com/MetaMask/eth-sig-util/pull/419))
   - `bool` fields now only accept the boolean values `true`/`false` or the exact strings `'true'`/`'false'`. Any other value (e.g. `0`, `1`, `'0'`, `''`, or an arbitrary string) now throws instead of being coerced via `Boolean(value)`.
   - This fixes a signing footgun where a `bool` field supplied as the string `'false'` was encoded and signed as `true` (every non-empty string is truthy in JavaScript), while interfaces displaying the raw value showed `'false'`.
+- Add additional validation to EIP7702 methods ([#410](https://github.com/MetaMask/eth-sig-util/pull/410))
 
 ## [8.2.0]
 ### Added
