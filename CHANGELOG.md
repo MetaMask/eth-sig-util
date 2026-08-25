@@ -5,10 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [9.0.0]
 ### Changed
 - **BREAKING**: Reject ambiguous `bool` values in `signTypedData` (all versions) instead of coercing them ([#419](https://github.com/MetaMask/eth-sig-util/pull/419))
   - `bool` fields now only accept the boolean values `true`/`false` or the exact strings `'true'`/`'false'`. Any other value (e.g. `0`, `1`, `'0'`, `''`, or an arbitrary string) now throws instead of being coerced via `Boolean(value)`.
   - This fixes a signing footgun where a `bool` field supplied as the string `'false'` was encoded and signed as `true` (every non-empty string is truthy in JavaScript), while interfaces displaying the raw value showed `'false'`.
+- Add additional validation to EIP7702 methods ([#410](https://github.com/MetaMask/eth-sig-util/pull/410))
 
 ## [8.2.0]
 ### Added
@@ -179,7 +182,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v8.2.0...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v9.0.0...HEAD
+[9.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v8.2.0...v9.0.0
 [8.2.0]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.2...v8.2.0
 [8.1.2]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.1...v8.1.2
 [8.1.1]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.0...v8.1.1
