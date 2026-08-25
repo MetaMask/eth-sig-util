@@ -277,7 +277,7 @@ const encodeDataExamples = {
     MAX_SAFE_INTEGER_AS_HEX,
     MAX_SAFE_INTEGER_PLUS_ONE_CHAR_AS_HEX,
   ],
-  bool: [true, false, 'true', 'false', 0, 1, -1, Number.MAX_SAFE_INTEGER],
+  bool: [true, false, 'true', 'false'],
   bytes1: [
     '0x10', // even
     '0x101', // odd
@@ -319,6 +319,28 @@ const encodeDataErrorExamples = {
       input: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB0',
       errorMessage:
         'Unable to encode value: Invalid address value. Expected address to be 20 bytes long, but received 21 bytes.',
+    },
+  ],
+  bool: [
+    {
+      input: 0,
+      errorMessage:
+        'Unable to encode value: Invalid bool. Expected a boolean or the string "true" or "false", but received "0".',
+    },
+    {
+      input: 1,
+      errorMessage:
+        'Unable to encode value: Invalid bool. Expected a boolean or the string "true" or "false", but received "1".',
+    },
+    {
+      input: -1,
+      errorMessage:
+        'Unable to encode value: Invalid bool. Expected a boolean or the string "true" or "false", but received "-1".',
+    },
+    {
+      input: Number.MAX_SAFE_INTEGER,
+      errorMessage:
+        'Unable to encode value: Invalid bool. Expected a boolean or the string "true" or "false", but received "9007199254740991".',
     },
   ],
   int8: [
@@ -4298,7 +4320,7 @@ const signTypedDataV1Examples = {
     '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbBbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
     '0x0',
   ],
-  bool: [true, false, 'true', 'false', 0, 1, -1, Number.MAX_SAFE_INTEGER],
+  bool: [true, false, 'true', 'false'],
   bytes1: [
     '0x10',
     10,
@@ -4341,6 +4363,28 @@ const signTypedDataV1ErrorExamples = {
       // V1: Does not accept numbers as strings (arguably correctly).
       input: 10,
       errorMessage: 'Value must be a string.',
+    },
+  ],
+  bool: [
+    {
+      input: 0,
+      errorMessage:
+        'Unable to encode value: Invalid bool. Expected a boolean or the string "true" or "false", but received "0".',
+    },
+    {
+      input: 1,
+      errorMessage:
+        'Unable to encode value: Invalid bool. Expected a boolean or the string "true" or "false", but received "1".',
+    },
+    {
+      input: -1,
+      errorMessage:
+        'Unable to encode value: Invalid bool. Expected a boolean or the string "true" or "false", but received "-1".',
+    },
+    {
+      input: Number.MAX_SAFE_INTEGER,
+      errorMessage:
+        'Unable to encode value: Invalid bool. Expected a boolean or the string "true" or "false", but received "9007199254740991".',
     },
   ],
   address: [
@@ -4388,6 +4432,49 @@ const allSignTypedDataV1ExampleTypes = [
     ),
   ),
 ];
+
+describe('bool encoding', function () {
+  const encodeBool = (
+    value: unknown,
+    version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,
+  ) =>
+    TypedDataUtils.encodeData(
+      'Message',
+      { data: value },
+      { Message: [{ name: 'data', type: 'bool' }] },
+      version,
+    ).toString('hex');
+
+  const versions = [SignTypedDataVersion.V3, SignTypedDataVersion.V4] as const;
+
+  for (const version of versions) {
+    describe(`${version}`, function () {
+      it('encodes the string "false" the same as the boolean false', function () {
+        expect(encodeBool('false', version)).toBe(encodeBool(false, version));
+      });
+
+      it('encodes the string "false" differently from the boolean true', function () {
+        expect(encodeBool('false', version)).not.toBe(
+          encodeBool(true, version),
+        );
+      });
+
+      it('encodes the string "true" the same as the boolean true', function () {
+        expect(encodeBool('true', version)).toBe(encodeBool(true, version));
+      });
+
+      for (const value of [0, 1, -1, '0', '1', '', 'no', 'False', 'TRUE']) {
+        it(`rejects the ambiguous value "${value}" (type "${typeof value}")`, function () {
+          expect(() => encodeBool(value, version)).toThrow(
+            `Unable to encode value: Invalid bool. Expected a boolean or the string "true" or "false", but received "${String(
+              value,
+            )}".`,
+          );
+        });
+      }
+    });
+  }
+});
 
 describe('typedSignatureHash', function () {
   for (const type of allSignTypedDataV1ExampleTypes) {

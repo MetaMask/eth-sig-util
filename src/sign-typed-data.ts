@@ -181,6 +181,40 @@ function parseNumber(type: string, value: string | number | bigint) {
 }
 
 /**
+ * Normalize a value for the Solidity `bool` type. Only real booleans and the
+ * exact strings `'true'` and `'false'` are accepted; anything else is rejected.
+ *
+ * The previous `Boolean(value)` implementation was a signing footgun: every
+ * non-empty string is truthy, so a `bool` field supplied as the string
+ * `'false'` was signed as `true` while UIs stringifying the raw value displayed
+ * `'false'`. Rejecting ambiguous input keeps the signed value consistent with
+ * what was requested.
+ *
+ * @param value - The value to normalize.
+ * @returns The normalized boolean.
+ * @throws If the value is not a boolean or the string `'true'` or `'false'`.
+ */
+function normalizeBool(value: unknown): boolean {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  if (value === 'true') {
+    return true;
+  }
+
+  if (value === 'false') {
+    return false;
+  }
+
+  throw new Error(
+    `Unable to encode value: Invalid bool. Expected a boolean or the string "true" or "false", but received "${String(
+      value,
+    )}".`,
+  );
+}
+
+/**
  * Parse an address string to a `Uint8Array`. The behaviour of this is quite
  * strange, in that it does not parse the address as hexadecimal string, nor as
  * UTF-8. It does some weird stuff with the string and char codes, and then
@@ -271,7 +305,7 @@ function encodeField(
   }
 
   if (type === 'bool') {
-    return ['bool', Boolean(value)];
+    return ['bool', normalizeBool(value)];
   }
 
   if (type === 'bytes') {
@@ -615,7 +649,7 @@ function normalizeValue(type: string, value: unknown): any {
   }
 
   if (type === 'bool') {
-    return Boolean(value);
+    return normalizeBool(value);
   }
 
   if (type.startsWith('bytes') && type !== 'bytes') {
