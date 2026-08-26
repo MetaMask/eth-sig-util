@@ -45,6 +45,5 @@ jobs:
         with:
           release-type: ${{ github.event.inputs.release-type }}
           release-version: ${{ github.event.inputs.release-version }}
-          formatter: 'oxfmt'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
