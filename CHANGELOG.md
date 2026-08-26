@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [9.0.0]
 ### Changed
 - **BREAKING**: Drop support for Node.js versions 18 and 20 ([#422](https://github.com/MetaMask/eth-sig-util/pull/422))
   - The minimum supported Node.js version is now 22.
@@ -182,7 +184,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix package metadata ([#81](https://github.com/MetaMask/eth-sig-util/pull/81)
 - Switch from Node.js v8 to Node.js v10 ([#76](https://github.com/MetaMask/eth-sig-util/pull/77) and [#80](https://github.com/MetaMask/eth-sig-util/pull/80))
 
-[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v8.2.0...HEAD
+[Unreleased]: https://github.com/MetaMask/eth-sig-util/compare/v9.0.0...HEAD
+[9.0.0]: https://github.com/MetaMask/eth-sig-util/compare/v8.2.0...v9.0.0
 [8.2.0]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.2...v8.2.0
 [8.1.2]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.1...v8.1.2
 [8.1.1]: https://github.com/MetaMask/eth-sig-util/compare/v8.1.0...v8.1.1
