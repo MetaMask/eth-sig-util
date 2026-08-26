@@ -96,3 +96,30 @@ jobs:
             echo "Working tree dirty at end of job"
             exit 1
           fi
+
+  compatibility-test:
+    name: Compatibility test
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x, 24.x, 26.x]
+    steps:
+      - name: Checkout and setup environment
+        uses: MetaMask/action-checkout-and-setup@v3
+        with:
+          is-high-risk-environment: false
+          persist-credentials: false
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies via Yarn
+        run: rm yarn.lock && YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn
+      - run: yarn test
+      - name: Restore lockfile
+        run: git restore yarn.lock
+      - name: Require clean working directory
+        shell: bash
+        run: |
+          if ! git diff --exit-code; then
+            echo "Working tree dirty at end of job"
+            exit 1
+          fi

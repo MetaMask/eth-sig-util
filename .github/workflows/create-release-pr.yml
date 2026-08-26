@@ -8,8 +8,14 @@ on:
         default: 'main'
         required: true
       release-type:
-        description: 'A SemVer version diff, i.e. major, minor, patch, prerelease etc. Mutually exclusive with "release-version".'
+        description: 'A SemVer version diff, i.e. major, minor, or patch. Mutually exclusive with "release-version".'
         required: false
+        type: choice
+        options:
+          - ''
+          - major
+          - minor
+          - patch
       release-version:
         description: 'A specific version to bump to. Mutually exclusive with "release-type".'
         required: false
@@ -39,5 +45,6 @@ jobs:
         with:
           release-type: ${{ github.event.inputs.release-type }}
           release-version: ${{ github.event.inputs.release-version }}
+          formatter: 'oxfmt'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -23,8 +23,46 @@ jobs:
         run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/914e7df21a07ef503a81201c76d2b11c789d3fca/scripts/download-actionlint.bash) 1.7.12
         shell: bash
       - name: Check workflow files
-        run: ${{ steps.download-actionlint.outputs.executable }} -color
+        env:
+          ACTIONLINT_EXECUTABLE: ${{ steps.download-actionlint.outputs.executable }}
+        run: |
+          echo "::add-matcher::.github/actionlint-matcher.json"
+          "$ACTIONLINT_EXECUTABLE" -color
         shell: bash
+
+  analyse-code:
+    name: Analyse code
+    needs: check-workflows
+    uses: MetaMask/action-security-code-scanner/.github/workflows/security-scan.yml@v2
+    with:
+      scanner-ref: v2
+      paths-ignored: |
+        .storybook/
+        **/__snapshots__/
+        **/*.snap
+        **/*.stories.js
+        **/*.stories.tsx
+        **/*.test.browser.ts*
+        **/*.test.js*
+        **/*.test.ts*
+        **/fixtures/
+        **/jest.config.js
+        **/jest.environment.js
+        **/mocks/
+        **/test*/
+        docs/
+        e2e/
+        merged-packages/
+        node_modules/
+        storybook/
+        test*/
+    secrets:
+      project-metrics-token: ${{ secrets.SECURITY_SCAN_METRICS_TOKEN }}
+      slack-webhook: ${{ secrets.APPSEC_BOT_SLACK_WEBHOOK }}
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
 
   build-lint-test:
     name: Build, lint, and test
@@ -35,6 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - check-workflows
+      - analyse-code
       - build-lint-test
     permissions: {}
     outputs:
@@ -84,3 +123,4 @@ jobs:
     uses: ./.github/workflows/publish-release.yml
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

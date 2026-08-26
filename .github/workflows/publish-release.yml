@@ -5,6 +5,8 @@ on:
     secrets:
       NPM_TOKEN:
         required: false
+      SLACK_WEBHOOK_URL:
+        required: true
 
 permissions:
   contents: read
@@ -52,6 +54,8 @@ jobs:
         uses: MetaMask/action-npm-publish@v6
         with:
           dry-run: true
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          subteam: S042S7RE4AE # @metamask-npm-publishers
         env:
           SKIP_PREPACK: true
 
