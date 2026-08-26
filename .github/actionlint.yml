@@ -1,0 +1,9 @@
+# Please see the documentation for all configuration options:
+# https://github.com/rhysd/actionlint/blob/main/docs/config.md#configuration-file
+
+paths:
+  .github/workflows/create-release-pr.yml:
+    ignore:
+      # `create-release-pr` has an empty string value for the `release-type`
+      # input, which is intentional and valid.
+      - 'string should not be empty'

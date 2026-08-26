@@ -22,7 +22,7 @@ The full API documentation for the latest published version of this library is [
 
 - Install [Node.js](https://nodejs.org) version 22
   - If you are using [nvm](https://github.com/creationix/nvm#installation) (recommended) running `nvm use` will automatically choose the right node version for you.
-- Install [Yarn v3](https://yarnpkg.com/getting-started/install)
+- Install [Yarn v4](https://yarnpkg.com/getting-started/install)
 - Run `yarn install` to install dependencies and run any required post-install scripts
 
 ### Testing and Linting
