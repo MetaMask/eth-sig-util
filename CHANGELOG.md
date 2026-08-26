@@ -9,12 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [9.0.0]
 
-### Uncategorized
-
-- revert: un-release 9.0.0 ([#423](https://github.com/MetaMask/eth-sig-util/pull/423))
-- 9.0.0 ([#420](https://github.com/MetaMask/eth-sig-util/pull/420))
-- chore: add workflow_dispatch to security-code-scanner ([#411](https://github.com/MetaMask/eth-sig-util/pull/411))
-
 ### Changed
 
 - **BREAKING**: Drop support for Node.js versions 18 and 20 ([#422](https://github.com/MetaMask/eth-sig-util/pull/422))
