@@ -25,7 +25,8 @@ jobs:
   publish-to-gh-pages:
     name: Publish docs to `rc-${{ needs.get-release-version.outputs.release-version }}` directory of `gh-pages` branch
     permissions:
-      contents: write
+      contents: read
+      id-token: write
     uses: ./.github/workflows/publish-docs.yml
     needs: get-release-version
     with:
