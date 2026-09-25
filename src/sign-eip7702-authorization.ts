@@ -133,6 +133,7 @@ function validateEIP7702Authorization(authorization: EIP7702Authorization) {
 
   if (
     typeof chainId !== 'number' ||
+    !Number.isInteger(chainId) ||
     chainId >= 2 ** CHAIN_ID_MAX_BITLENGTH ||
     chainId < 0
   ) {
@@ -143,6 +144,7 @@ function validateEIP7702Authorization(authorization: EIP7702Authorization) {
 
   if (
     typeof nonce !== 'number' ||
+    !Number.isInteger(nonce) ||
     nonce >= 2 ** NONCE_MAX_BITLENGTH ||
     nonce < 0
   ) {
