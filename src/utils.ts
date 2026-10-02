@@ -51,7 +51,7 @@ export function padWithZeroes(hexString: string, targetLength: number): string {
  * @param value - The value being checked.
  * @returns Whether the value is nullish.
  */
-export function isNullish(value) {
+export function isNullish(value: unknown) {
   return value === null || value === undefined;
 }
 
