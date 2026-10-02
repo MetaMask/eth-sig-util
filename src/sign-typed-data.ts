@@ -358,8 +358,8 @@ function encodeField(
       );
     }
     const parsedType = type.slice(0, type.lastIndexOf('['));
-    const typeValuePairs = value.map((item: any) =>
-      encodeField(types, name, parsedType, item, version),
+    const typeValuePairs: ReturnType<typeof encodeField>[] = value.map(
+      (item: any) => encodeField(types, name, parsedType, item, version),
     );
     return [
       'bytes32',
@@ -527,9 +527,12 @@ function sanitizeData<T extends MessageTypes>(
   data: TypedMessage<T>,
 ): TypedMessage<T> {
   const sanitizedData: Partial<TypedMessage<T>> = {};
+  const copyProperty = <K extends keyof TypedMessage<T>>(key: K) => {
+    sanitizedData[key] = data[key];
+  };
   for (const key in TYPED_MESSAGE_SCHEMA.properties) {
-    if (data[key]) {
-      sanitizedData[key] = data[key];
+    if (data[key as keyof TypedMessage<T>]) {
+      copyProperty(key as keyof TypedMessage<T>);
     }
   }
 

@@ -242,7 +242,7 @@ const MAX_SAFE_INTEGER_PLUS_ONE_CHAR_AS_HEX = `0x${Number.MAX_SAFE_INTEGER.toStr
  even or odd number of characters 
  */
 
-const encodeDataExamples = {
+const encodeDataExamples: Record<string, unknown[]> = {
   // dynamic types supported by EIP-712:
   bytes: [
     10,
@@ -313,7 +313,10 @@ const encodeDataExamples = {
   // `function` type omitted because it is not supported by `ethereumjs-abi`.
 };
 
-const encodeDataErrorExamples = {
+const encodeDataErrorExamples: Record<
+  string,
+  { input: unknown; errorMessage: string }[]
+> = {
   address: [
     {
       input: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB0',
@@ -4304,7 +4307,7 @@ describe('TypedDataUtils.eip712Hash', function () {
 });
 
 // Comments starting with "V1:" highlight differences relative to V3 and 4.
-const signTypedDataV1Examples = {
+const signTypedDataV1Examples: Record<string, unknown[]> = {
   // dynamic types supported by EIP-712:
   bytes: [10, '10', '0x10', Buffer.from('10', 'utf8')],
   string: [
@@ -4357,7 +4360,10 @@ const signTypedDataV1Examples = {
   // `function` type omitted because it is not supported by `ethereumjs-abi`.
 };
 
-const signTypedDataV1ErrorExamples = {
+const signTypedDataV1ErrorExamples: Record<
+  string,
+  { input: unknown; errorMessage: string }[]
+> = {
   string: [
     {
       // V1: Does not accept numbers as strings (arguably correctly).
