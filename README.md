@@ -1,3 +1,5 @@
+<table><tr><td><p align="center"><b>⚠️ PLEASE READ ⚠️</b></p><p align="center">This package is currently being migrated to our <a href="https://github.com/MetaMask/core"><code>core</code></a> monorepo. Please do not make any commits to this repository while this migration is taking place, as they will not be transferred over. Also, please re-open PRs that are under active development in the <a href="https://github.com/MetaMask/core"><code>core</code></a> repo.</p></td></tr></table>
+
 # `@metamask/eth-sig-util`
 
 A small collection of Ethereum signing functions.
