@@ -118,6 +118,17 @@ describe('signAuthorization', () => {
       );
     });
 
+    it('should throw if chainId is NaN', () => {
+      expect(() =>
+        signEIP7702Authorization({
+          privateKey: TEST_PRIVATE_KEY,
+          authorization: [NaN, TEST_AUTHORIZATION[1], TEST_AUTHORIZATION[2]],
+        }),
+      ).toThrow(
+        'Invalid chainId: must be a non-negative number less than 2^256',
+      );
+    });
+
     it('should throw if chainId is negative', () => {
       expect(() =>
         signEIP7702Authorization({
@@ -151,6 +162,15 @@ describe('signAuthorization', () => {
             TEST_AUTHORIZATION[1],
             '123' as any as number,
           ],
+        }),
+      ).toThrow('Invalid nonce: must be a non-negative number less than 2^64');
+    });
+
+    it('should throw if nonce is NaN', () => {
+      expect(() =>
+        signEIP7702Authorization({
+          privateKey: TEST_PRIVATE_KEY,
+          authorization: [TEST_AUTHORIZATION[0], TEST_AUTHORIZATION[1], NaN],
         }),
       ).toThrow('Invalid nonce: must be a non-negative number less than 2^64');
     });
