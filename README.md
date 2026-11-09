@@ -1,4 +1,18 @@
-<table><tr><td><p align="center"><b>⚠️ PLEASE READ ⚠️</b></p><p align="center">This package is currently being migrated to our <a href="https://github.com/MetaMask/core"><code>core</code></a> monorepo. Please do not make any commits to this repository while this migration is taking place, as they will not be transferred over. Also, please re-open PRs that are under active development in the <a href="https://github.com/MetaMask/core"><code>core</code></a> repo.</p></td></tr></table>
+<table>
+  <tr>
+    <td>
+      <p align="center"><b>⚠️ PLEASE READ ⚠️</b></p>
+      <p align="center">
+        This package has been migrated to our
+        <a href="https://github.com/MetaMask/core"><code>core</code></a>
+        monorepo, and this repository has been archived. Please note that all
+        future development and feature releases will take place in the
+        <a href="https://github.com/MetaMask/core"><code>core</code></a>
+        repository.
+      </p>
+    </td>
+  </tr>
+</table>
 
 # `@metamask/eth-sig-util`
 
