@@ -1,8 +1,10 @@
 import {
   decrypt,
   decryptSafely,
+  decryptWithSharedSecret,
   encrypt,
   encryptSafely,
+  EthEncryptedData,
   getEncryptionPublicKey,
 } from './encryption';
 
@@ -71,6 +73,86 @@ describe('encryption', function () {
       privateKey: bob.ethereumPrivateKey,
     });
     expect(plaintext).toBe(secretMessage);
+  });
+
+  // shared secret decryption test
+  it('bob decrypts message that Alice sent to him with his shared secret', function () {
+    const encryptedDataWithHW: EthEncryptedData = {
+      version: 'x25519-xsalsa20-poly1305',
+      nonce: 'QjBaLWLlYeIDUcMjqUpDkIxoaBIck/lh',
+      ephemPublicKey: '/uwH3xIXDBG8ARritky4dSh9DXFNo1Jw2lSgq+Prdx0=',
+      ciphertext: 'pT7dEopOHWZgFQZ0cK2ia/9Ewz03xq6db/vU8glwg+deI4WiyP2lTY0s',
+    };
+    const sharedSecret = 'Pplxc07fb6IiXAmtDJ9ebL4KRGXF9qeic0ZmktOdHCk=';
+
+    const result = decryptWithSharedSecret({
+      encryptedData: encryptedDataWithHW,
+      sharedSecret,
+    });
+    expect(result).toBe(secretMessage);
+  });
+
+  it('bob decrypts invalid message that Alice sent to him with his shared secret', function () {
+    const encryptedDataWithHW: EthEncryptedData = {
+      version: 'x25519-xsalsa20-poly1305',
+      nonce: 'QjBaLWLlYeIDUcMjqUpDkIxoaBIck/lh',
+      ephemPublicKey: '/uwH3xIXDBG8ARritky4dSh9DXFNo1Jw2lSgq+Prdx0=',
+      ciphertext: 'pT7dEopOHWZgFQZ0cK2ia/9Ewz03xq6db/vU8glgg+deI4WiyP2lTY0s',
+    };
+    const sharedSecret = 'Pplxc07fb6IiXAmtDJ9ebL4KRGXF9qeic0ZmktOdHCk=';
+
+    expect(() =>
+      decryptWithSharedSecret({
+        encryptedData: encryptedDataWithHW,
+        sharedSecret,
+      }),
+    ).toThrow('Decryption failed.');
+  });
+
+  it('bob decrypts unknown version message that Alice sent to him with his shared secret', function () {
+    const encryptedDataWithHW: EthEncryptedData = {
+      version: 'x25519-xsalsa21-poly1305',
+      nonce: 'QjBaLWLlYeIDUcMjqUpDkIxoaBIck/lh',
+      ephemPublicKey: '/uwH3xIXDBG8ARritky4dSh9DXFNo1Jw2lSgq+Prdx0=',
+      ciphertext: 'pT7dEopOHWZgFQZ0cK2ia/9Ewz03xq6db/vU8glgg+deI4WiyP2lTY0s',
+    };
+    const sharedSecret = 'Pplxc07fb6IiXAmtDJ9ebL4KRGXF9qeic0ZmktOdHCk=';
+
+    expect(() =>
+      decryptWithSharedSecret({
+        encryptedData: encryptedDataWithHW,
+        sharedSecret,
+      }),
+    ).toThrow('Encryption type/version not supported.');
+  });
+
+  it('bob decrypts null encrypted that Alice sent to him with his shared secret', function () {
+    const encryptedDataWithHW: EthEncryptedData = null;
+    const sharedSecret = 'Pplxc07fb6IiXAmtDJ9ebL4KRGXF9qeic0ZmktOdHCk=';
+
+    expect(() =>
+      decryptWithSharedSecret({
+        encryptedData: encryptedDataWithHW,
+        sharedSecret,
+      }),
+    ).toThrow('Missing encryptedData parameter');
+  });
+
+  it('bob decrypts message that Alice sent to him with null shared secret', function () {
+    const encryptedDataWithHW: EthEncryptedData = {
+      version: 'x25519-xsalsa21-poly1305',
+      nonce: 'QjBaLWLlYeIDUcMjqUpDkIxoaBIck/lh',
+      ephemPublicKey: '/uwH3xIXDBG8ARritky4dSh9DXFNo1Jw2lSgq+Prdx0=',
+      ciphertext: 'pT7dEopOHWZgFQZ0cK2ia/9Ewz03xq6db/vU8glgg+deI4WiyP2lTY0s',
+    };
+    const sharedSecret = null;
+
+    expect(() =>
+      decryptWithSharedSecret({
+        encryptedData: encryptedDataWithHW,
+        sharedSecret,
+      }),
+    ).toThrow('Missing sharedSecret parameter');
   });
 
   // decryption test
